@@ -1,0 +1,781 @@
+body {
+  margin: 80px;
+  font-family: Arial, helvetica, "sans";
+}
+
+@media screen and (max-width: 899px) {
+  .exampwrap {
+    display: block;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(center center, circle cover, #c9c2b6, #7a726f);
+    background: -moz-radial-gradient(
+      center center,
+      circle cover,
+      #c9c2b6 0%,
+      #7a726f 100%
+    );
+    background: -webkit-radial-gradient(
+      center center,
+      circle cover,
+      #c9c2b6 0%,
+      #7a726f 100%
+    );
+  }
+
+  .iinfo {
+    display: none;
+  }
+
+  .toggler {
+    display: none;
+  }
+
+  .ibody {
+    display: block;
+    margin-top: 0px;
+    height: 500px;
+    width: 250px;
+    background-color: black;
+    border-radius: 30px;
+    text-align: center;
+    margin-left: 20px;
+  }
+
+  .itabletbody {
+    display: block;
+    margin-top: 0px;
+    height: 500px;
+    width: 700px;
+    background-color: black;
+    border-radius: 30px;
+    text-align: center;
+    margin-left: 20px;
+  }
+
+  .itop {
+    position: absolute;
+    display: inline-block;
+    height: 5px;
+    width: 100%;
+  }
+
+  .itablettop {
+    position: absolute;
+    display: inline-block;
+    height: 10px;
+    width: 100%;
+  }
+
+  .iear {
+    margin: auto;
+    display: inline-block;
+    width: 121px;
+    height: 22px;
+    background-color: rgb(0, 0, 0);
+    margin-top: 4px;
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+  }
+
+  .imiddle {
+    margin: auto;
+    display: inline-block;
+    height: 480px;
+    width: 100%;
+    margin-top: 8px;
+  }
+
+  .itabletmiddle {
+    margin: auto;
+    display: inline-block;
+    height: 510px;
+    width: 100%;
+    margin-top: 15px;
+  }
+
+  .icontent {
+    display: block;
+    margin: auto;
+    height: 485px;
+    width: 235px;
+    background-color: rgba(76, 76, 76, 0.42);
+    overflow: hidden;
+    border-radius: 25px;
+  }
+
+  .itabletcontent {
+    display: block;
+    margin: auto;
+    height: 495px;
+    width: 670px;
+    background-color: rgba(76, 76, 76, 0.42);
+    overflow: hidden;
+    border-radius: 15px;
+  }
+
+  .cont {
+    width: 100%;
+    height: 480px;
+    border: 0px;
+  }
+
+  .itabletcont {
+    width: 100%;
+    height: 457px;
+    border: 0px;
+  }
+
+  .ibottom {
+    width: 100%;
+    height: 40px;
+    /* display: block; */
+    display: none;
+    text-align: center;
+    /* box-shadow */
+  }
+
+  .ihomebutton {
+    display: inline-block;
+    margin-top: 5px;
+    width: 30px;
+    height: 30px;
+    border-radius: 40px;
+    background-color: rgba(134, 134, 134, 0.35);
+  }
+
+  .ccont {
+    display: none;
+  }
+}
+
+@media screen and (min-width: 900px) {
+  .exampwrap {
+    display: block;
+    margin: auto;
+    height: 100%;
+    width: 100%;
+    background: radial-gradient(center center, circle cover, #c9c2b6, #7a726f);
+    background: -moz-radial-gradient(
+      center center,
+      circle cover,
+      #c9c2b6 0%,
+      #7a726f 100%
+    );
+    background: -webkit-radial-gradient(
+      center center,
+      circle cover,
+      #c9c2b6 0%,
+      #7a726f 100%
+    );
+    /* background: #f3f3f3; */
+    border-radius: 25px;
+    overflow: hidden;
+    box-shadow: 2px 2px 15px 10px rgba(1, 1, 1, 0.1);
+  }
+
+  .iinfo {
+    display: block;
+    width: 200px;
+    height: 55px;
+    background: gray;
+    color: white;
+    border-radius: 10px;
+    margin-right: auto;
+    margin-left: auto;
+    margin-top: -150px;
+    box-shadow: 1px 1px 10px 2px rgba(1, 1, 1, 0.4);
+  }
+
+  .iinfo p {
+    margin: auto;
+    text-align: center;
+    font-size: 18px;
+  }
+
+  .ibody {
+    display: inline-block;
+    margin-top: -175px;
+    height: 524px;
+    width: 250px;
+    background-color: black;
+    border-radius: 30px;
+    text-align: center;
+    margin-left: 20px;
+  }
+
+  .itabletbody {
+    display: inline-block;
+    margin-top: -175px;
+    height: 524px;
+    width: 700px;
+    background-color: black;
+    border-radius: 30px;
+    text-align: center;
+    margin-left: 10px;
+  }
+
+  .isafarilink {
+    position: absolute;
+    font-family: monospace;
+    font-weight: 700;
+    font-size: 10px;
+    margin-left: 40px;
+    margin-top: 35px;
+    width: 170px;
+  }
+
+  .itabletsafarilink {
+    position: absolute;
+    font-family: monospace;
+    font-weight: 700;
+    font-size: 10px;
+    margin-left: 223px;
+    margin-top: 18px;
+    width: 255px;
+    text-align: center;
+  }
+
+  .ipcsafarilink {
+    position: absolute;
+    font-family: monospace;
+    font-weight: 700;
+    font-size: 5px;
+    margin-left: 170px;
+    margin-top: 5px;
+    width: 165px;
+    text-align: center;
+    z-index: 2;
+  }
+
+  .toggler {
+    display: none;
+  }
+
+  .entph {
+    cursor: pointer;
+  }
+
+  @keyframes phonegrab {
+    from {
+      border: 0px rgb(188, 188, 188) solid;
+      border-top: 4px rgb(188, 188, 188) solid;
+      transform: rotateX(60deg) rotateY(0deg) rotateZ(-5deg) scale(0.4);
+      box-shadow: -2px 2px 2px 2px rgb(188, 188, 188),
+        -7px 7px rgb(188, 188, 188), -12px 12px rgb(188, 188, 188),
+        -12px 12px 5px rgba(152, 152, 152, 0.86);
+    }
+    to {
+      border: 2px rgb(188, 188, 188) solid;
+      border-top: 0px rgb(188, 188, 188) solid;
+      transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg) scale(1);
+      box-shadow: 0px 0px 0px 0px rgb(188, 188, 188), 0px 0px rgb(188, 188, 188),
+        0px 0px rgb(188, 188, 188), 0px 0px 0px rgba(152, 152, 152, 0.86);
+      position: relative;
+      z-index: 2;
+      margin-top: -350px;
+    }
+  }
+
+  @keyframes phoneungrab {
+    from {
+      border: 2px rgb(188, 188, 188) solid;
+      border-top: 0px rgb(188, 188, 188) solid;
+      transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg) scale(1);
+      box-shadow: 0px 0px 0px 0px rgb(188, 188, 188), 0px 0px rgb(188, 188, 188),
+        0px 0px rgb(188, 188, 188), 0px 0px 0px rgba(152, 152, 152, 0.86);
+    }
+    to {
+      border: 0px rgb(188, 188, 188) solid;
+      border-top: 4px rgb(188, 188, 188) solid;
+      transform: rotateX(60deg) rotateY(0deg) rotateZ(-5deg) scale(0.4);
+      box-shadow: -2px 2px 2px 2px rgb(188, 188, 188),
+        -2px 2px rgb(188, 188, 188), -2px 12px rgb(188, 188, 188),
+        -4px 4px 4px rgba(152, 152, 152, 0.86);
+    }
+  }
+
+  #phoneint:checked + .ibody {
+    animation: 1s phonegrab forwards;
+  }
+
+  #phoneint:not(:checked) + .ibody {
+    animation: 1s phoneungrab forwards;
+  }
+
+  @keyframes itabletgrab {
+    from {
+      border: 0px rgb(188, 188, 188) solid;
+      border-top: 4px rgb(188, 188, 188) solid;
+      transform: rotateX(60deg) rotateY(0deg) rotateZ(-5deg) scale(0.4);
+      box-shadow: -2px 2px 2px 2px rgb(188, 188, 188),
+        -7px 7px rgb(188, 188, 188), -12px 12px rgb(188, 188, 188),
+        -12px 12px 5px rgba(152, 152, 152, 0.86);
+    }
+    to {
+      border: 2px rgb(188, 188, 188) solid;
+      border-top: 0px rgb(188, 188, 188) solid;
+      transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg) scale(1);
+      box-shadow: 0px 0px 0px 0px rgb(188, 188, 188), 0px 0px rgb(188, 188, 188),
+        0px 0px rgb(188, 188, 188), 0px 0px 0px rgba(152, 152, 152, 0.86);
+      position: relative;
+      z-index: 2;
+      margin-top: -350px;
+    }
+  }
+
+  @keyframes itabletungrab {
+    from {
+      border: 2px rgb(188, 188, 188) solid;
+      border-top: 0px rgb(188, 188, 188) solid;
+      transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg) scale(1);
+      box-shadow: 0px 0px 0px 0px rgb(188, 188, 188), 0px 0px rgb(188, 188, 188),
+        0px 0px rgb(188, 188, 188), 0px 0px 0px rgba(152, 152, 152, 0.86);
+    }
+    to {
+      border: 0px rgb(188, 188, 188) solid;
+      border-top: 4px rgb(188, 188, 188) solid;
+      transform: rotateX(60deg) rotateY(0deg) rotateZ(-5deg) scale(0.4);
+      box-shadow: -2px 2px 2px 2px rgb(188, 188, 188),
+        -2px 2px rgb(188, 188, 188), -2px 12px rgb(188, 188, 188),
+        -4px 4px 4px rgba(152, 152, 152, 0.86);
+    }
+  }
+
+  #itabletint:checked + .itabletbody {
+    animation: 1s itabletgrab forwards;
+  }
+
+  #itabletint:not(:checked) + .itabletbody {
+    animation: 1s itabletungrab forwards;
+  }
+
+  @keyframes pcgrab {
+    from {
+    }
+    to {
+      transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg) scale(3);
+      text-align: center;
+      justify-content: center;
+      margin-top: 440px;
+      width: 500px;
+    }
+  }
+
+  @keyframes pcungrab {
+    from {
+      transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg) scale(3);
+    }
+    to {
+    }
+  }
+
+  #pcint:checked + .cbody {
+    animation: 1s pcgrab forwards;
+  }
+
+  #pcint:not(:checked) + .cbody {
+    animation: 1s pcungrab forwards;
+  }
+
+  .itop {
+    position: absolute;
+    display: inline-block;
+    height: 5px;
+    width: 100%;
+  }
+
+  .itablettop {
+    position: absolute;
+    display: inline-block;
+    height: 10px;
+    width: 100%;
+  }
+
+  .iear {
+    margin: auto;
+    display: inline-block;
+    width: 121px;
+    height: 22px;
+    background-color: rgb(0, 0, 0);
+    margin-top: 4px;
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+  }
+
+  .iear1 {
+    width: 10px;
+    display: inline-block;
+  }
+
+  .iear2 {
+    height: 5px;
+    width: 45px;
+    background-color: rgba(113, 112, 112, 0.9);
+    display: inline-block;
+    border-radius: 10px;
+  }
+
+  .iear3 {
+    height: 10px;
+    width: 10px;
+    background-color: #071e2b;
+    display: inline-block;
+    border-radius: 25px;
+  }
+
+  .imiddle {
+    margin: auto;
+    display: inline-block;
+    height: 485px;
+    width: 100%;
+    margin-top: 8px;
+  }
+
+  .itabletmiddle {
+    margin: auto;
+    display: inline-block;
+    height: 510px;
+    width: 100%;
+    margin-top: 15px;
+  }
+
+  .icontent {
+    display: block;
+    margin: auto;
+    height: 508px;
+    width: 235px;
+    background: url("../img/isafari.png");
+    background-size: cover;
+    /* background-color: rgba(76, 76, 76, 0.42); */
+    overflow: hidden;
+    /* border-radius: 25px; */
+  }
+
+  .itabletcontent {
+    display: block;
+    margin: auto;
+    height: 495px;
+    width: 670px;
+    background: url("../img/itabletsafari.png");
+    background-size: cover;
+    /* background-color: rgba(76, 76, 76, 0.42); */
+    overflow: hidden;
+    border-radius: 15px;
+  }
+
+  .cont {
+    width: 100%;
+    height: 398px;
+    border: 0px;
+    margin-top: 59px;
+  }
+
+  .itabletcont {
+    width: 100%;
+    height: 457px;
+    border: 0px;
+    margin-top: 38px;
+  }
+
+  .ibottom {
+    width: 100%;
+    height: 40px;
+    /* display: block; */
+    display: none;
+    text-align: center;
+    /* box-shadow */
+  }
+
+  .itabletbottom {
+    width: 100%;
+    height: 40px;
+    /* display: block; */
+    display: none;
+    text-align: center;
+    /* box-shadow */
+  }
+
+  .ihomebutton {
+    display: inline-block;
+    margin-top: 5px;
+    width: 30px;
+    height: 30px;
+    border-radius: 40px;
+    background-color: rgba(134, 134, 134, 0.35);
+  }
+
+  /* Start Computer*/
+
+  .cbody {
+    position: relative;
+    z-index: 1;
+    margin: auto;
+    display: inline-block;
+    height: 500px;
+    width: 500px;
+    text-align: center;
+    margin-top: 50px;
+  }
+  .cmain {
+    height: 300px;
+    border-top-right-radius: 25px;
+    border-top-left-radius: 25px;
+    background-color: black;
+  }
+  .ctop {
+    display: inline-block;
+    width: 100%;
+  }
+
+  .ccontentwrap {
+    display: inline-block;
+    margin-top: 25px;
+    width: 460px;
+    height: 250px;
+    background-color: rgba(76, 76, 76, 0.42);
+    text-align: center;
+  }
+
+  .ccontent {
+    width: 2565px;
+    height: 1390px;
+    background: url("../img/ipcsafari.png");
+    background-size: cover;
+    -webkit-transform-origin: 0 0;
+    transform-origin: 0 0;
+    transform: scale(0.18);
+  }
+
+  .ccont {
+    height: 1300px;
+    width: 100%;
+    margin-top: 92px;
+    border: 0px;
+  }
+
+  .cbottom {
+    height: 50px;
+    border-bottom-right-radius: 25px;
+    border-bottom-left-radius: 25px;
+    background: linear-gradient(
+      35deg,
+      rgb(114, 114, 114),
+      rgb(197, 197, 197),
+      rgb(218, 218, 218)
+    );
+    border-bottom: 1px solid rgb(92, 91, 91);
+  }
+
+  .cleg {
+    display: inline-block;
+    vertical-align: top;
+    width: 100px;
+    height: 50px;
+    background: linear-gradient(
+      0deg,
+      rgb(114, 114, 114),
+      rgb(255, 255, 255),
+      rgb(197, 197, 197),
+      rgb(114, 114, 114)
+    );
+    -webkit-clip-path: polygon(10% 0%, 90% 0%, 100% 100%, 0% 100%);
+    clip-path: polygon(10% 0%, 90% 0%, 100% 100%, 0% 100%);
+  }
+
+  .cfoot {
+    display: inline-block;
+    vertical-align: top;
+    width: 130px;
+    height: 20px;
+    background: linear-gradient(
+      0deg,
+      rgb(197, 197, 197),
+      rgb(197, 197, 197),
+      rgb(114, 114, 114)
+    );
+    -webkit-clip-path: polygon(5% 0%, 95% 0%, 100% 100%, 0% 100%);
+    clip-path: polygon(12% 0%, 88% 0%, 100% 100%, 0% 100%);
+    border-bottom-right-radius: 45px;
+    border-bottom-left-radius: 55px;
+    border-bottom: 2px solid rgb(114, 114, 114);
+  }
+
+  /*keyboard*/
+
+  .keybody {
+    display: inline-block;
+    width: 295px;
+    height: 140px;
+    background: linear-gradient(
+      90deg,
+      rgb(114, 114, 114),
+      rgb(197, 197, 197),
+      rgb(218, 218, 218)
+    );
+    border-radius: 10px;
+    padding: 8px;
+    transform: rotateX(55deg) rotateY(0deg) rotateZ(0deg);
+    border-bottom: 3px solid rgb(76, 76, 76);
+    border-right: 0.5px rgb(76, 76, 76);
+    box-shadow: -2px -1px 4px 0px rgba(0, 0, 0, 0.3);
+  }
+
+  .keyr {
+    width: 100%;
+    height: 20px;
+    margin-left: 10px;
+  }
+
+  .keyc1 {
+    height: 8px;
+    width: 10px;
+    background: white;
+    border-radius: 3px;
+    box-shadow: 5px 0px white, 45px 0px white, 30px 0px white, 45px 0px white,
+      60px 0px white, 75px 0px white, 90px 0px white, 105px 0px white,
+      120px 0px white, 135px 0px white, 150px 0px white, 165px 0px white,
+      180px 0px white, 195px 0px white, 220px 0px white, 250px 0px white,
+      240px 100px white, 240px 109px white, 229px 109px white, 251px 109px white;
+  }
+
+  .keyc2 {
+    height: 15px;
+    width: 15px;
+    background: white;
+    border-radius: 4px;
+    box-shadow: 18px 0px white, 36px 0px white, 54px 0px white, 72px 0px white,
+      90px 0px white, 108px 0px white, 126px 0px white, 144px 0px white,
+      162px 0px white, 180px 0px white, 198px 0px white, 216px 0px white,
+      234px 0px white, 240px 0px white, 246px 0px white, 0px 20px white,
+      5px 20px white, 25px 20px white, 43px 20px white, 62px 20px white,
+      81px 20px white, 99px 20px white, 117px 20px white, 135px 20px white,
+      153px 20px white, 171px 20px white, 190px 20px white, 208px 20px white,
+      225px 20px white, 242px 20px white, 246px 20px white, 0px 40px white,
+      10px 40px white, 30px 40px white, 50px 40px white, 70px 40px white,
+      90px 40px white, 110px 40px white, 130px 40px white, 148px 40px white,
+      167px 40px white, 185px 40px white, 202px 40px white, 220px 40px white,
+      238px 40px white, 246px 40px white, 0px 60px white, 10px 60px white,
+      21px 60px white, 41px 60px white, 61px 60px white, 81px 60px white,
+      100px 60px white, 120px 60px white, 138px 60px white, 156px 60px white,
+      174px 60px white, 191px 60px white, 208px 60px white, 226px 60px white,
+      236px 60px white, 246px 60px white, 0px 80px white, 18px 80px white,
+      36px 80px white, 55px 80px white, 58px 80px white, 78px 80px white,
+      85px 80px white, 95px 80px white, 105px 80px white, 115px 80px white,
+      125px 80px white, 135px 80px white, 145px 80px white, 155px 80px white,
+      162px 80px white, 183px 80px white, 187px 80px white, 205px 80px white;
+  }
+
+  /*Plant */
+  .plantwrap {
+    display: inline-block;
+    position: relative;
+    width: 50px;
+    height: 260px;
+    text-align: center;
+    transform: translate(80px, 40px);
+  }
+
+  .plantbase {
+    display: inline-block;
+    margin-top: 35px;
+    width: 0px;
+    height: 0px;
+    border-left: 15px solid transparent;
+    border-right: 15px solid transparent;
+    border-bottom: 100px solid rgba(129, 156, 193, 0.4);
+    box-shadow: 0px 0px 1px 4px rgba(186, 186, 186, 0.5);
+    background-color: rgba(154, 179, 210, 0.6);
+    border-radius: 8px;
+    transform: translate(-10px, -175px);
+  }
+
+  .plant {
+    display: inline-block;
+    width: 10px;
+    height: 230px;
+    background: green;
+    border-radius: 3px;
+  }
+
+  .plantleaf {
+    display: inline-block;
+    width: 10px;
+    height: 30px;
+    background-color: rgb(58, 201, 58);
+    border-top-right-radius: 50px;
+    border-bottom-left-radius: 50px;
+    transform: translate(6px, -5px) rotate(-30deg);
+  }
+
+  .plantleaf:nth-child(2) {
+    transform: translate(-12px, -30px) rotateY(180deg) rotate(-30deg);
+    background-color: rgb(57, 169, 57);
+  }
+
+  .plantleaf:nth-child(3) {
+    transform: translate(4px, -30px) rotate(-10deg);
+  }
+
+  .plantleaf:nth-child(4) {
+    transform: translate(-10px, -55px) rotateX(20deg) rotateY(180deg)
+      rotate(-10deg);
+    background-color: rgb(57, 169, 57);
+  }
+
+  .plantleaf:nth-child(5) {
+    transform: translate(4px, -30px) rotate(-10deg);
+  }
+
+  .plantleaf:nth-child(6) {
+    transform: translate(-10px, -75px) rotateX(20deg) rotateY(180deg)
+      rotate(-10deg);
+    background-color: rgb(57, 169, 57);
+  }
+
+  .plantrock {
+    display: inline-block;
+    width: 15px;
+    height: 18px;
+    background-color: rgb(115, 115, 115);
+    border-radius: 50%;
+    transform: translate(6px, -5px) rotate(-0deg);
+  }
+
+  .plantrock:nth-child(8) {
+    transform: translate(-8px, -24px) rotateY(180deg) rotate(-90deg);
+    background-color: rgb(75, 75, 75);
+  }
+
+  .plantrock:nth-child(9) {
+    transform: translate(5px, -34px) rotate(30deg);
+    background-color: rgb(175, 171, 171);
+  }
+
+  .plantrock:nth-child(10) {
+    transform: translate(-7px, -54px) rotate(-50deg);
+    background-color: rgb(35, 42, 73);
+  }
+
+  .plantrock:nth-child(11) {
+    transform: translate(-8px, -104px) rotate(-50deg);
+    background-color: rgb(35, 42, 73);
+  }
+
+  /*table*/
+  .filler1 {
+    width: 100%;
+    height: 530px;
+    text-align: center;
+  }
+
+  .filler2 {
+    margin-top: -115px;
+    width: 100%;
+    height: 230px;
+    background: url(../img/desktexture.jpg);
+    background-position: center;
+    /* background: #cc843f; */
+    box-shadow: 0px 40px #675d51, 0px 100px 110px #3e3e3e;
+  }
+}

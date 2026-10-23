@@ -632,7 +632,7 @@ async function init() {
   const screens = {};
   root.traverse(o => {
     if (!o.isMesh) return;
-    if (o.material.name === "W_Screen_iMac") screens.imac = { mesh: o, w: 1.16, h: 0.33, normal: new THREE.Vector3(0, 0, 1) };
+    if (o.material.name === "W_Screen_iMac") screens.imac = { mesh: o, w: 1.16, h: 0.33, normal: new THREE.Vector3(0, 0, 1), curved: true };
     if (o.material.name === "W_Screen_Left") {
       const n = new THREE.Vector3().fromBufferAttribute(o.geometry.attributes.normal, 0).transformDirection(o.matrixWorld).normalize();
       screens.tablet = { mesh: o, w: 0.6, h: 0.338, normal: n };
@@ -655,7 +655,7 @@ async function init() {
     camera.position.copy(eye); camLook.copy(c); camera.lookAt(camLook);
     screenMesh.visible = false;  // arayüz ekranın yerini alır; alttaki doku arkadan sızmasın
     renderer.render(scene, camera);
-    return { rect: () => rectOfMesh(screenMesh) };
+    return { rect: () => rectOfMesh(screenMesh), flat: !!sc.curved };
   });
   Devices.onClose(async () => {
     drop();

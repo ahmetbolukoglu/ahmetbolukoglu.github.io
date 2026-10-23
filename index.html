@@ -454,7 +454,25 @@
     .stage.embed .device { position: fixed; max-height: none; transform-origin: center; }
     .dev-imac.embed .imac-chin, .dev-imac.embed .imac-stand { display: none; }
     .dev-imac.embed .imac-screen { height: 100%; border: 0; border-radius: 2px; box-shadow: 0 0 60px -10px rgba(94,234,212,.35); }
-    .dev-imac.embed .screen-body > .wrap { padding: 20px 24px; }
+    .stage.embed .device { overflow: hidden; }
+    /* ultrawide yakından: 3D monitör yerinde kalır, düz ekran üstüne oturur; çerçeve monitörün siyahıyla aynı */
+    .stage.embed .device.flat { border-radius: 4px; box-shadow: 0 0 0 16px #0b0a14, 0 30px 80px -24px rgba(94,234,212,.3); }
+    .dev-imac.embed .screen-body > .wrap { padding: 18px 26px; }
+    /* ultrawide (32:9, 1600 px): yatay düzen, sekmenin başlığı yeterli */
+    .dev-imac.embed .sec-head, .dev-tablet.embed .os-app .sec-head .cmd { display: none; }
+    .dev-imac.embed .about-grid { grid-template-columns: 1.55fr 1fr; gap: 20px; align-items: start; }
+    .dev-imac.embed .code { padding: 14px 0; }
+    .dev-imac.embed .code .s { font-size: 15px; line-height: 1.6; }
+    .dev-imac.embed .stats { gap: 12px; }
+    .dev-imac.embed .stat { padding: 16px; } .dev-imac.embed .stat .n { font-size: 34px; }
+    .dev-imac.embed .skill-filter { margin-bottom: 14px; }
+    .dev-imac.embed .skills-grid { grid-template-columns: repeat(5, 1fr); gap: 12px; }
+    .dev-imac.embed .skill-card { padding: 14px; }
+    .dev-imac.embed .skill-card .desc { display: none; }
+    .dev-imac.embed .skill-card h4 { margin-bottom: 8px; }
+    .dev-imac.embed .skill-card .chips { gap: 4px; margin-top: 0; }
+    .dev-imac.embed .skill-card .chip { font-size: 11px; padding: 2px 7px; }
+    .dev-imac.embed .wrap[data-part="terminal"] .term-body { height: calc(var(--vh, 520px) - 42px - 36px - 46px - 52px); }
     .dev-tablet.embed { padding: 0; border-radius: 2px; background: none; box-shadow: 0 0 60px -10px rgba(96,165,250,.4); }
     .dev-tablet.embed .tab-screen { border-radius: 2px; }
 
@@ -465,16 +483,8 @@
       background: var(--bg); border: 14px solid #07060f; border-bottom-width: 18px; border-radius: 20px 20px 0 0;
       box-shadow: 0 0 90px -10px rgba(94,234,212,.35);
     }
-    .vs-bar { display: flex; align-items: center; gap: 12px; height: 42px; flex-shrink: 0; padding-left: 12px; background: var(--bg-2); border-bottom: 1px solid var(--line); }
     .dots { display: flex; gap: 6px; } .dots i { width: 11px; height: 11px; border-radius: 50%; background: #ff5f57; }
     .dots i:nth-child(2) { background: #febc2e; } .dots i:nth-child(3) { background: #28c840; }
-    .vs-tabs { display: flex; height: 100%; overflow-x: auto; scrollbar-width: none; }
-    .vs-tabs button {
-      font: 13px var(--mono); color: var(--muted); background: none; cursor: pointer; white-space: nowrap;
-      border: 0; border-right: 1px solid var(--line); border-top: 2px solid transparent; padding: 0 16px;
-    }
-    .vs-tabs button:hover { color: var(--text); }
-    .vs-tabs button[aria-selected="true"] { color: var(--text); background: var(--bg); border-top-color: var(--cyan); }
     .imac-chin { height: 46px; flex-shrink: 0; display: grid; place-items: center; background: linear-gradient(#d4d7e0, #a3a8b6); border-radius: 0 0 20px 20px; }
     .imac-chin span { font: 700 16px var(--mono); color: #4b5060; }
     .imac-stand { width: 150px; height: 52px; margin: 0 auto; flex-shrink: 0; background: linear-gradient(90deg, #8e93a1, #c6c9d3 50%, #8e93a1); clip-path: polygon(22% 0, 78% 0, 92% 100%, 8% 100%); }
@@ -516,6 +526,88 @@
     .dev-phone .mail-box a { font-size: 13px; padding: 12px; }
     .dev-phone .mail-box button { border-left: 0; border-top: 1px solid var(--line); padding: 12px; }
     .dev-phone .socials { display: none; }
+    .app { background: none; border: 0; cursor: pointer; font-family: var(--sans); }
+    .ph-home { display: block; border: 0; padding: 0; cursor: pointer; }
+    .ph-app { flex: 1; min-height: 0; display: flex; flex-direction: column; background: var(--bg); }
+    /* uygulama geçişleri (telefon ve monitörler) */
+    .os-app:not([hidden]) { animation: appIn .34s cubic-bezier(.2,.8,.2,1); transform-origin: 50% 60%; }
+    .os-home:not([hidden]) { animation: homeIn .26s ease-out; }
+    @keyframes appIn { from { opacity: 0; transform: scale(.9) translateY(10px); } }
+    @keyframes homeIn { from { opacity: 0; transform: scale(1.04); } }
+    @media (prefers-reduced-motion: reduce) { .os-app:not([hidden]), .os-home:not([hidden]) { animation: none; } }
+    .os { position: relative; }
+    .os .os-home { position: relative; overflow: hidden; }
+    .os .os-app { flex: 1; min-height: 0; display: flex; flex-direction: column; background: var(--bg); }
+    .os .os-app[hidden], .os .os-home[hidden] { display: none; }
+    .os-bar { display: flex; align-items: center; gap: 10px; height: 42px; padding: 0 12px; flex-shrink: 0; background: var(--bg-2); border-bottom: 1px solid var(--line); }
+    .os-bar b { font: 500 13px var(--mono); color: var(--text); }
+    .os-back { font: 26px/1 var(--sans); color: var(--cyan); background: none; border: 0; cursor: pointer; padding: 0 6px 3px; }
+    .os-bar .dots i:first-child { cursor: pointer; }
+    .os .app.desk { width: 96px; color: #e8e6f5; font: 12px var(--mono); text-shadow: 0 1px 4px rgba(0,0,0,.7); padding: 8px 4px; border-radius: 10px; }
+    .os .app.desk:hover { background: rgba(255,255,255,.08); }
+    .os .app.desk i { width: 52px; height: 52px; border-radius: 14px; }
+    /* ultrawide masaüstü: koyu duvar kâğıdı, sol üstte dosyalar, sağda karşılama, altta dock */
+    .os-uw .os-home { flex: 1; min-height: 0; }
+    .os-uw { box-sizing: border-box; background: radial-gradient(900px 420px at 72% 30%, rgba(167,139,250,.28), transparent 60%), radial-gradient(700px 400px at 15% 90%, rgba(94,234,212,.18), transparent 60%), linear-gradient(135deg, #0d0b22, #15123a); }
+    .os-uw .os-home::before { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(0deg, rgba(255,255,255,.025) 0 1px, transparent 1px 32px), repeating-linear-gradient(90deg, rgba(255,255,255,.025) 0 1px, transparent 1px 32px); pointer-events: none; }
+    .os-uw .os-icons { position: absolute; left: 24px; top: 20px; display: grid; grid-auto-flow: column; grid-template-rows: repeat(3, auto); gap: 6px 10px; }
+    .os-widget { position: absolute; right: 40px; top: 40px; width: 380px; padding: 24px; border-radius: 20px; background: rgba(21,19,46,.7); border: 1px solid var(--line); backdrop-filter: blur(8px); }
+    .os-widget span { font: 300 64px/1 var(--sans); color: #fff; }
+    .os-widget b { display: block; font: 700 26px var(--sans); margin: 12px 0 4px; background: linear-gradient(90deg, var(--cyan), var(--violet), var(--pink)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .os-widget p { color: var(--muted); font-size: 14px; }
+    .os-dock { position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); display: flex; gap: 8px; padding: 8px 12px; border-radius: 20px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.12); backdrop-filter: blur(10px); }
+    .os-dock .app { font-size: 0; gap: 0; }
+    .os-dock .app i { width: 50px; height: 50px; border-radius: 14px; transition: transform .15s; }
+    .os-dock .app:hover i { transform: translateY(-6px) scale(1.12); }
+    /* sol monitör: Windows benzeri masaüstü, solda simgeler, altta görev çubuğu */
+    .os-win .os-home { flex: 1; min-height: 0; background: radial-gradient(60% 70% at 58% 58%, #7dd3fc 0%, #1d4ed8 38%, #0b1340 78%); }
+    .os-win .os-icons { position: absolute; left: 16px; top: 16px; display: grid; gap: 6px; }
+    .os-taskbar { position: absolute; left: 0; right: 0; bottom: 0; height: 48px; display: flex; align-items: center; justify-content: center; gap: 6px; background: rgba(15,23,42,.88); backdrop-filter: blur(10px); }
+    .os-taskbar .app { font-size: 0; gap: 0; } .os-taskbar .app i { width: 36px; height: 36px; border-radius: 9px; font-size: 18px; }
+    .os-start { font-size: 24px; color: #7dd3fc; margin-right: 6px; }
+    .os-clock { position: absolute; right: 16px; font: 13px var(--sans); color: #e5e7eb; }
+    .os-win .os-bar { background: #f3f4f6; border-bottom-color: #e5e7eb; } .os-win .os-bar b { color: #111827; } .os-win .os-back { color: #2563eb; }
+    .os-winbtn { margin-left: auto; color: #6b7280; font: 14px var(--sans); letter-spacing: 8px; cursor: pointer; }
+    .dev-tablet:not(.embed) .tab-screen.os { min-height: 520px; }
+    .ph-app[hidden] { display: none; }
+    .ph-appbar { display: flex; align-items: center; gap: 6px; padding: 6px 10px; border-bottom: 1px solid var(--line); background: var(--bg-2); flex-shrink: 0; }
+    .ph-appbar b { font: 600 14px var(--sans); }
+    .ph-back { font: 28px/1 var(--sans); color: var(--cyan); background: none; border: 0; cursor: pointer; padding: 0 8px 4px; }
+    /* bölümler telefonun içinde: telefon genişliğine göre tek sütun */
+    .dev-phone .ph-app .screen-body > .wrap { padding: 16px 14px 24px; }
+    .dev-phone .sec-head { gap: 8px; margin-bottom: 14px; }
+    .dev-phone .sec-head h2 { font-size: 24px; }
+    .dev-phone .sec-head .cmd { margin-left: 0; width: 100%; }
+    .dev-phone .about-grid, .dev-phone .skills-grid, .dev-phone .edu-grid { grid-template-columns: 1fr; }
+    .dev-phone .code .s { font-size: 14px; } .dev-phone .code p { padding-left: 40px; } .dev-phone .code p::before { width: 26px; }
+    .dev-phone .stat .n { font-size: 30px; }
+    .dev-phone .commit { grid-template-columns: 18px 1fr; gap: 0 10px; }
+    .dev-phone .commit-date { grid-column: 2; grid-row: 1; text-align: left; padding-top: 0; margin-top: 4px; }
+    .dev-phone .rail { grid-column: 1; grid-row: 1 / span 2; }
+    .dev-phone .commit:first-child .rail::before { top: 8px; }
+    .dev-phone .rail i { margin-top: 8px; }
+    .dev-phone .commit .card { grid-column: 2; padding: 14px; }
+    .dev-phone .card h3 { font-size: 16px; } .dev-phone .card p { font-size: 13px; }
+    .dev-phone .commit-date small { display: inline; margin-left: 6px; }
+    .dev-phone .more-btn { margin-left: 28px; }
+    .dev-phone .term-body { height: 340px; font-size: 12px; }
+    .dev-phone .ar-drawer { height: 100%; border-radius: 0; }
+    .dev-phone .ph-app .screen-body:has(> .ar-drawer) { overflow: hidden; display: flex; }
+    .dev-phone .ar-row { grid-template-columns: 26px 1fr 20px; padding: 12px 12px; gap: 10px; }
+    .dev-phone .ar-meta { display: none; }
+    .dev-phone .ar-name { font-size: 26px; }
+    .dev-phone .ar-preview { display: none; }
+    .ph-mail { display: grid; gap: 12px; padding: 16px 14px; }
+    .ph-mail label { display: grid; gap: 4px; font: 12px var(--mono); color: var(--muted); }
+    .ph-mail input, .ph-mail textarea { font: 14px var(--sans); color: var(--text); background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 10px; resize: none; }
+    .ph-mail input:focus, .ph-mail textarea:focus { outline: none; border-color: var(--cyan); }
+    .ph-mail button { justify-content: center; cursor: pointer; }
+    .ph-mail small { font-size: 11px; color: var(--dim); text-align: center; }
+    .ph-profile { display: grid; justify-items: center; gap: 8px; padding: 36px 20px; text-align: center; }
+    .ph-profile i { width: 76px; height: 76px; border-radius: 20px; display: grid; place-items: center; background: var(--b); }
+    .ph-profile i svg { width: 40px; height: 40px; fill: #fff; }
+    .ph-profile b { font: 700 20px var(--sans); margin-top: 6px; } .ph-profile span { font: 12px var(--mono); color: var(--cyan); }
+    .ph-profile p { color: var(--muted); font-size: 14px; margin: 6px 0 12px; }
     /* archive (drawer) */
     .dev-archive {
       width: min(1240px, 100%); height: min(calc(100vh - 88px), 880px);
@@ -634,8 +726,8 @@
   <div class="wrap">
     <a href="#top" class="logo"><span class="u">ahmet</span>@<span class="h">dev-room</span>:<span class="p">~</span>$<span class="cur"></span></a>
     <div class="nav-links">
-      <a href="#hakkimda" data-open="imac"><span>~/</span>hakkımda</a>
-      <a href="#deneyim" data-open="tablet"><span>~/</span>deneyim</a>
+      <a href="#hakkimda" data-open="imac:hakkimda"><span>~/</span>hakkımda</a>
+      <a href="#deneyim" data-open="tablet:cv"><span>~/</span>deneyim</a>
       <a href="#yetenekler" data-open="imac:yetenekler"><span>~/</span>yetenekler</a>
       <a href="#terminal" data-open="imac:terminal"><span>~/</span>terminal</a>
       <a href="#arsiv" data-open="archive"><span>~/</span>arşiv</a>
@@ -661,7 +753,7 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
             İletişime geç
           </a>
-          <a class="btn btn-ghost" href="#deneyim" data-open="tablet">git log --deneyim</a>
+          <a class="btn btn-ghost" href="#deneyim" data-open="tablet:cv">git log --deneyim</a>
         </div>
       </div>
     </div>
@@ -1282,7 +1374,7 @@
     Sfx.onChange(paint);
     b.addEventListener("click", () => { Sfx.set(!Sfx.on); if (Sfx.on) Sfx.play("success"); });
     // menü, buton ve uygulama tıklamalarında hafif tık
-    document.addEventListener("click", e => { if (e.target.closest(".btn, .nav-links a, .app, .term-tips button, .skill-filter button, .vs-tabs button")) sfx("tick"); });
+    document.addEventListener("click", e => { if (e.target.closest(".btn, .nav-links a, .app, .term-tips button, .skill-filter button")) sfx("tick"); });
   })();
 
   // ---------- CLOCKS ----------
@@ -1433,41 +1525,108 @@
     const stage = $("#stage"), dev = $("#device"), closeBtn = $("#stageClose");
     const SRC = { imac: "#hMonitor", tablet: "#hTablet", phone: "#hPhone", archive: "#room" };
     const LABEL = { imac: "Masaüstü", tablet: "CV", phone: "İletişim", archive: "Proje arşivi" };
-    const PARTS = { imac: ["hakkimda", "yetenekler", "terminal"], tablet: ["deneyim", "egitim"], phone: ["iletisim"], archive: [] };
+    const PARTS = { imac: [], tablet: [], phone: [], archive: [] };  // ana ekranlı cihazlar bölümleri uygulama açılınca alır
     const SHORT = { "İstanbul Medipol Üniversitesi": "Medipol", "Arı Bilgi Bilişim Teknolojileri Akademisi": "Arı Bilgi", "Akbank Bankacılık Merkezi": "Akbank", "Mavi Bilişim ve Danışmanlık": "Mavi Bilişim", "İETT Genel Müdürlüğü": "İETT" };
     const up = s => (SHORT[s] || s).toLocaleUpperCase("tr-TR");
     const yr = e => `${e.from.slice(3)} — ${e.to.slice(3)}`;
-    const IMAC_TABS = [["hakkimda", "📄 README.md"], ["yetenekler", "{ } skills.json"], ["terminal", "▶ terminal.sh"]];
-    const APPS = [
-      { label: "Mail", href: "mailto:" + EMAIL, b: "#2563eb", icon: "✉️" },
-      ...SOCIALS.map(s => ({ label: s.name, href: s.url, b: s.name === "GitHub" ? "#24292f" : "#0a66c2", icon: `<svg viewBox="0 0 24 24">${s.icon}</svg>`, ext: true })),
-      { label: "CV", open: "tablet", b: "#7c3aed", icon: "📄" },
-      { label: "Terminal", open: "imac:terminal", b: "#0f172a", icon: "⌨️" },
-      { label: "README", open: "imac", b: "#0d9488", icon: "🖥️" },
-      { label: "Arşiv", open: "archive", b: "#b45309", icon: "🗂️" },
-    ];
+    // uygulamalar: sayfa bölümleri cihazın içine taşınır ya da uygulamaya özel ekran çizilir
+    const profile = s => `
+      <div class="ph-profile">
+        <i style="--b:${s.name === "GitHub" ? "#24292f" : "#0a66c2"}"><svg viewBox="0 0 24 24">${s.icon}</svg></i>
+        <b>Ahmet Bölükoğlu</b>
+        <span>${esc(s.url.replace(/^https?:\/\/(www\.)?/, ""))}</span>
+        <p>Kıdemli Yazılım Geliştirme Uzmanı · .NET Core, C#, mikroservisler, yapay zekâ ve MCP.</p>
+        <a class="btn btn-primary" href="${s.url}" target="_blank" rel="noopener">${s.name}'da aç ↗</a>
+      </div>`;
+    const OS_APPS = {
+      hakkimda: { label: "README", file: "README.md", icon: "🖥️", b: "#0d9488", parts: ["hakkimda"] },
+      yetenekler: { label: "Yetenekler", file: "skills.json", icon: "🧠", b: "#be185d", parts: ["yetenekler"] },
+      terminal: { label: "Terminal", file: "terminal.sh", icon: "⌨️", b: "#0f172a", parts: ["terminal"] },
+      cv: { label: "CV", file: "cv.pdf", icon: "📄", b: "#7c3aed", parts: ["deneyim", "egitim"] },
+      archive: { label: "Arşiv", file: "arşiv/", icon: "🗂️", b: "#b45309", html: () => TPL.archive(), setup: () => setupArchive() },
+      iletisim: { label: "İletişim", file: "iletişim.vcf", icon: "💬", b: "#0891b2", parts: ["iletisim"] },
+      mail: { label: "Mail", file: "Yeni e-posta", icon: "✉️", b: "#2563eb", html: () => `
+        <form class="ph-mail" id="phMail">
+          <label>Kime<input value="${EMAIL}" readonly></label>
+          <label>Konu<input name="s" placeholder="Merhaba Ahmet 👋"></label>
+          <label>Mesaj<textarea name="b" rows="7" placeholder="Projemden bahsedeyim…"></textarea></label>
+          <button class="btn btn-primary" type="submit">Gönder ✈️</button>
+          <small>Gönder'e basınca kendi mail uygulamanda açılır.</small>
+        </form>`, setup: () => {
+          dev.querySelector("#phMail").addEventListener("submit", e => {
+            e.preventDefault();
+            const f = e.target, q = new URLSearchParams({ subject: f.s.value, body: f.b.value }).toString().replace(/\+/g, "%20");
+            location.href = `mailto:${EMAIL}?${q}`;
+          });
+        } },
+      ...Object.fromEntries(SOCIALS.map(s => [s.name.toLowerCase(), { label: s.name, file: s.name, b: s.name === "GitHub" ? "#24292f" : "#0a66c2", icon: `<svg viewBox="0 0 24 24">${s.icon}</svg>`, html: () => profile(s) }])),
+    };
+    // her cihazın ana ekranı (telefonda altta iletişim kartı da durur)
+    const HOME_APPS = {
+      phone: ["mail", "github", "linkedin", "cv", "terminal", "hakkimda", "yetenekler", "archive"],
+      imac: ["hakkimda", "yetenekler", "terminal", "cv", "archive", "iletisim"],
+      tablet: ["cv", "hakkimda", "archive", "iletisim", "mail"],
+    };
+    const HOME_PARTS = { phone: ["iletisim"] };
+    const appIcons = (type, cls) => HOME_APPS[type].map(k => { const a = OS_APPS[k]; return `<button type="button" class="app ${cls || ""}" data-app="${k}"><i style="--b:${a.b}">${a.icon}</i>${type === "phone" ? a.label : a.file}</button>`; }).join("");
+    function openApp(name) {
+      const home = dev.querySelector(".os-home"), view = dev.querySelector(".os-app");
+      if (!home || !view) return;
+      const body = view.querySelector(".screen-body");
+      giveBack();
+      body.innerHTML = "";
+      if (!name || !OS_APPS[name]) {  // ana ekran
+        view.hidden = true; home.hidden = false;
+        (HOME_PARTS[current] || []).forEach(id => borrow(id, home));
+        return;
+      }
+      const app = OS_APPS[name];
+      sfx("tick");
+      home.hidden = true; view.hidden = false;
+      view.querySelector(".os-bar b").textContent = current === "phone" ? app.label : app.file;
+      if (app.html) body.innerHTML = app.html();
+      (app.parts || []).forEach(id => borrow(id, body));
+      app.setup?.();
+      body.scrollTop = 0;
+      if (name === "terminal") setTimeout(() => $("#termIn").focus({ preventScroll: true }), 60);
+    }
     const TPL = {
       imac: () => `
-        <div class="imac-screen">
-          <div class="vs-bar"><span class="dots"><i></i><i></i><i></i></span>
-            <div class="vs-tabs" role="tablist">${IMAC_TABS.map(([id, l]) => `<button type="button" role="tab" data-tab="${id}">${l}</button>`).join("")}</div>
+        <div class="imac-screen os os-uw">
+          <div class="os-home screen-body">
+            <div class="os-icons">${appIcons("imac", "desk")}</div>
+            <div class="os-widget"><span>${$("#navTime").textContent}</span><b>Merhaba 👋</b><p>Bir dosyaya tıkla: README, yetenekler, terminal…</p></div>
+            <div class="os-dock">${appIcons("imac")}</div>
           </div>
-          <div class="screen-body"></div>
+          <div class="os-app" hidden>
+            <div class="os-bar"><span class="dots"><i></i><i></i><i></i></span><button type="button" class="os-back" aria-label="Geri">‹</button><b></b></div>
+            <div class="screen-body"></div>
+          </div>
         </div>
         <div class="imac-chin"><span>&lt;/&gt;</span></div>
         <div class="imac-stand"></div>`,
       tablet: () => `
-        <div class="tab-screen">
-          <div class="safari"><span>🔒 ahmetbolukoglu.github.io/<b>cv</b></span></div>
-          <div class="screen-body"></div>
+        <div class="tab-screen os os-win">
+          <div class="os-home screen-body">
+            <div class="os-icons">${appIcons("tablet", "desk")}</div>
+            <div class="os-taskbar"><span class="os-start">⊞</span>${appIcons("tablet", "tb")}<span class="os-clock">${$("#navTime").textContent}</span></div>
+          </div>
+          <div class="os-app" hidden>
+            <div class="os-bar"><button type="button" class="os-back" aria-label="Geri">‹</button><b></b><span class="os-winbtn">— ▢ ✕</span></div>
+            <div class="screen-body"></div>
+          </div>
         </div>`,
       phone: () => `
         <div class="ph-screen">
           <div class="ph-status"><span class="ph-time">${$("#navTime").textContent}</span><span class="ph-island"></span><span>5G 87%</span></div>
-          <div class="screen-body">
-            <div class="ph-apps">${APPS.map(a => `<a class="app" href="${a.href || "#"}"${a.open ? ` data-open="${a.open}"` : ""}${a.ext ? ' target="_blank" rel="noopener"' : ""}><i style="--b:${a.b}">${a.icon}</i>${a.label}</a>`).join("")}</div>
+          <div class="screen-body ph-home-view os-home">
+            <div class="ph-apps">${appIcons("phone")}</div>
           </div>
-          <div class="ph-home"></div>
+          <div class="ph-app os-app" hidden>
+            <div class="ph-appbar os-bar"><button type="button" class="ph-back os-back" aria-label="Geri">‹</button><b></b></div>
+            <div class="screen-body"></div>
+          </div>
+          <button type="button" class="ph-home" aria-label="Ana ekran"></button>
         </div>`,
       archive: () => `
         <div class="ar-drawer">
@@ -1547,19 +1706,20 @@
     }
     function giveBack() { borrowed.forEach(([w, ph]) => { w.hidden = false; ph.replaceWith(w); }); borrowed = []; }
 
-    function showTab(id) {
-      dev.querySelectorAll(".screen-body > .wrap").forEach(w => w.hidden = w.dataset.part !== id);
-      dev.querySelectorAll(".vs-tabs button").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === id));
-      dev.querySelector(".screen-body").scrollTop = 0;
-      if (id === "terminal") setTimeout(() => $("#termIn").focus({ preventScroll: true }), 60);
-    }
-
     // 3D odada masaüstü monitörün içinde açılır: kamera ekrana yaklaşır, arayüz ekranın üstüne oturur
     let embed = null, embedSource = null;
+    // monitörün "çözünürlüğü": arayüz bu genişlikte çizilir, ekrana ölçeklenir (gerçek bir ekran gibi)
+    const NATIVE = { imac: 1600, tablet: 1280 };
     function place() {
       if (!embed) return;
       const r = embed();
       Object.assign(dev.style, { left: r.left + "px", top: r.top + "px", width: r.width + "px", height: r.height + "px" });
+      const inner = dev.querySelector(".imac-screen, .tab-screen"), vw = NATIVE[current];
+      if (inner && vw) {
+        const s = r.width / vw, vh = r.height / s;
+        Object.assign(inner.style, { width: vw + "px", height: vh + "px", flex: "none", transform: `scale(${s})`, transformOrigin: "0 0" });
+        inner.style.setProperty("--vh", vh + "px");
+      }
     }
     function flip(reverse) {
       if (reduceMotion) return Promise.resolve();
@@ -1574,9 +1734,14 @@
       return dev.animate(frames, { duration: reverse ? 420 : 720, easing: "cubic-bezier(.2,.8,.2,1)", fill: reverse ? "forwards" : "none" }).finished;
     }
 
+    function osClick(e) {
+      const a = e.target.closest("[data-app]");
+      if (a) return openApp(a.dataset.app);
+      if (e.target.closest(".os-back, .ph-home, .os-bar .dots i:first-child, .os-winbtn")) openApp(null);
+    }
     let opening = false;  // açılış sürerken (kamera uçarken) gelen ikinci istek yok sayılır
     async function open(type, tab) {
-      if (current === type) { if (tab) showTab(tab); return; }
+      if (current === type) { if (tab) openApp(tab); return; }
       if (opening) return;
       opening = true;
       try { await openNow(type, tab); } finally { opening = false; }
@@ -1586,17 +1751,18 @@
       const em = embedSource ? await embedSource(type) : null;
       embed = em && em.rect;
       current = type; srcEl = $(SRC[type]); lastFocus = document.activeElement;
-      dev.className = "device dev-" + type + (embed ? " embed" : "");
+      dev.className = "device dev-" + type + (embed ? " embed" : "") + (em && em.flat ? " flat" : "");
       stage.classList.toggle("embed", !!embed);
       dev.setAttribute("aria-label", LABEL[type]);
       dev.innerHTML = TPL[type]();
       const body = dev.querySelector(".screen-body");
       PARTS[type].forEach(id => borrow(id, body));
-      if (type === "imac") {
-        dev.querySelector(".vs-tabs").addEventListener("click", e => { const b = e.target.closest("button"); if (b) showTab(b.dataset.tab); });
-        showTab(tab || "hakkimda");
-      }
       if (type === "archive") setupArchive();
+      if (dev.querySelector(".os")) dev.querySelector(".os").classList.add("os-on");
+      if (HOME_APPS[type]) {
+        dev.addEventListener("click", osClick);
+        openApp(tab);
+      }
       openHooks.forEach(fn => fn(type));
       sfx("whooshIn");
       stage.hidden = false;
@@ -1609,12 +1775,14 @@
 
     async function close(switching) {
       if (!current) return;
+      if (HOME_APPS[current] && !switching && dev.querySelector(".os-app") && !dev.querySelector(".os-app").hidden) { openApp(null); return; }  // önce ana ekrana dön
       if (current === "archive") { const det = dev.querySelector(".ar-detail"); if (det && !det.hidden && !switching) { det.hidden = true; sfx("paper"); return; } }
       sfx("whooshOut");
       stage.classList.remove("on");
       await flip(true);
       giveBack();
       dev.getAnimations().forEach(a => a.cancel());
+      dev.removeEventListener("click", osClick);
       dev.innerHTML = ""; current = null;
       dev.removeAttribute("style"); stage.classList.remove("embed"); embed = null;
       if (switching) return;

@@ -50,6 +50,7 @@ const MATS = {
   W_Paper: { color: "#f5f3ff", roughness: 0.9 },
   W_PhoneBody: { color: "#2b2a31", roughness: 0.3, metalness: 0.7 }, W_LEDGreen: { color: "#22c55e", emissive: "#22c55e", emissiveIntensity: 2.5 },
   W_Chair: { color: "#1b1b21", roughness: 0.75 }, W_ChairAccent: { color: "#dc2626", roughness: 0.6 },
+  W_Cat: { color: "#d9822b", roughness: 0.95 }, W_CatDark: { color: "#8a4a14", roughness: 0.95 }, W_CatWhite: { color: "#f5efe6", roughness: 0.95 },
 };
 // raftaki kitaplar: her biri bir yetenek alanı (tıklanınca masaüstünde o kategori açılır)
 const BOOKS = {
@@ -65,6 +66,7 @@ const BOOKS = {
 };
 for (const [id, b] of Object.entries(BOOKS)) MATS["W_Book_" + id] = { color: b.color, roughness: 0.55 };
 const sfx = (name, ...a) => window.Sfx && window.Sfx.play(name, ...a);
+const jump = y => (window.scrollToY ? window.scrollToY(y) : scrollTo({ top: y, behavior: "instant" }));
 const boot = window.Boot || { progress() {}, ready() {}, entered: true };
 
 // scroll turu durakları (Blender koordinatı) ve yazıları
@@ -80,7 +82,11 @@ const STOPS = [
   { pos: [0.15, -1.5, 1.42], look: [0.18, 1.3, 1.22] },
 ];
 const SCREENS = ["W_Screen_iMac", "W_Screen_Left", "W_Screen_TV", "W_Screen_Phone", "W_Screen_Watch", "W_Cert"];
-const CLICK = ["iMac", "Monitor2", "Phone", "Shelf", "Tea", "Duck", "Ball", "Window", "Cert", "Clock", "Neon", "Drawer", "Keyboard", "PC", "TV", "PS5", "Controllers", "Headphones", "Bottle", "Modem", "Watch", "Chair"];
+const CLICK = ["iMac", "Monitor2", "Phone", "Shelf", "Tea", "Duck", "Ball", "Window", "Cert", "Clock", "Neon", "Drawer", "Keyboard", "PC", "TV", "PS5", "Controllers", "Headphones", "Bottle", "Modem", "Watch", "Chair", "Cat"];
+// imlecin yanında görünen adlar
+const NAMES = { iMac: "49\" masaüstü", Monitor2: "CV · 27\"", Phone: "İletişim · S22", Shelf: "Kitaplık", Tea: "Çay", Duck: "🦆 Ördeğe sor", Ball: "Top", Window: "Boğaz manzarası",
+  Cert: "Sertifika", Clock: "Saat", Neon: "Neon", Drawer: "Projeler", Keyboard: "Terminal", PC: "Kasa", TV: "65\" TV", PS5: "PS5", Controllers: "PS5 kolları",
+  Headphones: "Kulaklık", Bottle: "Su", Modem: "Modem", Watch: "Akıllı saat", Chair: "Koltuk", Cat: "😺 Tekir" };
 
 function webglOK() {
   try { const c = document.createElement("canvas"); return !!(c.getContext("webgl2") || c.getContext("webgl")); }
@@ -327,15 +333,25 @@ function leftScreen() {  // 27" monitör: masaüstü duvar kâğıdı + cv.pdf p
   });
 }
 
-function tvScreen() {  // 65" TV: oyun molası ekranı
-  return canvasTex(1024, 576, (g, w, h) => {
+// 65" TV: çalıştığım yerler kayan yazı olarak geçer (alt satır ters yönde teknolojiler)
+const COMPANIES = ["EnerjiSA", "Agrio Finans", "Ovinot", "INTERTECH", "Timbo ICT", "Akbank", "Mavi Bilişim", "Medipol", "Arı Bilgi", "İETT"];
+const TECH_ROW = [".NET Core", "C#", "Redis", "gRPC", "Event Bus", "PostgreSQL", "MSSQL", "Blazor", "React", "MCP", "Azure DevOps", "k6"];
+function tvScreen() {
+  const row = (g, items, font, gap, y, x0, color) => {
+    g.font = font; g.fillStyle = color;
+    const widths = items.map(t => g.measureText(t).width + gap), total = widths.reduce((a, b) => a + b, 0);
+    let x = ((x0 % total) + total) % total - total;
+    while (x < 1024) { items.forEach((t, i) => { g.fillText(t, x, y); g.fillStyle = "#f472b6"; g.fillText("✦", x + widths[i] - gap / 2 - 10, y); g.fillStyle = color; x += widths[i]; }); }
+  };
+  return canvasTex(1024, 576, (g, w, h, now = 0) => {
     const bg = g.createLinearGradient(0, 0, w, h); bg.addColorStop(0, "#0b1a4a"); bg.addColorStop(1, "#2e1065");
     g.fillStyle = bg; g.fillRect(0, 0, w, h);
-    g.strokeStyle = "rgba(147,197,253,.25)"; g.lineWidth = 2;
-    for (let i = 0; i < 14; i++) { g.beginPath(); g.moveTo(0, 340 + i * 10); for (let x = 0; x <= w; x += 32) g.lineTo(x, 340 + i * 10 + Math.sin(x / 120 + i * 0.4) * 30); g.stroke(); }
-    g.fillStyle = "#fff"; g.font = "700 46px Space Grotesk, sans-serif"; g.fillText("Oyun molası 🎮", 60, 110);
-    g.fillStyle = "#bfdbfe"; g.font = "20px JetBrains Mono, monospace"; g.fillText("kod derleniyor… o sırada bir maç?", 62, 150);
-    ["#f472b6", "#5eead4", "#fbbf24", "#a78bfa", "#60a5fa"].forEach((c, i) => { g.fillStyle = c; g.beginPath(); g.roundRect(60 + i * 150, 210, 130, 130, 16); g.fill(); });
+    g.strokeStyle = "rgba(147,197,253,.18)"; g.lineWidth = 2;
+    for (let i = 0; i < 10; i++) { g.beginPath(); g.moveTo(0, 470 + i * 9); for (let x = 0; x <= w; x += 32) g.lineTo(x, 470 + i * 9 + Math.sin(x / 120 + i * 0.4 + now / 2000) * 18); g.stroke(); }
+    g.fillStyle = "#5eead4"; g.font = "20px JetBrains Mono, monospace"; g.textAlign = "left"; g.fillText("// çalıştığım yerler · 2011 → 2025", 60, 92);
+    row(g, COMPANIES, "700 104px Space Grotesk, sans-serif", 90, 250, -now * 0.09, "#ffffff");
+    row(g, TECH_ROW, "28px JetBrains Mono, monospace", 70, 340, now * 0.05, "#bfdbfe");
+    g.fillStyle = "rgba(255,255,255,.75)"; g.font = "22px Space Grotesk, sans-serif"; g.fillText("🎮 kod bitince bir maç · PS5", 60, 430);
   });
 }
 
@@ -372,7 +388,8 @@ function watchScreen() {
     g.fillText(d.toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" }), w / 2, 128);
     g.fillStyle = "#9ca3af"; g.font = "16px Space Grotesk, sans-serif"; g.fillText(d.toLocaleDateString("tr-TR", { weekday: "short", day: "numeric" }), w / 2, 154);
     g.fillStyle = "#1f2937"; g.beginPath(); g.roundRect(40, 172, w - 80, 34, 17); g.fill();
-    g.fillStyle = "#e5e7eb"; g.font = "15px Space Grotesk, sans-serif"; g.fillText(WATCH_NOTES[Math.floor(Date.now() / 5000) % WATCH_NOTES.length], w / 2, 195);
+    g.fillStyle = "#e5e7eb"; g.font = "15px Space Grotesk, sans-serif"; const notes = [...(window.GHFeed || []).slice(0, 3).map(e => e.short), ...WATCH_NOTES];
+    g.fillText(notes[Math.floor(Date.now() / 5000) % notes.length], w / 2, 195);
     g.restore();
   });
   return tex;
@@ -542,6 +559,8 @@ async function init() {
   // ---------------------------------------------------------------- etkileşim
   const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
   let hover = null, busy = false, teaCount = 1, qi = 0, rgbBoost = 0;
+  let catCount = 0, catPoke = 0;
+  const CAT = ["😺 Mırr… kod yazarken uyuyakaldım", "😼 Klavyenin üstüne yatmadım, söz", "😸 Deploy bitince uyandır", "🐟 Mama saati geçti ama…"];
   const QUACK = ["🦆 Quack! Bug'ı bana anlat…", "🦆 Satır satır anlat, bulacağız.", "🦆 Null mı geliyor yoksa?", "🦆 Cache'i temizledin mi?"];
 
   function pick(ev) {
@@ -564,6 +583,8 @@ async function init() {
     hover = p;
     if (hover) (partMats[hover.name] || []).forEach(m => { m.userData.e0 ??= m.emissive.getHex(); if (!m.userData.e0) m.emissive.set("#2a2550"); });
     canvas.style.cursor = hover ? "pointer" : "";
+    const label = hover && (hover.name.startsWith("Book_") ? "Kitap" : hover.name.startsWith("Drawer_") ? "Çekmece" : NAMES[hover.name]);
+    dispatchEvent(new CustomEvent("room:hover", { detail: label || "" }));
     const b = hover && BOOKS[hover.name.slice(5)];
     tip.classList.toggle("show", !!(hover && hover.name.startsWith("Book_") && b));
     if (b && hover.name.startsWith("Book_")) tip.innerHTML = `<b>${b.title}</b><span>${b.sub}</span>`;
@@ -631,7 +652,7 @@ async function init() {
   Devices.setPreOpen(async type => {
     if (!frame.classList.contains("is-3d")) return;
     const fr = frame.getBoundingClientRect();
-    if (fr.top < 64 || fr.bottom > innerHeight) scrollTo({ top: scrollY + fr.top - Math.max(64, (innerHeight - fr.height) / 2), behavior: "instant" });
+    if (fr.top < 64 || fr.bottom > innerHeight) jump(scrollY + fr.top - Math.max(64, (innerHeight - fr.height) / 2));
     busy = true;
     if (type === "phone") {
       const c = new THREE.Box3().setFromObject(parts.Phone).getCenter(new THREE.Vector3());
@@ -663,7 +684,7 @@ async function init() {
     const d = Math.max(sc.h / (2 * t * fill), sc.w / (2 * t * camera.aspect * fill));
     const eye = c.clone().addScaledVector(sc.normal, d);  // ekranın tam karşısı (çapraz monitörde de düz görünür)
     const fr = frame.getBoundingClientRect();  // oda ekranın dışına taşıyorsa önce görünür alana al (sayfa kilitlenecek)
-    if (fr.top < 64 || fr.bottom > innerHeight) scrollTo({ top: scrollY + fr.top - Math.max(64, (innerHeight - fr.height) / 2), behavior: "instant" });
+    if (fr.top < 64 || fr.bottom > innerHeight) jump(scrollY + fr.top - Math.max(64, (innerHeight - fr.height) / 2));
     busy = true; frame.classList.add("zoomed");
     await flyTo(eye, c, 900);
     camera.position.copy(eye); camLook.copy(c); camera.lookAt(camLook);
@@ -693,6 +714,12 @@ async function init() {
     }, 90);
   }
   const ferryLoop = () => setTimeout(() => { if (!document.hidden) ferry(); ferryLoop(); }, 70000 + Math.random() * 50000);
+  function duckHop() {
+    const p = parts.Duck; if (!p) return;
+    const y0 = lifted.Duck ? p.position.y : (p.userData.y0 ??= p.position.y);
+    tween(700, t => { p.position.y = y0 + Math.sin(t * Math.PI) * 0.05; p.rotation.y = t * Math.PI * 2; p.scale.set(1, 1 - Math.sin(t * Math.PI * 2) * 0.08, 1); });
+    sfx("quack");
+  }
   async function act(p) {
     if (!p || busy) return;
     const n = p.name;
@@ -727,10 +754,13 @@ async function init() {
       say(p, `🍵 Çay tazelendi! (${++teaCount}. bardak)`);
       puffs.forEach(s => { s.userData.t = Math.random() * 0.3; });
     } else if (n === "Duck") {
-      const y0 = p.position.y;
-      tween(700, t => { p.position.y = y0 + Math.sin(t * Math.PI) * 0.05; p.rotation.y = t * Math.PI * 2; p.scale.set(1, 1 - Math.sin(t * Math.PI * 2) * 0.08, 1); });
-      sfx("quack");
-      say(p, QUACK[qi++ % QUACK.length]);
+      duckHop();
+      if (window.DuckChat) window.DuckChat.open(); else say(p, QUACK[qi++ % QUACK.length]);
+    } else if (n === "Cat") {
+      const meow = catCount++ % 3 !== 2;
+      sfx(meow ? "meow" : "purr");
+      catPoke = 1;
+      say(p, CAT[catCount % CAT.length]);
     } else if (n === "Ball") {
       const x0 = p.position.x;
       tween(1400, t => { const k = Math.sin(t * Math.PI); p.position.x = x0 + k * 0.5; p.rotation.z = -k * 0.5 / 0.11; });
@@ -779,7 +809,7 @@ async function init() {
   new IntersectionObserver(es => { visible = es[0].isIntersecting; }).observe(frame);
   const stage = document.getElementById("stage");
   const tmp = new THREE.Vector3(), rgb = new THREE.Color();
-  let last = 0, lastType = 0, lastWatch = 0;
+  let last = 0, lastType = 0, lastWatch = 0, lastTV = 0, reel = null;
 
   // ---------------------------------------------------------------- scroll turu
   // #tour uzun bir kap; içindeki giriş (sticky) sabit kalır, kaydırma ilerlemesi kamerayı duraktan durağa taşır
@@ -810,7 +840,7 @@ async function init() {
     base.look.lerpVectors(stops[i].look, stops[i + 1].look, t);
     const near = Math.round(tourS), st = stops[near];
     const idx = st.h && Math.abs(tourS - near) < 0.32 ? near : -1;
-    if (idx !== capIdx && capEl) {
+    if (idx !== capIdx && capEl && !reel) {
       capIdx = idx;
       capEl.classList.remove("show");
       if (idx >= 0) {
@@ -834,6 +864,12 @@ async function init() {
     tour();
     if (now % 30000 < 20) screenTex.W_Screen_Phone.redraw();
     if (now - lastWatch > 1000) { screenTex.W_Screen_Watch.redraw(); lastWatch = now; }
+    if (!reduceMotion && now - lastTV > 33) { screenTex.W_Screen_TV.redraw(now); lastTV = now; }
+    if (parts.Cat) {
+      catPoke *= 0.94;
+      const b = Math.sin(now / 900) * (reduceMotion ? 0 : 1), k = Math.sin(now / 60) * catPoke;
+      parts.Cat.scale.set(1 + 0.02 * b, 1 + 0.035 * b + 0.06 * k, 1 + 0.02 * b);
+    }
     // ışık nabızları
     const hue = (now / 8000) % 1;
     ledLight.color.setHSL(0.47 + hue * 0.45, 0.8, 0.6);
@@ -870,6 +906,54 @@ async function init() {
     });
     renderer.render(scene, camera);
   }
+
+  // ---------------------------------------------------------------- showreel: odayı izle
+  // duraklar arası sinematik uçuş, yazılar ve küçük olaylar; tıklama, kaydırma ya da Esc ile biter
+  const reelBar = document.createElement("div"); reelBar.className = "reel-bar"; reelBar.innerHTML = "<i></i><span>▶ odayı izliyorsun · çıkmak için tıkla ya da Esc</span>"; frame.appendChild(reelBar);
+  const REEL_FX = { 1: () => ferry(), 3: () => puffs.forEach(p => { p.userData.t = Math.random() * 0.3; }), 4: () => { drawerHold = true; openDrawer(); }, 5: () => { rgbBoost = 1; } };
+  async function showreel() {
+    if (reel || !stage.hidden || !frame.classList.contains("is-3d")) return;
+    while (busy) await new Promise(r => setTimeout(r, 100));
+    // giriş yazısı çekilmiş, oda ekranı dolduruyor (turun başı)
+    const total = tourEl.offsetHeight - tourEl.firstElementChild.offsetHeight;
+    jump(innerWidth > 900 && total > 10 ? tourEl.offsetTop + total * 0.07 + 2 : scrollY + frame.getBoundingClientRect().top - 72);
+    const me = reel = { stop: false, music: false };
+    busy = true; capIdx = -1;
+    frame.classList.add("reeling");
+    if (window.Sfx?.on && !Sfx.music.playing) { Sfx.music.toggle(); me.music = true; }
+    const fly = (pos, look, ms) => {
+      const p0 = camera.position.clone(), l0 = camLook.clone();
+      return tween(ms, t => { if (me.stop) return; camera.position.lerpVectors(p0, pos, t); camLook.lerpVectors(l0, look, t); });
+    };
+    const wait = ms => new Promise(r => { const t0 = performance.now(); const id = setInterval(() => { if (me.stop || performance.now() - t0 > ms) { clearInterval(id); r(); } }, 50); });
+    const n = stops.length - 2;
+    for (let i = 1; i <= n && !me.stop; i++) {
+      const st = stops[i];
+      reelBar.style.setProperty("--p", (i / n).toFixed(3));
+      capEl.classList.remove("show");
+      await fly(st.pos, st.look, reduceMotion ? 0 : 2400);
+      if (me.stop) break;
+      capEl.innerHTML = `<span>${st.n} / 07</span><h3>${st.h}</h3><p>${st.p}</p>`;
+      capEl.classList.add("show"); sfx("whooshOut");
+      REEL_FX[i]?.();
+      await wait(2600);
+      if (i === 4) drawerHold = false;
+    }
+    stopReel();
+  }
+  async function stopReel() {
+    const me = reel; if (!me) return;
+    me.stop = true; reel = null;
+    drawerHold = false;
+    frame.classList.remove("reeling");
+    capEl.classList.remove("show"); capIdx = -1;
+    if (me.music && Sfx.music.playing) Sfx.music.toggle();
+    await flyTo(base.pos, base.look, 900);
+    busy = false;
+  }
+  ["pointerdown", "wheel", "touchstart"].forEach(ev => addEventListener(ev, e => { if (reel && !e.target.closest?.("#reelBtn")) stopReel(); }, { passive: true }));
+  addEventListener("keydown", e => { if (reel && e.key === "Escape") stopReel(); });
+  window.Room3D = { showreel, stopReel, duckHop };
 
   resize();
   renderer.compile(scene, camera);

@@ -29,6 +29,7 @@
       }, 15000);
     })();
   </script>
+  <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js" defer></script>
   <script src="js/sfx.js"></script>
   <script type="module" src="js/room3d.js"></script>
   <style>
@@ -746,6 +747,74 @@
       html { scroll-behavior: auto; }
       .reveal { opacity: 1; transform: none; }
     }
+    /* ---------- 2. DALGA ---------- */
+    .stat .k { display: block; font: 11px var(--mono); letter-spacing: .14em; color: var(--muted); margin-bottom: 12px; }
+    .reel-btn { border-style: dashed; }
+    .ai-btn { font: 12px var(--mono); color: var(--text); background: rgba(250,204,21,.08); border: 1px solid rgba(250,204,21,.35); border-radius: 999px; padding: 4px 10px; cursor: pointer; margin-right: 10px; }
+    .ai-btn:hover, .ai-btn[aria-pressed="true"] { background: rgba(250,204,21,.2); color: #fde047; }
+    @media (max-width: 720px) { .ai-btn span { display: none; } }
+
+    .gh-tick { position: absolute; left: 16px; top: 16px; z-index: 3; display: flex; align-items: center; gap: 8px; max-width: min(460px, calc(100% - 32px));
+      font: 12px var(--mono); color: var(--text); background: rgba(11,10,26,.7); border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; backdrop-filter: blur(6px); text-decoration: none; }
+    .gh-tick i { flex: none; width: 7px; height: 7px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 8px #22c55e; animation: ghp 1.6s ease-in-out infinite; }
+    .gh-tick span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; transition: opacity .3s; }
+    @keyframes ghp { 50% { opacity: .35; } }
+    .touring .gh-tick, .zoomed .gh-tick, .reeling .gh-tick, .reeling .tag3d, .reeling .room-hint, .reeling .scroll-hint { opacity: 0 !important; pointer-events: none; transition: opacity .3s; }
+
+    .reel-bar { position: absolute; left: 0; right: 0; top: 0; z-index: 5; opacity: 0; pointer-events: none; transition: opacity .3s; }
+    .reel-bar i { display: block; height: 3px; width: calc(var(--p, 0) * 100%); background: linear-gradient(90deg, var(--cyan), var(--pink)); transition: width 2.4s cubic-bezier(.4,0,.2,1); }
+    .reel-bar span { position: absolute; right: 16px; top: 14px; font: 12px var(--mono); color: var(--text); background: rgba(11,10,26,.7); border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; }
+    .reeling .reel-bar { opacity: 1; }
+    .reeling #room3d { cursor: default; }
+
+    .screen-body:has(> .dc) { overflow: hidden; display: flex; }
+    .dc { flex: 1; min-height: 0; display: flex; flex-direction: column; width: 100%; max-width: 860px; margin: 0 auto; }
+    .dc-intro { display: flex; align-items: center; gap: 10px; padding: 14px 16px 10px; }
+    .dc-intro b { display: block; font-size: 16px; } .dc-intro small { color: var(--muted); font: 11px var(--mono); }
+    .dev-imac .dc-msg { font-size: 16px; } .dev-imac .dc-form input { font-size: 16px; padding: 12px 14px; }
+    .dc-ava { font-size: 26px; width: 40px; height: 40px; display: grid; place-items: center; background: rgba(250,204,21,.14); border-radius: 50%; }
+    .dc-log { flex: 1; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 10px; overscroll-behavior: contain; }
+    .dc-msg { max-width: 88%; padding: 9px 12px; border-radius: 14px; font-size: 14px; line-height: 1.5; white-space: pre-line; animation: dcm .25s ease-out; }
+    @keyframes dcm { from { opacity: 0; transform: translateY(6px); } }
+    .dc-msg.bot { background: #1d1a3d; border: 1px solid var(--line); border-bottom-left-radius: 4px; align-self: flex-start; }
+    .dc-msg.me { background: linear-gradient(135deg, #0d9488, #7c3aed); color: #fff; border-bottom-right-radius: 4px; align-self: flex-end; }
+    .dc-msg b { color: #fde047; font-weight: 600; } .dc-msg.me b { color: #fff; }
+    .dc-msg .chips { margin-top: 8px; }
+    .dc-acts { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+    .dc-acts a, .dc-acts button { font: 12px var(--mono); color: var(--cyan); background: rgba(94,234,212,.08); border: 1px solid rgba(94,234,212,.3); border-radius: 8px; padding: 4px 8px; cursor: pointer; text-decoration: none; }
+    .dc-typing { display: inline-flex; gap: 4px; } .dc-typing i { width: 6px; height: 6px; border-radius: 50%; background: var(--muted); animation: dct 1s infinite; }
+    .dc-typing i:nth-child(2) { animation-delay: .15s; } .dc-typing i:nth-child(3) { animation-delay: .3s; }
+    @keyframes dct { 50% { transform: translateY(-4px); opacity: .5; } }
+    .dc-chips { display: flex; gap: 6px; overflow-x: auto; padding: 0 14px 10px; scrollbar-width: none; }
+    .dc-chips button { flex: none; font: 12px var(--sans); color: var(--text); background: rgba(255,255,255,.05); border: 1px solid var(--line); border-radius: 999px; padding: 6px 10px; cursor: pointer; }
+    .dc-chips button:hover { border-color: rgba(250,204,21,.5); color: #fde047; }
+    .dc-form { display: flex; gap: 8px; padding: 10px 12px 12px; border-top: 1px solid var(--line); }
+    .dc-form input { flex: 1; min-width: 0; background: #0b0a1a; border: 1px solid var(--line); border-radius: 12px; color: var(--text); padding: 10px 12px; font: 14px var(--sans); outline: none; }
+    .dc-form input:focus { border-color: rgba(250,204,21,.5); }
+    .dc-form button { width: 42px; border: 0; border-radius: 12px; background: #facc15; color: #15132e; font-size: 18px; font-weight: 700; cursor: pointer; }
+
+    .svc { display: grid; gap: 12px; padding: 4px; }
+    .svc-item { display: grid; grid-template-columns: auto 1fr; gap: 4px 14px; padding: 16px; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; }
+    .svc-item .k { grid-row: span 2; font: 12px var(--mono); color: var(--cyan); padding-top: 4px; }
+    .svc-item b { font-size: 17px; } .svc-item p { color: var(--muted); font-size: 14px; margin: 0; }
+    .svc-item .chips { grid-column: 2; margin-top: 6px; }
+    .svc-cta { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 16px; border: 1px dashed rgba(250,204,21,.4); border-radius: 14px; }
+    .svc-cta p { margin: 0; flex: 1; min-width: 200px; }
+    .svc-head { font: 13px var(--mono); color: var(--muted); padding: 4px 4px 0; } .svc-head b { color: var(--text); font: 600 22px var(--sans); display: block; margin-top: 4px; }
+
+    .cur-dot, .cur-ring { position: fixed; left: 0; top: 0; z-index: 9999; pointer-events: none; display: none; }
+    html.cc .cur-dot, html.cc .cur-ring { display: block; }
+    .cur-dot { width: 6px; height: 6px; margin: -3px 0 0 -3px; border-radius: 50%; background: #fff; mix-blend-mode: difference; }
+    .cur-ring { width: 24px; height: 24px; margin: -12px 0 0 -12px; border-radius: 50%; border: 1px solid rgba(255,255,255,.35); transition: width .25s, height .25s, margin .25s, background .25s, border-color .25s, opacity .25s; }
+    .cur-ring.big { width: 38px; height: 38px; margin: -19px 0 0 -19px; background: rgba(94,234,212,.06); border-color: rgba(94,234,212,.7); }
+    .cur-ring.down { width: 18px; height: 18px; margin: -9px 0 0 -9px; }
+    .cur-ring.out { opacity: 0; }
+    .cur-ring span { position: absolute; left: calc(100% + 8px); top: 50%; transform: translateY(-50%); white-space: nowrap; font: 12px var(--mono); color: #15132e; background: var(--cyan); border-radius: 6px; padding: 3px 8px; opacity: 0; transition: opacity .2s; }
+    .cur-ring.named span { opacity: 1; }
+    html.cc, html.cc * { cursor: none !important; }
+    html.cc input, html.cc textarea { cursor: text !important; }
+    html.lenis, html.lenis body { height: auto; }
+    .lenis.lenis-smooth { scroll-behavior: auto !important; }
   </style>
 </head>
 <body>
@@ -774,7 +843,7 @@
       <a href="#projeler" data-open="archive"><span>~/</span>projeler</a>
       <a href="#iletisim" data-open="phone"><span>~/</span>iletişim</a>
     </div>
-    <div class="nav-clock"><button type="button" class="snd" id="sndBtn" aria-pressed="false" aria-label="Sesi aç/kapat">ses<span class="bars"><i></i><i></i><i></i></span></button><span class="d" id="navDate"></span> <b id="navTime">--:--</b></div>
+    <div class="nav-clock"><button type="button" class="ai-btn" id="aiBtn" data-open="imac:ordek">🦆 <span>AI modu</span></button><button type="button" class="snd" id="sndBtn" aria-pressed="false" aria-label="Sesi aç/kapat">ses<span class="bars"><i></i><i></i><i></i></span></button><span class="d" id="navDate"></span> <b id="navTime">--:--</b></div>
   </div>
 </nav>
 
@@ -795,6 +864,7 @@
             İletişime geç
           </a>
           <a class="btn btn-ghost" href="#deneyim" data-open="tablet:cv">git log --deneyim</a>
+          <button type="button" class="btn btn-ghost reel-btn" id="reelBtn">▶ Odayı izle</button>
         </div>
       </div>
     </div>
@@ -803,6 +873,7 @@
     <div class="room-frame" id="room">
       <div class="room-hint">✨ Bilgisayara, tablete veya telefona tıklayarak keşfedebilirsiniz</div>
       <div class="bubble" id="bubble"></div>
+      <a class="gh-tick" id="ghTick" href="https://github.com/ahmetbolukoglu" target="_blank" rel="noopener" hidden><i></i><span></span></a>
       <div class="tour-cap" id="tourCap" aria-live="polite"></div>
       <div class="scroll-hint">kaydır, odayı gez <i>↓</i></div>
       <canvas id="room3d" aria-label="3D yazılımcı odası: bilgisayar, tablet ve telefona tıklayarak içeriği açabilirsiniz"></canvas>
@@ -1165,10 +1236,10 @@
           </div>
         </div>
         <div class="stats">
-          <div class="stat reveal"><span class="ico">⏳</span><div class="n" data-count="10">0</div><div class="l">yıl+ deneyim</div></div>
-          <div class="stat reveal"><span class="ico">🏢</span><div class="n" data-count="9">0</div><div class="l">şirket &amp; kurum</div></div>
-          <div class="stat reveal"><span class="ico">🧰</span><div class="n" data-count="70">0</div><div class="l">teknoloji+</div></div>
-          <div class="stat reveal"><span class="ico">🍵</span><div class="n">∞</div><div class="l">bardak çay</div></div>
+          <div class="stat reveal"><span class="k">[01]</span><span class="ico">⏳</span><div class="n" data-count="10">0</div><div class="l">yıl+ deneyim</div></div>
+          <div class="stat reveal"><span class="k">[02]</span><span class="ico">🏢</span><div class="n" data-count="9">0</div><div class="l">şirket &amp; kurum</div></div>
+          <div class="stat reveal"><span class="k">[03]</span><span class="ico">🧰</span><div class="n" data-count="70">0</div><div class="l">teknoloji+</div></div>
+          <div class="stat reveal"><span class="k">[04]</span><span class="ico">🍵</span><div class="n">∞</div><div class="l">bardak çay</div></div>
           <div class="hobbies reveal">
             <span class="hobby">⚽ Halı saha</span>
             <span class="hobby">🎬 Dizi &amp; film</span>
@@ -1250,12 +1321,13 @@
   <div class="wrap">© <span id="yr"></span> Ahmet Bölükoğlu · <span>🍵</span> ve &lt;/&gt; ile yapıldı</div>
 </footer>
 
-<div class="stage" id="stage" hidden>
+<div class="stage" id="stage" data-lenis-prevent hidden>
   <button class="stage-close" id="stageClose" type="button">↩ masaya geri koy<kbd>Esc</kbd></button>
   <div class="device" id="device" role="dialog" aria-modal="true"></div>
 </div>
 
 <div class="toast" id="toast"></div>
+<div class="cur-dot" aria-hidden="true"></div><div class="cur-ring" aria-hidden="true"><span></span></div>
 
 <script>
   // ---------- DATA ----------
@@ -1323,6 +1395,14 @@
       items: ["2D JS Oyun Motorları", "Canvas / WebGL", "Oyun Durumu Senkronizasyonu", "Blender Python API", "Prosedürel Üretim"] },
     { cat: "fun", title: "Liderlik & Ürün", icon: "🧭", c: "#fb923c", desc: "Kodun ötesinde",
       items: ["Takım Liderliği", "Proje Yönetimi", "Ürün Geliştirme", "Ürün Yönetimi", "Scrum", "İngilizce (Teknik)"] },
+  ];
+  const SERVICES = [
+    { icon: "⚙️", t: "Backend & API geliştirme", d: "Kurumsal ölçekte, test edilebilir ve sürdürülebilir .NET Core servisleri.", tech: [".NET Core", "C#", "Web API", "FastEndpoints"] },
+    { icon: "🧩", t: "Mikroservis mimarisi", d: "Servis sınırları, gRPC/RPC iletişimi, Event Bus (Pub/Sub) akışları.", tech: ["gRPC", "Event Bus", "PostgreSQL", "MSSQL"] },
+    { icon: "⚡", t: "Performans & ölçekleme", d: "Yavaş ekranları hızlandırma: cache, sorgu optimizasyonu, yük testi ve izleme.", tech: ["Redis", "Prometheus", "Grafana", "k6"] },
+    { icon: "🤖", t: "Yapay zekâ entegrasyonu", d: "Agentic akışlar, MCP sunucuları ve uygulamana bağlam bilen yapay zekâ.", tech: ["MCP", "Claude Code", "Tool Calling"] },
+    { icon: "🎨", t: "Web & mobil arayüz", d: "Backend'e iyi oturan, hızlı ve temiz arayüzler.", tech: ["React", "Angular", "Blazor", "Ionic"] },
+    { icon: "🧭", t: "Teknik liderlik & danışmanlık", d: "Kod inceleme, mimari kararlar, ekip süreçleri ve dış kaynak danışmanlık.", tech: ["Scrum", "Azure DevOps", "Code Review"] },
   ];
   const SKILL_CATS = [["all","hepsi"],["ai","yapay-zeka"],["backend","backend"],["data","veri"],["frontend","frontend"],["devops","devops"],["fun","diğer"]];
 
@@ -1585,6 +1665,14 @@
       cv: { label: "CV", file: "cv.pdf", icon: "📄", b: "#7c3aed", parts: ["deneyim", "egitim"] },
       archive: { label: "Projeler", file: "projeler/", icon: "🗂️", b: "#b45309", html: () => TPL.archive(), setup: () => setupArchive() },
       iletisim: { label: "İletişim", file: "iletişim.vcf", icon: "💬", b: "#0891b2", parts: ["iletisim"] },
+      ordek: { label: "Ördeğe sor", file: "ördek.chat", icon: "🦆", b: "#ca8a04", html: () => window.DuckChat.html(), setup: () => window.DuckChat.mount(dev.querySelector(".dc")) },
+      hizmet: { label: "Hizmetler", file: "hizmetler.md", icon: "🛠️", b: "#ca8a04", html: () => `
+        <div class="svc">
+          <div class="svc-head">## hizmetler.md<b>Nasıl yardımcı olabilirim?</b></div>
+          ${SERVICES.map((v, i) => `<div class="svc-item"><span class="k">[${String(i + 1).padStart(2, "0")}]</span><b>${v.icon} ${esc(v.t)}</b><p>${esc(v.d)}</p>
+            <div class="chips">${v.tech.map(t => `<span class="chip">${esc(t)}</span>`).join("")}</div></div>`).join("")}
+          <div class="svc-cta"><p>Bir fikrin ya da projen mi var? Kısa bir mail yeter, birlikte bakalım.</p><a class="btn btn-primary" href="mailto:${EMAIL}?subject=${encodeURIComponent("Proje hakkında")}">✉️ Mail at</a></div>
+        </div>` },
       mail: { label: "Mail", file: "Yeni e-posta", icon: "✉️", b: "#2563eb", html: () => `
         <form class="ph-mail" id="phMail">
           <label>Kime<input value="${EMAIL}" readonly></label>
@@ -1606,8 +1694,10 @@
     const WATCH_POOL = ["✅ Build succeeded · main", "🚀 Deploy tamam · prod", "📧 Yeni mail: proje teklifi", "🍵 Çay molası zamanı", "🧪 128 test geçti",
       "⚡ Redis hit oranı %98.7", "📦 PR #42 birleştirildi", "⚽ Halı saha 21:00", "🗓️ Daily standup 10:00", "🎮 PS5: arkadaşın çevrimiçi", "🔔 GitHub: yeni yıldız ⭐"];
     Object.assign(OS_APPS, {
-      bildirim: { label: "Bildirimler", icon: "🔔", b: "#2563eb", html: () => `<ul class="w-list">${[...WATCH_POOL].sort(() => Math.random() - .5).slice(0, 5)
-        .map((t, i) => `<li><b>${esc(t)}</b><small>${i ? i * rnd(2, 9) + " dk önce" : "şimdi"}</small></li>`).join("")}</ul>` },
+      bildirim: { label: "Bildirimler", icon: "🔔", b: "#2563eb", html: () => `<ul class="w-list">${[
+          ...(window.GHFeed || []).slice(0, 3).map(e => [e.short, e.ago]),
+          ...[...WATCH_POOL].sort(() => Math.random() - .5).map((t, i) => [t, i ? i * rnd(2, 9) + " dk önce" : "şimdi"])].slice(0, 5)
+        .map(([t, a]) => `<li><b>${esc(t)}</b><small>${esc(a)}</small></li>`).join("")}</ul>` },
       nabiz: { label: "Nabız", icon: "❤️", b: "#dc2626", html: () => `<div class="w-center"><div class="w-heart">❤</div><b class="w-big">${rnd(62, 84)}</b><small>bpm · dinlenme</small>
         <svg class="w-ecg" viewBox="0 0 200 40"><polyline points="0,20 40,20 50,8 58,34 66,20 110,20 120,4 128,36 136,20 200,20"/></svg></div>` },
       adim: { label: "Adım", icon: "👟", b: "#16a34a", html: () => { const n = rnd(4200, 11800), p = Math.min(1, n / 10000);
@@ -1630,9 +1720,9 @@
     });
     // her cihazın ana ekranı (telefonda altta iletişim kartı da durur)
     const HOME_APPS = {
-      phone: ["mail", "github", "linkedin", "cv", "terminal", "hakkimda", "yetenekler", "archive"],
-      imac: ["hakkimda", "yetenekler", "terminal", "cv", "archive", "iletisim"],
-      tablet: ["cv", "hakkimda", "archive", "iletisim", "mail"],
+      phone: ["mail", "github", "linkedin", "cv", "terminal", "hakkimda", "yetenekler", "hizmet", "ordek", "archive"],
+      imac: ["hakkimda", "ordek", "yetenekler", "hizmet", "terminal", "cv", "archive", "iletisim"],
+      tablet: ["cv", "hakkimda", "hizmet", "archive", "iletisim", "mail"],
       watch: ["bildirim", "nabiz", "adim", "hava", "takvim", "muzik"],
     };
     const HOME_PARTS = { phone: ["iletisim"] };
@@ -2026,6 +2116,189 @@
     $("#termTips").addEventListener("click", e => { const b = e.target.closest("button"); if (b) { run(b.textContent); inp.focus({ preventScroll: true }); } });
     print(`<span class="c">dev-room v2.0</span> — hoş geldin! 👋  Başlamak için <span class="a">help</span> yaz.`);
   })();
+
+  // ---------- SMOOTH SCROLL (Lenis) ----------
+  (function () {
+    const start = () => {
+      if (!window.Lenis || reduceMotion || !matchMedia("(pointer: fine)").matches) return;
+      const lenis = new Lenis({ lerp: 0.11, wheelMultiplier: 1 });
+      const raf = t => { lenis.raf(t); requestAnimationFrame(raf); }; requestAnimationFrame(raf);
+      window.lenis = lenis;
+      window.scrollToY = y => lenis.scrollTo(y, { immediate: true, force: true });
+      if (!Boot.entered) { lenis.stop(); addEventListener("devroom:enter", () => lenis.start(), { once: true }); }
+      document.addEventListener("click", e => {  // sayfa içi bağlantılar yumuşak kaysın
+        const a = e.target.closest('a[href^="#"]'); if (!a || a.dataset.open || e.defaultPrevented) return;
+        const t = document.querySelector(a.getAttribute("href")); if (!t) return;
+        e.preventDefault(); lenis.scrollTo(t, { offset: -70 });
+      });
+    };
+    if (document.readyState === "complete") start(); else addEventListener("load", start, { once: true });
+  })();
+
+  // ---------- CURSOR: nokta + halka, üstüne gelinen nesnenin adı ----------
+  (function () {
+    if (!matchMedia("(pointer: fine)").matches || reduceMotion) return;
+    const dot = $(".cur-dot"), ring = $(".cur-ring"), label = ring.querySelector("span");
+    let x = innerWidth / 2, y = innerHeight / 2, rx = x, ry = y, room = "";
+    document.documentElement.classList.add("cc");
+    addEventListener("pointermove", e => {
+      if (e.pointerType !== "mouse") return;
+      x = e.clientX; y = e.clientY;
+      dot.style.transform = `translate(${x}px, ${y}px)`;
+      const hot = e.target.closest("a, button, [data-app], .hot, .chip, input, textarea, label");
+      ring.classList.toggle("big", !!hot || !!room);
+      const name = room && e.target.id === "room3d" ? room : (hot && hot.dataset.cursor) || "";
+      ring.classList.toggle("named", !!name); if (name) label.textContent = name;
+      ring.classList.remove("out");
+    });
+    addEventListener("room:hover", e => { room = e.detail; });
+    document.addEventListener("pointerleave", () => ring.classList.add("out"));
+    addEventListener("pointerdown", () => ring.classList.add("down")); addEventListener("pointerup", () => ring.classList.remove("down"));
+    (function loop() { rx += (x - rx) * 0.5; ry += (y - ry) * 0.5; ring.style.transform = `translate(${rx}px, ${ry}px)`; requestAnimationFrame(loop); })();
+  })();
+
+  // ---------- CANLI GITHUB: herkese açık son olaylar (saat bildirimleri + odadaki şerit) ----------
+  window.GHFeed = [];
+  (async function () {
+    const USER = "ahmetbolukoglu", KEY = "devroom-gh";
+    const ago = d => { const m = Math.round((Date.now() - new Date(d)) / 60000);
+      return m < 60 ? Math.max(1, m) + " dk önce" : m < 1440 ? Math.round(m / 60) + " sa önce" : Math.round(m / 1440) + " gün önce"; };
+    const short = (t, n = 22) => t.length > n ? t.slice(0, n - 1) + "…" : t;
+    const map = e => {
+      const r = e.repo.name.split("/")[1] || e.repo.name, p = e.payload || {};
+      const kinds = {
+        PushEvent: ["⬆️", `${r}: ${p.size || p.commits?.length || 1} commit`],
+        CreateEvent: ["✨", `${r}: yeni ${({ repository: "repo", tag: "etiket" })[p.ref_type] || "dal"}`],
+        WatchEvent: ["⭐", `${r} yıldızlandı`], ForkEvent: ["🍴", `${r} fork'landı`],
+        PullRequestEvent: ["🔀", `${r}: PR ${p.action === "closed" ? "kapandı" : "açıldı"}`],
+        IssuesEvent: ["🐞", `${r}: issue ${p.action === "closed" ? "kapandı" : "açıldı"}`],
+        ReleaseEvent: ["🚀", `${r}: yeni sürüm`], PublicEvent: ["🌍", `${r} herkese açıldı`],
+      };
+      const k = kinds[e.type]; if (!k) return null;
+      return { text: `${k[0]} ${k[1]}`, short: short(`${k[0]} ${r}`), ago: ago(e.created_at) };
+    };
+    let list;
+    try { list = JSON.parse(sessionStorage.getItem(KEY) || "null"); } catch {}
+    if (!list) {
+      try {
+        const res = await fetch(`https://api.github.com/users/${USER}/events/public?per_page=15`, { headers: { Accept: "application/vnd.github+json" } });
+        if (!res.ok) return;
+        list = (await res.json()).map(map).filter(Boolean).slice(0, 8);
+        try { sessionStorage.setItem(KEY, JSON.stringify(list)); } catch {}
+      } catch { return; }
+    }
+    if (!list.length) return;
+    window.GHFeed = list;
+    const el = $("#ghTick"), sp = el.querySelector("span");
+    let i = 0;
+    const show = () => { const e = list[i++ % list.length]; sp.style.opacity = 0; setTimeout(() => { sp.textContent = `GitHub · ${e.text} · ${e.ago}`; sp.style.opacity = 1; }, 300); };
+    el.hidden = false; show(); setInterval(show, 6000);
+  })();
+
+  // ---------- ÖRDEĞE SOR: CV'den çevrimdışı soru-cevap ----------
+  window.DuckChat = (function () {
+    let log = null, inp = null;
+    const norm = t => t.toLocaleLowerCase("tr-TR").replace(/[çğıöşü]/g, c => ({ ç: "c", ğ: "g", ı: "i", ö: "o", ş: "s", ü: "u" }[c])).replace(/\s+/g, " ").trim();
+    const has = (q, ...ws) => ws.some(w => q.includes(w));
+    const years = new Date().getFullYear() - 2013;
+    const co = e => e.company.replace(/ (Bankacılık Merkezi| ve Danışmanlık|Bilgi Bilişim Teknolojileri Akademisi|Genel Müdürlüğü)$/, "");
+    const yr = e => e.from.slice(3) + (e.from.slice(3) === e.to.slice(3) ? "" : "–" + e.to.slice(3));
+    const COMP = EXPERIENCE.map(e => ({ e, keys: [norm(co(e)), norm(co(e).split(" ")[0])] }));
+    // teknoloji → hangi kategori ve hangi işlerde
+    const TECH = new Map();
+    const addTech = (name, where) => { const k = norm(name).replace(/^\./, ""); if (k.length < 2) return; const t = TECH.get(k) || { name, cats: new Set(), jobs: new Set() }; where(t); TECH.set(k, t); };
+    SKILLS.forEach(s => s.items.forEach(i => i.split(" / ").forEach(n => addTech(n, t => t.cats.add(s.title)))));
+    EXPERIENCE.forEach(e => e.tech.forEach(n => addTech(n, t => t.jobs.add(co(e)))));
+    const techKeys = [...TECH.keys()].sort((a, b) => b.length - a.length);
+    const findTech = q => { const qq = " " + q.replace(/[?!.,]/g, " ") + " "; const out = [];
+      for (const k of techKeys) { const hit = k.length <= 3 ? qq.includes(" " + k + " ") : qq.includes(k); if (hit && !out.some(o => o.includes(k))) out.push(k); }
+      return out.map(k => TECH.get(k)); };
+    const list = a => a.length > 1 ? a.slice(0, -1).join(", ") + " ve " + a[a.length - 1] : a[0] || "";
+    const A = (text, acts = []) => ({ text, acts });
+    const open = (label, target) => ({ label, open: target });
+
+    function answer(raw) {
+      const q = norm(raw);
+      const c = COMP.find(x => x.keys.some(k => k.length > 2 && q.includes(k)));
+      if (c) { const e = c.e;
+        return A(`<b>${esc(e.company)}</b> · ${esc(e.role)}\n${e.from} – ${e.to} (${e.dur}) · ${esc(e.type)}\n\n${esc(e.desc)}\n\nKullandıklarım: ${esc(e.tech.slice(0, 8).join(", "))}`, [open("📄 tüm deneyim", "tablet:cv")]); }
+      if (has(q, "merhaba", "selam", "hey", "naber", "nasilsin", "hello", "hi ")) return A("Quack! 🦆 Ben Ahmet'in kod ördeğiyim. Deneyimini, yeteneklerini ya da nasıl ulaşacağını sorabilirsin.");
+      if (has(q, "tesekkur", "sag ol", "sagol", "eyvallah", "thanks")) return A("Rica ederim! Bir bug'ın olursa bana anlat, birlikte buluruz. 🦆");
+      if (has(q, "mail", "e-posta", "eposta", "iletisim", "ulas", "linkedin", "github", "telefon", "numara", "sosyal"))
+        return A(`Sadece e-posta paylaşıyor: <b>${EMAIL}</b>\nGitHub ve LinkedIn bağlantıları telefonda duruyor.`, [{ label: "✉️ mail at", href: "mailto:" + EMAIL }, open("📱 telefonu aç", "phone")]);
+      if (has(q, "ise al", "musait", "freelance", "calisalim", "teklif", "birlikte", "uygun mu", "acik mi", "is ar", "fiyat", "ucret", "hire"))
+        return A(`Evet, <b>yeni projelere açık</b>. Dış kaynak danışmanlık, freelance ya da tam zamanlı rolleri konuşabilir. Kısa bir mail yeter: ${EMAIL}`, [{ label: "✉️ mail at", href: "mailto:" + EMAIL }, open("🛠️ hizmetler", "imac:hizmet")]);
+      if (has(q, "hizmet", "ne yapabil", "yardim", "neler yap", "destek ver"))
+        return A(SERVICES.map((v, i) => `[${String(i + 1).padStart(2, "0")}] ${v.icon} ${v.t}`).join("\n"), [open("🛠️ hizmetler.md", "imac:hizmet")]);
+      if (has(q, "proje", "portfolyo", "portfoy", "neler yaptin", "is ornek"))
+        return A("Projeler çekmecede hazırlanıyor: hepsi şimdilik <b>coming soon</b> 🚧. İş deneyimindeki projeleri (EnerjiSA güneş santrali, QPay, Ovinot e-SMM…) sorabilirsin.", [open("🗂️ çekmeceyi aç", "archive")]);
+      if (has(q, "egitim", "okul", "universite", "mezun", "lise", "sertifika", "mcpd", "diploma"))
+        return A("🎓 Bilgisayar Programcılığı · İstanbul Üniversitesi MYO / Fatih Üniversitesi (2012–2014)\n🎓 Haydarpaşa Endüstri Meslek Lisesi (2008–2012)\n📜 Microsoft Certified Professional Developer: 100 puan (2013)");
+      if (has(q, "hobi", "bos zaman", "hali saha", "futbol", "dizi", "film", "oyun", "ps5", "playstation"))
+        return A("⚽ Halı saha, 🎬 dizi & film, 🎮 PS5 ve 🚀 yeni teknolojileri kurcalamak. Bir de bol çay. 🍵");
+      if (has(q, "cay", "kahve")) return A("Kahve değil, çay! 🍵 Neon tabelada da yazıyor: çay · kod · tekrar.");
+      if (has(q, "nerede yasi", "nerelisin", "sehir", "istanbul", "uskudar", "nerede otur", "konum", "remote", "uzaktan"))
+        return A("İstanbul, Üsküdar 📍 Pencereden Kız Kulesi görünüyor. Uzaktan (remote) çalışmaya da alışık: Timbo ICT'de tamamen remote çalıştı.");
+      if (has(q, "lider", "takim", "ekip", "yonet"))
+        return A("Ovinot'ta kıdemli geliştiricilikten <b>takım liderliğine</b> geçti; süreçleri iyileştiren, ekip içi koordinasyonu güçlendiren bir rol. Akbank'ta 6 kişilik Scrum ekibinde çalıştı.");
+      if (has(q, "yapay zeka", " ai", "ai ", "mcp", "agent", "claude", "cursor", "copilot", "llm", "gpt")) {
+        const s1 = SKILLS.filter(s => s.cat === "ai");
+        return A(`Son dönem odağı yapay zekâ 🤖\n${s1.map(s => `<b>${esc(s.title)}</b>: ${esc(s.items.join(", "))}`).join("\n")}`, [open("🧠 yetenekler", "imac:yetenekler")]);
+      }
+      const techs = findTech(q);
+      if (techs.length) return A(techs.slice(0, 3).map(t => {
+        const jobs = [...t.jobs], cats = [...t.cats];
+        return `✅ <b>${esc(t.name)}</b>: evet${cats.length ? " (" + esc(cats.join(", ")) + ")" : ""}.${jobs.length ? " Kullandığı yerler: " + esc(list(jobs)) + "." : ""}`;
+      }).join("\n"), [open("🧠 tüm yetenekler", "imac:yetenekler")]);
+      if (has(q, "yetenek", "teknoloji", "stack", "bildigin", "hangi dil", "uzman", "beceri", "skill"))
+        return A(SKILLS.map(s => `${s.icon} <b>${esc(s.title)}</b>: ${esc(s.items.slice(0, 4).join(", "))}…`).join("\n"), [open("🧠 skills.json", "imac:yetenekler")]);
+      if (has(q, "deneyim", "tecrube", "kac yil", "kariyer", "nerede calis", "nerelerde", "sirket", "is gecmis", "calistigin", "gecmis"))
+        return A(`${years}+ yıl, ${EXPERIENCE.length} kurum:\n${EXPERIENCE.map(e => `• <b>${esc(co(e))}</b> ${yr(e)}`).join("\n")}\n\nBirinin adını yaz, detayını anlatayım.`, [open("📄 cv.pdf", "tablet:cv")]);
+      if (has(q, "kim", "kendini", "hakkinda", "tanit", "ozet", "ahmet", "nesin", "ne is"))
+        return A(`<b>Ahmet Bölükoğlu</b>, Kıdemli Yazılım Geliştirme Uzmanı. ${years}+ yıldır .NET Core, C# ve mikroservislerle performanslı, ölçeklenebilir sistemler geliştiriyor; son dönemde yapay zekâ, agentic sistemler ve MCP.`, [open("🖥️ README.md", "imac:hakkimda")]);
+      return A("Hmm, bunu bilmiyorum 🦆 Ama şunları sorabilirsin: deneyim, bir şirket adı (ör. Ovinot), bir teknoloji (ör. Redis), eğitim, hizmetler ya da iletişim.");
+    }
+
+    const SUGGEST = ["Kimsin?", "Nerelerde çalıştın?", "Redis kullandın mı?", "Yapay zekâ ile ne yapıyorsun?", "Müsait misin?", "Hizmetler", "İletişim"];
+    const HELLO = "Quack! 🦆 Ben Ahmet'in kod ördeğiyim. Bug'ları dinlerim ama onun CV'sini de ezbere biliyorum. Ne merak ediyorsun?";
+    const msgs = [{ cls: "bot", html: HELLO }];
+    const msgEl = m => `<div class="dc-msg ${m.cls}">${m.html}</div>`;
+    const html = () => `
+      <div class="dc">
+        <div class="dc-intro"><span class="dc-ava">🦆</span><div><b>Ördeğe sor</b><small>CV'mi ezbere bilir · çevrimdışı</small></div></div>
+        <div class="dc-log" aria-live="polite">${msgs.map(msgEl).join("")}</div>
+        <div class="dc-chips">${SUGGEST.map(t => `<button type="button">${t}</button>`).join("")}</div>
+        <form class="dc-form"><input autocomplete="off" placeholder="Bir şey sor… (ör. Redis kullandın mı?)" aria-label="Soru"><button type="submit" aria-label="Gönder">↑</button></form>
+      </div>`;
+    function mount(el) {
+      log = el.querySelector(".dc-log"); inp = el.querySelector("input");
+      log.scrollTop = log.scrollHeight;
+      el.querySelector(".dc-chips").addEventListener("click", e => { const b = e.target.closest("button"); if (b) ask(b.textContent); });
+      el.querySelector("form").addEventListener("submit", e => { e.preventDefault(); ask(inp.value); });
+      setTimeout(() => inp.focus({ preventScroll: true }), 80);
+    }
+    const add = (cls, html) => {
+      const m = { cls, html }; msgs.push(m);
+      if (!log || !log.isConnected) return m;
+      log.insertAdjacentHTML("beforeend", msgEl(m)); m.el = log.lastElementChild; log.scrollTop = log.scrollHeight; return m;
+    };
+    let busy = false;
+    async function ask(text) {
+      text = text.trim(); if (!text || busy) return;
+      busy = true; add("me", esc(text)); if (inp) inp.value = "";
+      const a = answer(text);
+      const m = add("bot", '<span class="dc-typing"><i></i><i></i><i></i></span>');
+      await new Promise(r => setTimeout(r, reduceMotion ? 0 : 450 + Math.min(900, a.text.length * 4)));
+      m.html = a.text + (a.acts.length ? `<div class="dc-acts">${a.acts.map(x => x.href ? `<a href="${x.href}">${x.label}</a>` : `<button type="button" data-open="${x.open}">${x.label}</button>`).join("")}</div>` : "");
+      if (m.el && m.el.isConnected) { m.el.innerHTML = m.html; log.scrollTop = log.scrollHeight; }
+      sfx("quack"); window.Room3D?.duckHop?.();
+      busy = false;
+    }
+    return { open: () => Devices.open("imac", "ordek"), html, mount, ask, answer };
+  })();
+
+  // ---------- SHOWREEL düğmesi ----------
+  $("#reelBtn").addEventListener("click", () => { if (window.Room3D) Room3D.showreel(); else toast("3D oda yükleniyor…"); });
 
   // ---------- REVEAL + COUNTERS ----------
   (function () {

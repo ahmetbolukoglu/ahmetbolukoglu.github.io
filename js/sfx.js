@@ -65,6 +65,8 @@ window.Sfx = (function () {
     chime() { [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => tone(f, 1.2, { gain: 0.07, delay: i * 0.09, attack: 0.01 })); },
     success() { tone(880, 0.12, { type: "triangle", gain: 0.06 }); tone(1320, 0.25, { type: "triangle", gain: 0.06, delay: 0.1 }); },
     horn() { HORNS[Math.floor(Math.random() * HORNS.length)](); },  // uzaktan, rastgele: vapur ya da gemi
+    meow() { tone(720, 0.45, { type: "triangle", gain: 0.06, to: 480, attack: 0.06 }); tone(1440, 0.4, { type: "sine", gain: 0.02, to: 960, attack: 0.06 }); },
+    purr() { for (let i = 0; i < 6; i++) tone(28, 0.12, { type: "sawtooth", gain: 0.05, delay: i * 0.14, attack: 0.03 }); },
   };
 
   // Boğaz'dan gelen düdükler: yumuşak (sinüs + az harmonik), alçak geçiren süzgeç ve uzak yankı; sert "börrt" yok

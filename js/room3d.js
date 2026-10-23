@@ -15,7 +15,7 @@ const B = (x, y, z) => new THREE.Vector3(x, z, -y);
 const MATS = {
   W_Wall: { color: "#2b2657", roughness: 0.95 },
   W_Floor: { color: "#7a5434", roughness: 0.7, map: "planks" },
-  W_Wood: { color: "#9a6a42", roughness: 0.6 },
+  W_Wood: { color: "#ffffff", roughness: 0.55, map: "oak" },
   W_WoodDark: { color: "#4a2f1c", roughness: 0.65 },
   W_Rug: { color: "#3a2a6e", roughness: 1, map: "rug" },
   W_Black: { color: "#0d0c16", roughness: 0.35 },
@@ -25,7 +25,6 @@ const MATS = {
   W_Tea: { color: "#c2410c", roughness: 0.15, transparent: true, opacity: 0.92 },
   W_Ceramic: { color: "#eeebf8", roughness: 0.35 },
   W_Lamp: { color: "#7c3aed", roughness: 0.45 },
-  W_Bulb: { color: "#fff3c4", emissive: "#fde68a", emissiveIntensity: 3 },
   W_Duck: { color: "#facc15", roughness: 0.45 },
   W_Beak: { color: "#f97316", roughness: 0.5 },
   W_Leaf: { color: "#22a355", roughness: 0.6, side: THREE.DoubleSide },
@@ -39,23 +38,49 @@ const MATS = {
   W_Book_yellow: { color: "#eab308", roughness: 0.7 },
   W_Folder: { color: "#e8c98a", roughness: 0.85 }, W_Folder2: { color: "#d9b56f", roughness: 0.85 },
   W_FolderRed: { color: "#c2410c", roughness: 0.8 },
+  W_Pages: { color: "#efe4cb", roughness: 0.95 },
+  W_Notch: { color: "#1a120b", roughness: 1 }, W_Mat: { color: "#26282e", roughness: 1 }, W_Grill: { color: "#0c0c10", roughness: 1 },
+  W_Grey: { color: "#6b7280", roughness: 0.5 }, W_White: { color: "#eef0f4", roughness: 0.35 },
+  W_GlassDark: { color: "#0b1220", roughness: 0.05, transparent: true, opacity: 0.18, depthWrite: false },
+  W_RGB: { color: "#5eead4", emissive: "#38bdf8", emissiveIntensity: 3.5 },
+  W_Keys: { color: "#1b1c24", roughness: 0.6, emissive: "#1e3a8a", emissiveIntensity: 0.25 },
+  W_KeyGlow: { color: "#38bdf8", emissive: "#38bdf8", emissiveIntensity: 1.6 },
+  W_Bottle: { color: "#60a5fa", roughness: 0.1, transparent: true, opacity: 0.5, depthWrite: false },
+  W_Fabric: { color: "#b9a68a", roughness: 1 }, W_WoodLight: { color: "#d9b98a", roughness: 0.8 },
+  W_Paper: { color: "#f5f3ff", roughness: 0.9 },
+  W_PhoneBody: { color: "#2b2a31", roughness: 0.3, metalness: 0.7 }, W_LEDGreen: { color: "#22c55e", emissive: "#22c55e", emissiveIntensity: 2.5 },
+  W_Chair: { color: "#1b1b21", roughness: 0.75 }, W_ChairAccent: { color: "#dc2626", roughness: 0.6 },
 };
+// raftaki kitaplar: her biri bir yetenek alanı (tıklanınca masaüstünde o kategori açılır)
+const BOOKS = {
+  net: { title: ".NET Core & C#", sub: "10+ yıl · ana dilim", cat: "backend", color: "#5b21b6", icon: "C#" },
+  micro: { title: "Mikroservis Mimarisi", sub: "gRPC · Event Bus · FastEndpoints", cat: "backend", color: "#1e40af", icon: "{ }" },
+  redis: { title: "Redis & Performans", sub: "Cache · Prometheus · Grafana · k6", cat: "data", color: "#991b1b", icon: "⚡" },
+  sql: { title: "SQL & Veritabanı", sub: "MSSQL · PostgreSQL · EF · Dapper", cat: "data", color: "#155e75", icon: "DB" },
+  grpc: { title: "BaaS & Real-time", sub: "Supabase · WebSockets · Edge Functions", cat: "devops", color: "#065f46", icon: "RT" },
+  ai: { title: "Yapay Zekâ & MCP", sub: "Agentic sistemler · Claude Code · Cursor", cat: "ai", color: "#9d174d", icon: "AI" },
+  front: { title: "React & TypeScript", sub: "React · Angular · Blazor · Ionic", cat: "frontend", color: "#075985", icon: "</>" },
+  devops: { title: "DevOps & CI/CD", sub: "Azure DevOps · GitHub · Jenkins", cat: "devops", color: "#9a3412", icon: "CI" },
+  game: { title: "Oyun & 3D", sub: "Canvas/WebGL · Blender Python API", cat: "fun", color: "#854d0e", icon: "3D" },
+};
+for (const [id, b] of Object.entries(BOOKS)) MATS["W_Book_" + id] = { color: b.color, roughness: 0.55 };
 const sfx = (name, ...a) => window.Sfx && window.Sfx.play(name, ...a);
 const boot = window.Boot || { progress() {}, ready() {}, entered: true };
 
 // scroll turu durakları (Blender koordinatı) ve yazıları
 const STOPS = [
   { pos: [0.15, -1.5, 1.42], look: [0.18, 1.3, 1.22] },
-  { pos: [-0.55, 0.35, 1.5], look: [-1.25, 5.0, 1.45], n: "01", h: "Üsküdar'dan Boğaz'a", p: "Kız Kulesi'ne bakan bir oda. 10 yılı aşkın süredir kod burada demleniyor." },
-  { pos: [0.12, 0.5, 1.16], look: [0.12, 1.36, 1.1], n: "02", h: "Masaüstü", p: ".NET Core, C#, mikroservisler. Ekrana tıkla: README, yetenekler ve terminal." },
-  { pos: [-0.12, 0.6, 0.99], look: [-0.24, 1.05, 0.8], n: "03", h: "Çay · kod · tekrar", p: "Performans, ölçeklenebilirlik ve sürdürülebilir kod. Bir de bol çay." },
-  { pos: [0.8, 0.02, 1.08], look: [0.8, 0.72, 0.6], n: "04", h: "Proje arşivi", p: "Çekmecede 10 yıllık iş: EnerjiSA'dan Ovinot'a. Tıkla, dosyaları karıştır.", drawer: true },
-  { pos: [0.78, 0.15, 1.62], look: [1.45, 1.5, 1.58], n: "05", h: "Kitaplık", p: "Yapay zekâ, MCP, Redis, gRPC… Yetenekler rafta dizili." },
-  { pos: [0.58, 0.5, 1.02], look: [0.62, 1.2, 0.9], n: "06", h: "Bana ulaş", p: "Telefona dokun: mail, GitHub, LinkedIn. Tablet: CV." },
+  { pos: [-0.95, 0.45, 1.7], look: [-1.4, 5.0, 1.75], n: "01", h: "Üsküdar'dan Boğaz'a", p: "Kız Kulesi'ne bakan bir oda. 10 yılı aşkın süredir kod burada demleniyor." },
+  { pos: [0.12, 0.05, 1.12], look: [0.12, 1.3, 1.07], n: "02", h: "49 inç masaüstü", p: ".NET Core, C#, mikroservisler. Ekrana tıkla: README, yetenekler ve terminal." },
+  { pos: [-0.42, 0.5, 1.02], look: [-0.35, 1.0, 0.8], n: "03", h: "Çay · kod · tekrar", p: "Performans, ölçeklenebilirlik ve sürdürülebilir kod. Bir de bol çay ve lastik ördek." },
+  { pos: [0.835, 0.02, 1.08], look: [0.835, 0.72, 0.6], n: "04", h: "Proje arşivi", p: "Çekmecede 10 yıllık iş: EnerjiSA'dan Ovinot'a. Tıkla, dosyaları karıştır.", drawer: true },
+  { pos: [0.6, 0.35, 1.25], look: [0.92, 1.2, 1.0], n: "05", h: "Kasa ve RGB", p: "Sıvı soğutma, üç fan, beyaz kasa. Derleme hızlı, ışıklar daha hızlı." },
+  { pos: [0.78, 0.15, 1.62], look: [1.45, 1.5, 1.58], n: "06", h: "Kitaplık", p: "Yapay zekâ, MCP, Redis, gRPC… Yetenekler rafta dizili." },
+  { pos: [-0.45, -0.6, 1.3], look: [-1.95, 0.15, 1.25], n: "07", h: "Oyun molası", p: "65 inç TV ve PS5. Kod bitince bir maç." },
   { pos: [0.15, -1.5, 1.42], look: [0.18, 1.3, 1.22] },
 ];
-const SCREENS = ["W_Screen_iMac", "W_Screen_Tablet", "W_Screen_Phone", "W_Cert"];
-const CLICK = ["iMac", "Tablet", "Phone", "Shelf", "Lamp", "Tea", "Duck", "Ball", "Window", "Cert", "Plant", "Clock", "Neon", "Drawer"];
+const SCREENS = ["W_Screen_iMac", "W_Screen_Left", "W_Screen_TV", "W_Screen_Phone", "W_Screen_Watch", "W_Cert"];
+const CLICK = ["iMac", "Monitor2", "Phone", "Shelf", "Tea", "Duck", "Ball", "Window", "Cert", "Clock", "Neon", "Drawer", "Keyboard", "PC", "TV", "PS5", "Controllers", "Headphones", "Bottle", "Modem", "Watch", "Chair"];
 
 function webglOK() {
   try { const c = document.createElement("canvas"); return !!(c.getContext("webgl2") || c.getContext("webgl")); }
@@ -75,6 +100,25 @@ function canvasTex(w, h, draw) {
 }
 
 const PATTERNS = {
+  oak: () => {
+    const t = canvasTex(512, 512, (g, w, h) => {
+      g.fillStyle = "#a8743f"; g.fillRect(0, 0, w, h);
+      for (let i = 0; i < 90; i++) {
+        const y = (i * 5.7) % h, l = 38 + ((i * 37) % 17);
+        g.strokeStyle = `hsla(28, 45%, ${l}%, .55)`; g.lineWidth = 1 + (i % 3);
+        g.beginPath(); g.moveTo(0, y);
+        for (let x = 0; x <= w; x += 32) g.lineTo(x, y + Math.sin(x / 70 + i) * 4 + Math.sin(x / 23 + i * 2) * 1.5);
+        g.stroke();
+      }
+      for (let k = 0; k < 6; k++) {
+        const x = (k * 191) % w, y = (k * 311) % h;
+        g.strokeStyle = "rgba(60,30,10,.35)";
+        for (let r = 4; r < 26; r += 4) { g.beginPath(); g.ellipse(x, y, r * 2.4, r * 0.7, 0, 0, 7); g.stroke(); }
+      }
+    });
+    t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(1.4, 1.4);
+    return t;
+  },
   planks: () => {
     const t = canvasTex(512, 512, (g, w, h) => {
       for (let i = 0; i < 5; i++) {
@@ -110,7 +154,8 @@ const PATTERNS = {
 };
 
 function skyTexture(day) {
-  return canvasTex(2048, 1024, (g, w, h, shoot) => {
+  return canvasTex(2048, 1024, (g, w, h, o = {}) => {
+    const shoot = o.shoot;
     const sky = g.createLinearGradient(0, 0, 0, h * .62);
     if (day) { sky.addColorStop(0, "#5aa7e8"); sky.addColorStop(1, "#f6c99a"); }
     else { sky.addColorStop(0, "#060a24"); sky.addColorStop(.7, "#1d1650"); sky.addColorStop(1, "#5b2a68"); }
@@ -158,6 +203,21 @@ function skyTexture(day) {
     g.fillRect(kx - 70, ky - 34, 140, 34); g.fillRect(kx - 24, ky - 110, 48, 80); g.fillRect(kx - 30, ky - 118, 60, 10);
     g.beginPath(); g.moveTo(kx - 18, ky - 118); g.lineTo(kx, ky - 175); g.lineTo(kx + 18, ky - 118); g.fill();
     if (!day) { g.fillStyle = "#fcd34d"; g.fillRect(kx - 8, ky - 90, 16, 20); g.fillRect(kx - 50, ky - 24, 12, 12); g.fillRect(kx + 38, ky - 24, 12, 12); g.beginPath(); g.arc(kx, ky - 182, 7, 0, 7); g.fill(); }
+    // Şehir Hatları vapuru (o.ferry = x)
+    if (o.ferry != null) {
+      const fx = o.ferry, fy = hz + 215, white = day ? "#f8fafc" : "#aeb6c8";
+      g.strokeStyle = day ? "rgba(255,255,255,.5)" : "rgba(252,211,77,.25)"; g.lineWidth = 4;
+      g.beginPath(); g.moveTo(fx - 160, fy + 4); g.lineTo(fx + 10, fy + 2); g.stroke();
+      g.fillStyle = white; g.beginPath(); g.moveTo(fx, fy - 34); g.lineTo(fx + 280, fy - 34); g.lineTo(fx + 256, fy); g.lineTo(fx + 18, fy); g.fill();
+      g.fillStyle = "#1e293b"; g.fillRect(fx + 16, fy - 9, 242, 9);
+      g.fillStyle = white; g.fillRect(fx + 50, fy - 64, 180, 30); g.fillRect(fx + 80, fy - 86, 110, 22);
+      g.fillStyle = day ? "#334155" : "#fcd34d";
+      for (let k = 0; k < 9; k++) g.fillRect(fx + 60 + k * 19, fy - 56, 10, 10);
+      for (let k = 0; k < 5; k++) g.fillRect(fx + 90 + k * 20, fy - 79, 9, 8);
+      g.fillStyle = "#111827"; g.fillRect(fx + 150, fy - 126, 26, 40);
+      g.fillStyle = "#e11d48"; g.fillRect(fx + 150, fy - 112, 26, 7);
+      if (!day) { g.fillStyle = "#ef4444"; g.beginPath(); g.arc(fx + 276, fy - 40, 5, 0, 7); g.fill(); }
+    }
   });
 }
 
@@ -193,7 +253,9 @@ const CC = { k: "#ff7b72", t: "#79c0ff", s: "#a5d6ff", f: "#d2a8ff", c: "#8b949e
 
 function imacScreen() {
   let fi = 0, li = 0, ci = 0;
-  const tex = canvasTex(1024, 620, (g, w, h) => {
+  const tex = canvasTex(2048, 582, (g, W, h) => {
+    const w = 1024;  // sol yarı: editör; sağ yarı: tarayıcıda site
+    browserPane(g, 1024, 0, 1024, h);
     g.fillStyle = "#0d1117"; g.fillRect(0, 0, w, h);
     g.fillStyle = "#161b22"; g.fillRect(0, 0, w, 44);
     [["#ff5f57", 24], ["#febc2e", 50], ["#28c840", 76]].forEach(([c, x]) => { g.fillStyle = c; g.beginPath(); g.arc(x, 22, 8, 0, 7); g.fill(); });
@@ -225,38 +287,130 @@ function imacScreen() {
   return tex;
 }
 
-function tabletScreen() {
-  return canvasTex(512, 744, (g, w, h) => {
-    g.fillStyle = "#f5f3ff"; g.fillRect(0, 0, w, h);
-    g.fillStyle = "#a78bfa"; g.beginPath(); g.arc(80, 90, 46, 0, 7); g.fill();
-    g.fillStyle = "#fff"; g.font = "700 36px Space Grotesk, sans-serif"; g.textAlign = "center"; g.fillText("AB", 80, 103);
-    g.textAlign = "left"; g.fillStyle = "#15132e"; g.font = "700 30px Space Grotesk, sans-serif"; g.fillText("Ahmet Bölükoğlu", 146, 84);
-    g.fillStyle = "#7c3aed"; g.font = "20px JetBrains Mono, monospace"; g.fillText("Kıdemli Yazılım Uzmanı", 146, 116);
-    g.fillStyle = "#ddd8f5"; g.fillRect(36, 160, w - 72, 3);
-    const jobs = [["EnerjiSA", "2024–2025"], ["Agrio Finans", "2023–2024"], ["Ovinot · Takım Lideri", "2020–2023"], ["Akbank", "2018–2019"], ["Medipol Üniv.", "2014–2016"]];
-    g.fillStyle = "#ddd8f5"; g.fillRect(52, 200, 3, 470);
-    jobs.forEach(([n, d], i) => {
-      const y = 210 + i * 94;
-      g.fillStyle = i ? "#a78bfa" : "#14b8a6"; g.beginPath(); g.arc(53, y, 12, 0, 7); g.fill();
-      g.fillStyle = "#15132e"; g.font = "700 24px Space Grotesk, sans-serif"; g.fillText(n, 84, y + 8);
-      g.fillStyle = "#8b86a8"; g.font = "18px JetBrains Mono, monospace"; g.fillText(d, 84, y + 36);
-      g.fillStyle = "#e4e0f5"; g.fillRect(84, y + 48, 300 - i * 24, 8);
+function browserPane(g, x0, y0, w, h) {
+  g.save(); g.translate(x0, y0);
+  g.fillStyle = "#0b0a1a"; g.fillRect(0, 0, w, h);
+  g.fillStyle = "#1b1838"; g.fillRect(0, 0, w, 44);
+  g.fillStyle = "#110f26"; g.beginPath(); g.roundRect(120, 9, w - 240, 26, 13); g.fill();
+  g.fillStyle = "#9a96bd"; g.font = "18px JetBrains Mono, monospace"; g.textAlign = "center"; g.fillText("🔒 ahmetbolukoglu.github.io", w / 2, 28);
+  g.textAlign = "left"; g.fillStyle = "#86efac"; g.font = "16px JetBrains Mono, monospace"; g.fillText("● yeni projelere açık", 48, 92);
+  g.font = "700 54px Space Grotesk, sans-serif"; g.fillStyle = "#e8e6f5"; g.fillText("Merhaba, ben", 48, 158);
+  const gr = g.createLinearGradient(48, 0, 560, 0); gr.addColorStop(0, "#5eead4"); gr.addColorStop(.55, "#a78bfa"); gr.addColorStop(1, "#f472b6");
+  g.fillStyle = gr; g.fillText("Ahmet Bölükoğlu", 48, 218);
+  g.fillStyle = "#15132e"; g.beginPath(); g.roundRect(48, 250, w - 96, h - 280, 16); g.fill();
+  g.fillStyle = "#2a2650"; g.fillRect(90, 300, 160, 110); g.fillStyle = "#5eead4"; g.fillRect(330, 330, 200, 120);
+  g.fillStyle = "#9a6a42"; g.fillRect(260, 470, 420, 18);
+  g.restore();
+}
+
+function leftScreen() {  // 27" monitör: masaüstü duvar kâğıdı + cv.pdf penceresi
+  return canvasTex(1024, 576, (g, w, h) => {
+    const bg = g.createRadialGradient(w * 0.55, h * 0.55, 30, w * 0.55, h * 0.55, w * 0.7);
+    bg.addColorStop(0, "#7dd3fc"); bg.addColorStop(.35, "#1d4ed8"); bg.addColorStop(1, "#0b1340");
+    g.fillStyle = bg; g.fillRect(0, 0, w, h);
+    g.strokeStyle = "rgba(191,219,254,.35)"; g.lineWidth = 3;
+    for (let i = 0; i < 9; i++) { g.beginPath(); g.ellipse(w * 0.55, h * 0.58, 90 + i * 34, 40 + i * 18, -0.5 + i * 0.12, 0, Math.PI * 1.4); g.stroke(); }
+    g.fillStyle = "rgba(255,255,255,.96)"; g.beginPath(); g.roundRect(250, 60, 520, 440, 12); g.fill();
+    g.fillStyle = "#e5e7eb"; g.fillRect(250, 60, 520, 36); g.fillStyle = "#374151"; g.font = "16px JetBrains Mono, monospace"; g.fillText("cv.pdf", 270, 84);
+    g.fillStyle = "#a78bfa"; g.beginPath(); g.arc(310, 150, 34, 0, 7); g.fill();
+    g.fillStyle = "#fff"; g.font = "700 26px Space Grotesk, sans-serif"; g.textAlign = "center"; g.fillText("AB", 310, 159); g.textAlign = "left";
+    g.fillStyle = "#15132e"; g.font = "700 26px Space Grotesk, sans-serif"; g.fillText("Ahmet Bölükoğlu", 360, 146);
+    g.fillStyle = "#7c3aed"; g.font = "16px JetBrains Mono, monospace"; g.fillText("Kıdemli Yazılım Uzmanı", 360, 172);
+    [["EnerjiSA", "2024–2025"], ["Agrio Finans", "2023–2024"], ["Ovinot", "2020–2023"], ["Akbank", "2018–2019"]].forEach(([n, d], i) => {
+      const y = 228 + i * 64;
+      g.fillStyle = i ? "#a78bfa" : "#14b8a6"; g.beginPath(); g.arc(300, y, 8, 0, 7); g.fill();
+      g.fillStyle = "#15132e"; g.font = "700 19px Space Grotesk, sans-serif"; g.fillText(n, 322, y + 6);
+      g.fillStyle = "#9ca3af"; g.font = "14px JetBrains Mono, monospace"; g.fillText(d, 560, y + 6);
+      g.fillStyle = "#e5e7eb"; g.fillRect(322, y + 16, 300 - i * 30, 6);
     });
+    g.fillStyle = "rgba(15,23,42,.85)"; g.fillRect(0, h - 34, w, 34);
+  });
+}
+
+function tvScreen() {  // 65" TV: oyun molası ekranı
+  return canvasTex(1024, 576, (g, w, h) => {
+    const bg = g.createLinearGradient(0, 0, w, h); bg.addColorStop(0, "#0b1a4a"); bg.addColorStop(1, "#2e1065");
+    g.fillStyle = bg; g.fillRect(0, 0, w, h);
+    g.strokeStyle = "rgba(147,197,253,.25)"; g.lineWidth = 2;
+    for (let i = 0; i < 14; i++) { g.beginPath(); g.moveTo(0, 340 + i * 10); for (let x = 0; x <= w; x += 32) g.lineTo(x, 340 + i * 10 + Math.sin(x / 120 + i * 0.4) * 30); g.stroke(); }
+    g.fillStyle = "#fff"; g.font = "700 46px Space Grotesk, sans-serif"; g.fillText("Oyun molası 🎮", 60, 110);
+    g.fillStyle = "#bfdbfe"; g.font = "20px JetBrains Mono, monospace"; g.fillText("kod derleniyor… o sırada bir maç?", 62, 150);
+    ["#f472b6", "#5eead4", "#fbbf24", "#a78bfa", "#60a5fa"].forEach((c, i) => { g.fillStyle = c; g.beginPath(); g.roundRect(60 + i * 150, 210, 130, 130, 16); g.fill(); });
   });
 }
 
 function phoneScreen() {
   return canvasTex(256, 552, (g, w, h) => {
-    const bg = g.createLinearGradient(0, 0, w, h); bg.addColorStop(0, "#7c3aed"); bg.addColorStop(1, "#db2777");
+    const bg = g.createLinearGradient(0, 0, w * 0.4, h); bg.addColorStop(0, "#3b0d1a"); bg.addColorStop(0.55, "#7a1f35"); bg.addColorStop(1, "#1a0610");
     g.fillStyle = bg; g.fillRect(0, 0, w, h);
-    g.fillStyle = "#000"; g.beginPath(); g.roundRect(88, 14, 80, 22, 11); g.fill();
-    const t = new Date().toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" });
-    g.fillStyle = "#fff"; g.textAlign = "center"; g.font = "700 64px Space Grotesk, sans-serif"; g.fillText(t, w / 2, 140);
-    g.font = "18px Space Grotesk, sans-serif"; g.fillText(new Date().toLocaleDateString("tr-TR", { weekday: "long", day: "numeric", month: "long" }), w / 2, 172);
-    g.fillStyle = "rgba(255,255,255,.92)"; g.beginPath(); g.roundRect(18, 240, w - 36, 84, 18); g.fill();
-    g.fillStyle = "#15132e"; g.textAlign = "left"; g.font = "700 18px Space Grotesk, sans-serif"; g.fillText("✉️ Yeni mesaj", 34, 274);
-    g.fillStyle = "#4b4670"; g.font = "16px Space Grotesk, sans-serif"; g.fillText("Projen için konuşalım mı?", 34, 302);
-    g.fillStyle = "rgba(255,255,255,.7)"; g.beginPath(); g.roundRect(w / 2 - 50, h - 22, 100, 6, 3); g.fill();
+    g.fillStyle = "rgba(255,255,255,.06)"; g.beginPath(); g.ellipse(w * 0.8, h * 0.7, 160, 260, -0.4, 0, 7); g.fill();
+    g.fillStyle = "#000"; g.beginPath(); g.arc(w / 2, 16, 7, 0, 7); g.fill();                       // kamera deliği
+    g.fillStyle = "#fff"; g.font = "600 12px Space Grotesk, sans-serif"; g.textAlign = "left"; g.fillText("Turkcell", 14, 20);
+    g.textAlign = "right"; g.fillText("5G  87%", w - 14, 20);
+    const d = new Date(), hh = String(d.getHours()).padStart(2, "0"), mm = String(d.getMinutes()).padStart(2, "0");
+    g.textAlign = "center"; g.font = "300 74px Space Grotesk, sans-serif"; g.fillText(hh, w / 2, 122); g.fillText(mm, w / 2, 196);
+    g.font = "16px Space Grotesk, sans-serif"; g.fillText(d.toLocaleDateString("tr-TR", { weekday: "short", day: "numeric", month: "long" }), w / 2, 226);
+    g.fillStyle = "rgba(20,8,14,.72)"; g.beginPath(); g.roundRect(16, 262, w - 32, 78, 20); g.fill();
+    g.fillStyle = "#fff"; g.textAlign = "left"; g.font = "700 15px Space Grotesk, sans-serif"; g.fillText("✉️ Gmail · şimdi", 30, 290);
+    g.fillStyle = "#e5d3da"; g.font = "14px Space Grotesk, sans-serif"; g.fillText("Projen için konuşalım mı?", 30, 316);
+    g.fillStyle = "rgba(255,255,255,.85)"; g.textAlign = "center"; g.font = "20px Space Grotesk, sans-serif";
+    g.fillText("📞", 34, h - 30); g.fillText("📷", w - 34, h - 30);
+  });
+}
+
+// Galaxy Watch yüzü: yuvarlak, köşeler saydam; saat + dönen bildirimler
+const WATCH_NOTES = ["✅ Build succeeded", "🍵 Çay molası", "📧 Yeni mail", "🚀 Deploy tamam", "❤️ 72 bpm"];
+function watchScreen() {
+  const tex = canvasTex(256, 256, (g, w, h) => {
+    g.clearRect(0, 0, w, h);
+    g.save(); g.beginPath(); g.arc(w / 2, h / 2, w / 2 - 2, 0, 7); g.clip();
+    g.fillStyle = "#05060a"; g.fillRect(0, 0, w, h);
+    const d = new Date(), s = d.getSeconds();
+    g.strokeStyle = "#1f2937"; g.lineWidth = 10; g.beginPath(); g.arc(w / 2, h / 2, w / 2 - 14, 0, 7); g.stroke();
+    g.strokeStyle = "#5eead4"; g.beginPath(); g.arc(w / 2, h / 2, w / 2 - 14, -Math.PI / 2, -Math.PI / 2 + s / 60 * Math.PI * 2); g.stroke();
+    g.fillStyle = "#fff"; g.textAlign = "center"; g.font = "600 58px Space Grotesk, sans-serif";
+    g.fillText(d.toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" }), w / 2, 128);
+    g.fillStyle = "#9ca3af"; g.font = "16px Space Grotesk, sans-serif"; g.fillText(d.toLocaleDateString("tr-TR", { weekday: "short", day: "numeric" }), w / 2, 154);
+    g.fillStyle = "#1f2937"; g.beginPath(); g.roundRect(40, 172, w - 80, 34, 17); g.fill();
+    g.fillStyle = "#e5e7eb"; g.font = "15px Space Grotesk, sans-serif"; g.fillText(WATCH_NOTES[Math.floor(Date.now() / 5000) % WATCH_NOTES.length], w / 2, 195);
+    g.restore();
+  });
+  return tex;
+}
+
+function soonTexture() {  // çekmecedeki A4: COMING SOON
+  return canvasTex(420, 594, (g, w, h) => {
+    g.fillStyle = "#fbfaf6"; g.fillRect(0, 0, w, h);
+    g.strokeStyle = "#e5e1d6"; for (let y = 60; y < h; y += 28) { g.beginPath(); g.moveTo(30, y); g.lineTo(w - 30, y); g.stroke(); }
+    g.fillStyle = "#15132e"; g.textAlign = "center"; g.font = "700 52px Space Grotesk, sans-serif"; g.fillText("COMING", w / 2, h / 2 - 20); g.fillText("SOON", w / 2, h / 2 + 40);
+    g.fillStyle = "#c2410c"; g.font = "18px JetBrains Mono, monospace"; g.fillText("yeni projeler yolda…", w / 2, h / 2 + 86);
+    g.strokeStyle = "#c2410c"; g.lineWidth = 4; g.strokeRect(w / 2 - 110, h / 2 - 82, 220, 140);
+  });
+}
+
+function spineTexture(b) {
+  return canvasTex(120, 600, (g, w, h) => {
+    const sh = g.createLinearGradient(0, 0, w, 0);  // sırt yuvarlak görünsün
+    sh.addColorStop(0, "rgba(0,0,0,.35)"); sh.addColorStop(.35, "rgba(255,255,255,.12)"); sh.addColorStop(1, "rgba(0,0,0,.4)");
+    g.fillStyle = b.color; g.fillRect(0, 0, w, h); g.fillStyle = sh; g.fillRect(0, 0, w, h);
+    g.fillStyle = "#e7c26a";
+    [[26, 4], [36, 2], [h - 40, 2], [h - 30, 4]].forEach(([y, t]) => g.fillRect(8, y, w - 16, t));
+    g.save(); g.translate(w / 2 + 9, h - 120); g.rotate(-Math.PI / 2);
+    g.font = "700 30px Space Grotesk, sans-serif"; g.fillStyle = "#fbf3dc"; g.textAlign = "left";
+    let t = b.title; while (g.measureText(t).width > h - 190 && t.length > 4) t = t.slice(0, -2) + "…";
+    g.fillText(t, 0, 0); g.restore();
+    g.font = "700 26px JetBrains Mono, monospace"; g.fillStyle = "#e7c26a"; g.textAlign = "center";
+    g.fillText(b.icon, w / 2, h - 66);
+    g.strokeStyle = "#e7c26a"; g.lineWidth = 2; g.beginPath(); g.arc(w / 2, h - 75, 26, 0, 7); g.stroke();
+  });
+}
+
+function noteTexture(lines, bg) {
+  return canvasTex(256, 256, (g, w, h) => {
+    g.fillStyle = bg; g.fillRect(0, 0, w, h);
+    g.fillStyle = "rgba(0,0,0,.08)"; g.fillRect(0, 0, w, 26);
+    g.fillStyle = "#3b2a14"; g.font = "700 34px Space Grotesk, sans-serif"; g.textAlign = "left";
+    lines.forEach((l, i) => g.fillText(l, 22, 74 + i * 48));
   });
 }
 
@@ -295,15 +449,17 @@ async function init() {
   scene.background = new THREE.Color("#0f0d24");
   const camera = new THREE.PerspectiveCamera(40, 16 / 10, 0.03, 60);
   const HOME = { pos: B(0.15, -1.5, 1.42), look: B(0.18, 1.3, 1.22) };
-  const INTRO = { pos: B(0.12, 1.02, 1.12), look: B(0.12, 1.36, 1.11) };  // açılışta ekranın içinden geri çekilir
+  const INTRO = { pos: B(0.12, 1.0, 1.08), look: B(0.12, 1.36, 1.08) };  // açılışta ekranın içinden geri çekilir
   camera.position.copy(INTRO.pos); camera.lookAt(INTRO.look);
   const stops = STOPS.map(s => ({ ...s, pos: B(...s.pos), look: B(...s.look) }));
 
   // ışıklar
   const hemi = new THREE.HemisphereLight("#4a46a0", "#140f28", 1.1); scene.add(hemi);
   const moon = new THREE.DirectionalLight("#9db4ff", 1.2); moon.position.copy(B(-1.6, 6, 3.5)); moon.target.position.copy(B(0, 0.5, 0.6)); scene.add(moon, moon.target);
-  const lampLight = new THREE.PointLight("#ffb35c", 2.2, 0, 2); lampLight.position.copy(B(-0.27, 1.22, 1.1)); scene.add(lampLight);
-  const monLight = new THREE.PointLight("#5eead4", 0.9, 0, 2); monLight.position.copy(B(0.12, 1.15, 1.1)); scene.add(monLight);
+  const warm = new THREE.PointLight("#ffc285", 1.6, 0, 2); warm.position.copy(B(-0.3, 0.6, 1.9)); scene.add(warm);
+  const pcLight = new THREE.PointLight("#38bdf8", 0.9, 0, 2); pcLight.position.copy(B(0.72, 1.25, 1.0)); scene.add(pcLight);
+  const tvLight = new THREE.PointLight("#818cf8", 0.7, 0, 2); tvLight.position.copy(B(-1.6, 0.15, 1.35)); scene.add(tvLight);
+  const monLight = new THREE.PointLight("#5eead4", 0.9, 0, 2); monLight.position.copy(B(0.12, 1.0, 1.15)); scene.add(monLight);
   const ledLight = new THREE.PointLight("#5eead4", 0.7, 0, 2); ledLight.position.copy(B(0.0, 0.88, 0.55)); scene.add(ledLight);
   const neonLight = new THREE.PointLight("#f472b6", 0.8, 0, 2); neonLight.position.copy(B(0.12, 1.4, 2.1)); scene.add(neonLight);
 
@@ -313,7 +469,7 @@ async function init() {
   const sky = skyTexture(day);
   const outside = new THREE.Mesh(new THREE.PlaneGeometry(16, 8), new THREE.MeshBasicMaterial({ map: sky, toneMapped: false }));
   sky.flipY = true; sky.needsUpdate = true;
-  outside.position.copy(B(-1.0, 9, 1.9)); scene.add(outside);
+  outside.position.copy(B(-1.35, 9, 2.0)); scene.add(outside);
   if (day) { hemi.intensity = 1.8; moon.color.set("#fff1d6"); moon.intensity = 2.2; }
 
   // model
@@ -330,8 +486,15 @@ async function init() {
   let drawerAmt = 0, drawerHold = false;
   const setDrawer = a => { drawerAmt = a; if (parts.Drawer) parts.Drawer.position.z = drawerOpenZ - 0.33 * (1 - a); };
   setDrawer(0);
+  // diğer çekmeceler: model açık, kapalı = 0.33 m içeride; tıklayınca aç/kapa
+  const extraDrawers = Object.keys(parts).filter(k => k.startsWith("Drawer_")).map(k => ({ o: parts[k], z: parts[k].position.z, amt: 0 }));
+  extraDrawers.forEach(d => { d.o.position.z = d.z - 0.33; });
 
-  const screenTex = { W_Screen_iMac: imacScreen(), W_Screen_Tablet: tabletScreen(), W_Screen_Phone: phoneScreen(), W_Cert: certScreen() };
+  const screenTex = { W_Screen_iMac: imacScreen(), W_Screen_Left: leftScreen(), W_Screen_TV: tvScreen(), W_Screen_Phone: phoneScreen(), W_Screen_Watch: watchScreen(), W_Cert: certScreen() };
+  // ışık alan baskılı yüzeyler: kitap sırtları ve not kâğıtları
+  const printTex = { W_Note_1: noteTexture(["TODO:", "Redis TTL", "kontrol ✓"], "#fde047"), W_Note_2: noteTexture(["Çay al", "🍵 x2"], "#f9a8d4") };
+  for (const [id, b] of Object.entries(BOOKS)) printTex["W_Spine_" + id] = spineTexture(b);
+  printTex.W_Soon = soonTexture();
   const patterns = {};
   const partMats = {};
 
@@ -341,12 +504,12 @@ async function init() {
     const name = o.material.name;
     let m;
     if (SCREENS.includes(name)) {
-      m = new THREE.MeshBasicMaterial({ map: screenTex[name], toneMapped: false });
+      m = new THREE.MeshBasicMaterial({ map: screenTex[name], toneMapped: false, transparent: name === "W_Screen_Watch", alphaTest: name === "W_Screen_Watch" ? 0.5 : 0 });
     } else {
-      const d = MATS[name] || { color: "#888" };
+      const d = MATS[name] || { color: printTex[name] ? "#ffffff" : "#888", roughness: 0.6 };
       const { map, ...rest } = d;
       if (map && !patterns[map]) patterns[map] = PATTERNS[map]();
-      m = new THREE.MeshStandardMaterial({ ...rest, map: map ? patterns[map] : null });
+      m = new THREE.MeshStandardMaterial({ ...rest, map: printTex[name] || (map ? patterns[map] : null) });
       if (rest.emissive) m.emissive = new THREE.Color(rest.emissive);
       maskShader(m);
       (partMats[part.name] ||= []).push(m);
@@ -361,7 +524,7 @@ async function init() {
   neon.position.copy(B(0.12, 1.568, 2.12)); scene.add(neon);
 
   // çay buharı
-  const steam = new THREE.Group(); steam.position.copy(B(-0.2, 1.0, 0.86)); scene.add(steam);
+  const steam = new THREE.Group(); steam.position.copy(B(-0.22, 0.97, 0.86)); scene.add(steam);
   const puffTex = canvasTex(64, 64, (g) => { const r = g.createRadialGradient(32, 32, 0, 32, 32, 32); r.addColorStop(0, "rgba(255,255,255,.55)"); r.addColorStop(1, "rgba(255,255,255,0)"); g.fillStyle = r; g.fillRect(0, 0, 64, 64); });
   const puffs = Array.from({ length: 10 }, (_, i) => {
     const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: puffTex, transparent: true, depthWrite: false, opacity: 0 }));
@@ -370,15 +533,15 @@ async function init() {
 
   // etiketler (HTML, 3D noktaya bağlı)
   const TAGS = [
-    { text: "🖥️ masaüstü", at: B(0.12, 1.36, 1.36), cls: "c" },
-    { text: "📲 cv.pdf", at: B(0.72, 1.3, 1.12), cls: "v" },
-    { text: "📱 iletişim", at: B(0.52, 1.07, 0.96), cls: "p" },
-    { text: "🗂️ arşiv", at: B(0.8, 0.84, 0.58), cls: "a" },
+    { text: "🖥️ masaüstü", at: B(0.12, 1.3, 1.31), cls: "c" },
+    { text: "📄 cv.pdf", at: B(-0.84, 1.13, 1.25), cls: "v" },
+    { text: "📱 iletişim", at: B(0.98, 1.0, 0.97), cls: "p" },
+    { text: "🗂️ arşiv", at: B(0.835, 0.88, 0.6), cls: "a" },
   ].map(t => { const el = document.createElement("div"); el.className = "tag3d " + t.cls; el.textContent = t.text; frame.appendChild(el); return { ...t, el }; });
 
   // ---------------------------------------------------------------- etkileşim
   const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
-  let hover = null, busy = false, lampOn = true, teaCount = 1, qi = 0;
+  let hover = null, busy = false, teaCount = 1, qi = 0, rgbBoost = 0;
   const QUACK = ["🦆 Quack! Bug'ı bana anlat…", "🦆 Satır satır anlat, bulacağız.", "🦆 Null mı geliyor yoksa?", "🦆 Cache'i temizledin mi?"];
 
   function pick(ev) {
@@ -388,22 +551,39 @@ async function init() {
     for (const h of ray.intersectObject(root, true)) {
       let p = h.object; while (p.parent && p.parent !== root) p = p.parent;
       if (p.name === "Room") return null;
-      if (CLICK.includes(p.name) || p.name.startsWith("Clock")) return p.name.startsWith("Clock") ? parts.Clock : p;
+      if (CLICK.includes(p.name) || p.name.startsWith("Book_") || p.name.startsWith("Drawer_")) return p;
+      if (p.name.startsWith("Clock")) return parts.Clock;
     }
     return null;
   }
+  // kitabın üstüne gelince başlığı imleçte
+  const tip = document.createElement("div"); tip.className = "booktip"; frame.appendChild(tip);
   function setHover(p) {
     if (hover === p) return;
     if (hover) (partMats[hover.name] || []).forEach(m => m.emissive.set(m.userData.e0 ?? 0x000000));
     hover = p;
     if (hover) (partMats[hover.name] || []).forEach(m => { m.userData.e0 ??= m.emissive.getHex(); if (!m.userData.e0) m.emissive.set("#2a2550"); });
     canvas.style.cursor = hover ? "pointer" : "";
+    const b = hover && BOOKS[hover.name.slice(5)];
+    tip.classList.toggle("show", !!(hover && hover.name.startsWith("Book_") && b));
+    if (b && hover.name.startsWith("Book_")) tip.innerHTML = `<b>${b.title}</b><span>${b.sub}</span>`;
   }
   function rectOf(obj) {
     const box = new THREE.Box3().setFromObject(obj), r = canvas.getBoundingClientRect();
     let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
     for (let i = 0; i < 8; i++) {
       const v = new THREE.Vector3(i & 1 ? box.max.x : box.min.x, i & 2 ? box.max.y : box.min.y, i & 4 ? box.max.z : box.min.z).project(camera);
+      const x = r.left + (v.x + 1) / 2 * r.width, y = r.top + (1 - v.y) / 2 * r.height;
+      x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y);
+    }
+    return { left: x0, top: y0, width: x1 - x0, height: y1 - y0, right: x1, bottom: y1 };
+  }
+  // ekranın kendi köşe noktalarından ekrandaki dikdörtgen (eğik ekranda dünya kutusu fazla büyük çıkar)
+  function rectOfMesh(mesh) {
+    const p = mesh.geometry.attributes.position, r = canvas.getBoundingClientRect(), v = new THREE.Vector3();
+    let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+    for (let i = 0; i < p.count; i++) {
+      v.fromBufferAttribute(p, i).applyMatrix4(mesh.matrixWorld).project(camera);
       const x = r.left + (v.x + 1) / 2 * r.width, y = r.top + (1 - v.y) / 2 * r.height;
       x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y);
     }
@@ -440,52 +620,108 @@ async function init() {
     }
   }
 
-  const DEV = { iMac: "imac", Tablet: "tablet", Phone: "phone", Drawer: "archive" };
+  const DEV = { iMac: "imac", Monitor2: "tablet", Phone: "phone", Drawer: "archive" };
   Devices.setRectSource(type => {
     const name = Object.keys(DEV).find(k => DEV[k] === type);
     return frame.classList.contains("is-3d") && parts[name] ? rectOf(parts[name]) : null;
   });
   const openDrawer = async () => { if (drawerAmt < 0.99) { sfx("drawer"); const a0 = drawerAmt; await tween(600, t => setDrawer(a0 + (1 - a0) * t)); } drawerHold = true; };
   Devices.onOpen(type => { if (type === "archive") openDrawer(); });
+  // masaüstü monitörün içinde açılır: kamera ekranı kadraja sığdırır, arayüz ekranın üstüne oturur
+  // ekran: ölçü (m) ve izleyiciye bakan normal
+  const screens = {};
+  root.traverse(o => {
+    if (!o.isMesh) return;
+    if (o.material.name === "W_Screen_iMac") screens.imac = { mesh: o, w: 1.16, h: 0.33, normal: new THREE.Vector3(0, 0, 1) };
+    if (o.material.name === "W_Screen_Left") {
+      const n = new THREE.Vector3().fromBufferAttribute(o.geometry.attributes.normal, 0).transformDirection(o.matrixWorld).normalize();
+      screens.tablet = { mesh: o, w: 0.6, h: 0.338, normal: n };
+    }
+  });
+  Devices.setEmbedSource(async type => {
+    const sc = screens[type], screenMesh = sc && sc.mesh;
+    if (!screenMesh || !frame.classList.contains("is-3d") || frame.clientWidth < 640) return null;
+    document.documentElement.classList.add("roomzoom");  // giriş yazısı çekilir, oda büyür, ekran daha geniş açılır
+    await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+    resize();
+    const c = new THREE.Box3().setFromObject(screenMesh).getCenter(new THREE.Vector3());
+    const t = Math.tan(THREE.MathUtils.degToRad(camera.fov) / 2), fill = 0.9;
+    const d = Math.max(sc.h / (2 * t * fill), sc.w / (2 * t * camera.aspect * fill));
+    const eye = c.clone().addScaledVector(sc.normal, d);  // ekranın tam karşısı (çapraz monitörde de düz görünür)
+    const fr = frame.getBoundingClientRect();  // oda ekranın dışına taşıyorsa önce görünür alana al (sayfa kilitlenecek)
+    if (fr.top < 64 || fr.bottom > innerHeight) scrollTo({ top: scrollY + fr.top - Math.max(64, (innerHeight - fr.height) / 2), behavior: "instant" });
+    busy = true; frame.classList.add("zoomed");
+    await flyTo(eye, c, 900);
+    camera.position.copy(eye); camLook.copy(c); camera.lookAt(camLook);
+    screenMesh.visible = false;  // arayüz ekranın yerini alır; alttaki doku arkadan sızmasın
+    renderer.render(scene, camera);
+    return { rect: () => rectOfMesh(screenMesh) };
+  });
   Devices.onClose(async () => {
     drop();
+    frame.classList.remove("zoomed");
+    Object.values(screens).forEach(sc => { sc.mesh.visible = true; });
+    document.documentElement.classList.remove("roomzoom");
     if (drawerHold) { drawerHold = false; sfx("drawer"); }
     busy = true; await flyTo(base.pos, base.look, 800); busy = false;
   });
 
+  const skyState = { ferry: null };
+  function ferry() {  // Boğaz'dan geçen vapur (düdüğüyle)
+    if (skyState.ferry != null) return;
+    sfx("horn");
+    const t0 = performance.now(), dur = reduceMotion ? 1 : 26000;
+    const id = setInterval(() => {
+      const t = (performance.now() - t0) / dur;
+      skyState.ferry = t >= 1 ? null : -320 + t * 2700;
+      sky.redraw(skyState);
+      if (t >= 1) clearInterval(id);
+    }, 90);
+  }
+  const ferryLoop = () => setTimeout(() => { if (!document.hidden) ferry(); ferryLoop(); }, 70000 + Math.random() * 50000);
   async function act(p) {
     if (!p || busy) return;
     const n = p.name;
+    if (n.startsWith("Drawer_")) {
+      const d = extraDrawers.find(x => x.o === p), a0 = d.amt, a1 = a0 > 0.5 ? 0 : 1;
+      sfx("drawer");
+      if (a1) say(p, "📄 Coming soon: yeni projeler bu çekmecede");
+      await tween(600, t => { d.amt = a0 + (a1 - a0) * t; p.position.z = d.z - 0.33 * (1 - d.amt); });
+      return;
+    }
+    if (n === "Keyboard") { await Devices.open("imac", "terminal"); window.Term?.autoplay(); return; }
+    if (n.startsWith("Book_")) {
+      const b = BOOKS[n.slice(5)], z0 = p.position.z;
+      sfx("paper"); say(p, "📘 " + b.title + " — " + b.sub);
+      await tween(320, t => { p.position.z = z0 + 0.07 * t; });
+      await new Promise(r => setTimeout(r, 650));
+      tween(320, t => { p.position.z = z0 + 0.07 * (1 - t); });
+      Devices.open("imac", "yetenekler");
+      setTimeout(() => document.querySelector('#skillFilter button[data-k="' + b.cat + '"]')?.click(), 80);
+      return;
+    }
     if (n === "iMac" || n === "Shelf") {
-      busy = true;
-      await flyTo(B(0.12, 0.55, 1.12), B(0.12, 1.36, 1.1));
-      busy = false;
       Devices.open("imac", n === "Shelf" ? "yetenekler" : undefined);
     } else if (n === "Drawer") {
       busy = true;
       await Promise.all([openDrawer(), flyTo(stops[4].pos, stops[4].look, 800)]);
       busy = false;
       Devices.open("archive");
-    } else if (n === "Tablet" || n === "Phone") {
+    } else if (n === "Monitor2") {
+      Devices.open("tablet");
+    } else if (n === "Phone") {
       busy = true;
       const o = parts[n], c = new THREE.Box3().setFromObject(o).getCenter(new THREE.Vector3());
       await Promise.all([flyTo(c.clone().add(new THREE.Vector3(0, 0.15, 0.9)), c, 650), lift(n)]);
       busy = false;
       Devices.open(DEV[n]);
-    } else if (n === "Lamp") {
-      lampOn = !lampOn;
-      sfx("click");
-      lampLight.intensity = lampOn ? 2.2 : 0;
-      (partMats.Lamp || []).filter(m => m.name === "W_Bulb").forEach(m => { m.emissiveIntensity = lampOn ? 3 : 0; });
-      hemi.intensity = (day ? 1.8 : 1.1) * (lampOn ? 1 : 0.6);
-      say(p, lampOn ? "💡 Işıklar açık" : "🌙 Gece modu: sadece monitör");
     } else if (n === "Tea") {
       sfx("spoon");
       say(p, `🍵 Çay tazelendi! (${++teaCount}. bardak)`);
       puffs.forEach(s => { s.userData.t = Math.random() * 0.3; });
     } else if (n === "Duck") {
       const y0 = p.position.y;
-      tween(500, t => { p.position.y = y0 + Math.sin(t * Math.PI) * 0.06; p.rotation.y = Math.sin(t * Math.PI * 2) * 0.4; });
+      tween(700, t => { p.position.y = y0 + Math.sin(t * Math.PI) * 0.05; p.rotation.y = t * Math.PI * 2; p.scale.set(1, 1 - Math.sin(t * Math.PI * 2) * 0.08, 1); });
       sfx("quack");
       say(p, QUACK[qi++ % QUACK.length]);
     } else if (n === "Ball") {
@@ -494,11 +730,18 @@ async function init() {
       sfx("thump");
       say(p, "⚽ Halı saha akşam 21:00'de!");
     } else if (n === "Window") {
-      sfx("horn");
-      if (!day) { const s = { x: 1500, y: 160 }; tween(900, t => sky.redraw({ x: s.x - t * 500, y: s.y + t * 250 })).then(() => sky.redraw()); }
+      if (skyState.ferry == null) ferry();
+      else if (!day) { const s = { x: 1500, y: 160 }; tween(900, t => sky.redraw({ ...skyState, shoot: { x: s.x - t * 500, y: s.y + t * 250 } })); }
       say(p, day ? "☀️ Üsküdar'dan Boğaz manzarası" : "🌠 Kız Kulesi manzarası, bir dilek tut");
     } else if (n === "Cert") { sfx("paper"); say(p, "📜 MCPD — 100 puan (2013)"); }
-    else if (n === "Plant") { sfx("rustle"); say(p, "🌿 Su verildi, teşekkürler!"); }
+    else if (n === "PC") { sfx("whooshIn"); rgbBoost = 1; say(p, "🖥️ Sıvı soğutma + 3 RGB fan. Derleme: 3 sn ⚡"); }
+    else if (n === "TV") { sfx("click"); say(p, "📺 65 inç · PS5 hazır: akşam bir maç? 🎮"); }
+    else if (n === "PS5" || n === "Controllers") { sfx("thump"); say(p, "🎮 Kod molası: bir maç?"); }
+    else if (n === "Headphones") { sfx("chime"); say(p, "🎧 Lo-fi açık, odak modu"); }
+    else if (n === "Watch") { sfx("tick"); say(p, "⌚ " + WATCH_NOTES[Math.floor(Date.now() / 5000) % WATCH_NOTES.length]); }
+    else if (n === "Modem") { sfx("tick"); say(p, "📶 Fiber hat: ping 4 ms, deploy hızlı"); }
+    else if (n === "Chair") { sfx("thump"); say(p, "🪑 xDrive HEY 15: oyun ve kod koltuğu"); }
+    else if (n === "Bottle") { sfx("spoon"); say(p, "💧 Sadece çay değil, su da içiyoruz 😄"); }
     else if (n === "Clock") { sfx("tick"); say(p, "🕐 " + new Date().toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" })); }
     else if (n === "Neon") { sfx("click"); say(p, "🍵 çay · kod · tekrar"); }
   }
@@ -507,6 +750,7 @@ async function init() {
   canvas.addEventListener("pointermove", e => {
     const r = canvas.getBoundingClientRect();
     mouse = { x: (e.clientX - r.left) / r.width - 0.5, y: (e.clientY - r.top) / r.height - 0.5 };
+    tip.style.transform = `translate(${e.clientX - r.left + 16}px, ${e.clientY - r.top + 16}px)`;
     if (e.pointerType === "mouse") setHover(pick(e));
   });
   canvas.addEventListener("pointerleave", () => { setHover(null); mouse = { x: 0, y: 0 }; });
@@ -520,14 +764,15 @@ async function init() {
     const hfov = (camera.aspect < 1.4 ? 60 : 66) * Math.PI / 180;
     camera.fov = THREE.MathUtils.clamp(2 * Math.atan(Math.tan(hfov / 2) / camera.aspect) * 180 / Math.PI, 26, 62);
     camera.updateProjectionMatrix();
+    renderer.render(scene, camera);  // açık cihaz varken döngü durur; arka plan boş kalmasın
   }
   new ResizeObserver(resize).observe(frame);
 
   let visible = true;
   new IntersectionObserver(es => { visible = es[0].isIntersecting; }).observe(frame);
   const stage = document.getElementById("stage");
-  const tmp = new THREE.Vector3();
-  let last = 0, lastType = 0;
+  const tmp = new THREE.Vector3(), rgb = new THREE.Color();
+  let last = 0, lastType = 0, lastWatch = 0;
 
   // ---------------------------------------------------------------- scroll turu
   // #tour uzun bir kap; içindeki giriş (sticky) sabit kalır, kaydırma ilerlemesi kamerayı duraktan durağa taşır
@@ -562,7 +807,7 @@ async function init() {
       capIdx = idx;
       capEl.classList.remove("show");
       if (idx >= 0) {
-        capEl.innerHTML = `<span>${st.n} / 06</span><h3>${st.h}</h3><p>${st.p}</p>`;
+        capEl.innerHTML = `<span>${st.n} / 07</span><h3>${st.h}</h3><p>${st.p}</p>`;
         requestAnimationFrame(() => capEl.classList.add("show"));
         sfx("whooshOut");
       }
@@ -581,10 +826,14 @@ async function init() {
     if (!reduceMotion && now - lastType > 45) { screenTex.W_Screen_iMac.step(); lastType = now; if (Math.random() < 0.3) sfx("key", 0.3); }
     tour();
     if (now % 30000 < 20) screenTex.W_Screen_Phone.redraw();
+    if (now - lastWatch > 1000) { screenTex.W_Screen_Watch.redraw(); lastWatch = now; }
     // ışık nabızları
     const hue = (now / 8000) % 1;
     ledLight.color.setHSL(0.47 + hue * 0.45, 0.8, 0.6);
-    (partMats.Desk || []).filter(x => x.name === "W_LED").forEach(x => x.emissive.copy(ledLight.color));
+    rgbBoost *= 0.985;
+    rgb.setHSL((now / (4000 - 3200 * rgbBoost)) % 1, 0.85, 0.55);
+    for (const m of [...(partMats.PC || []), ...(partMats.Keyboard || [])]) if (m.name === "W_RGB" || m.name === "W_KeyGlow") m.emissive.copy(rgb);
+    pcLight.color.copy(rgb);
     const flick = reduceMotion ? 1 : ((now / 1000) % 6 > 5.6 && Math.sin(now / 30) > 0 ? 0.35 : 1);
     neon.material.opacity = flick; neonLight.intensity = 0.8 * flick;
     // buhar
@@ -623,7 +872,7 @@ async function init() {
   busy = true;
   requestAnimationFrame(frameLoop);
   // açılış: "Sesle/Sessiz gir" seçilince kamera ekranın içinden odaya geri çekilir
-  const intro = async () => { await flyTo(base.pos, base.look, reduceMotion ? 0 : 2400); busy = false; };
+  const intro = async () => { await flyTo(base.pos, base.look, reduceMotion ? 0 : 2400); busy = false; setTimeout(ferry, 15000); ferryLoop(); };
   if (boot.entered) intro(); else addEventListener("devroom:enter", intro, { once: true });
   boot.ready();
 }

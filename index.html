@@ -365,7 +365,10 @@
     @media (max-width: 560px) { .tag3d { font-size: 9px; padding: 2px 7px; } .room-loader { font-size: 10px; right: 8px; top: 8px; } }
 
     .tag3d.a { background: var(--amber); color: #3b2405; }
-    .touring .tag3d, .touring .room-hint, .touring .scroll-hint { opacity: 0 !important; transition: opacity .3s; }
+    .booktip { position: absolute; left: 0; top: 0; z-index: 4; pointer-events: none; opacity: 0; transition: opacity .15s; max-width: 260px; padding: 8px 12px; border-radius: 10px; background: rgba(11,10,26,.92); border: 1px solid var(--line); font: 12px var(--mono); color: var(--muted); }
+    .booktip.show { opacity: 1; }
+    .booktip b { display: block; font: 700 15px var(--sans); color: var(--text); margin-bottom: 2px; }
+    .touring .tag3d, .touring .room-hint, .touring .scroll-hint, .zoomed .tag3d, .zoomed .room-hint, .zoomed .scroll-hint, .zoomed .tour-cap { opacity: 0 !important; transition: opacity .3s; }
 
     /* ---------- BOOT ---------- */
     html.booting { overflow: hidden; }
@@ -445,6 +448,16 @@
     .screen-body .sec-head { margin-bottom: 20px; }
     .screen-body .sec-head h2 { font-size: clamp(22px, 2.6vw, 30px); }
 
+    /* monitörün içinde (3D): sahne şeffaf, arayüz ekranın üstüne oturur */
+    .stage.embed, .stage.embed.on { background: transparent; backdrop-filter: none; }
+    html.webgl.roomzoom .hero-top { height: 0 !important; margin-bottom: 0 !important; opacity: 0 !important; overflow: hidden; }
+    .stage.embed .device { position: fixed; max-height: none; transform-origin: center; }
+    .dev-imac.embed .imac-chin, .dev-imac.embed .imac-stand { display: none; }
+    .dev-imac.embed .imac-screen { height: 100%; border: 0; border-radius: 2px; box-shadow: 0 0 60px -10px rgba(94,234,212,.35); }
+    .dev-imac.embed .screen-body > .wrap { padding: 20px 24px; }
+    .dev-tablet.embed { padding: 0; border-radius: 2px; background: none; box-shadow: 0 0 60px -10px rgba(96,165,250,.4); }
+    .dev-tablet.embed .tab-screen { border-radius: 2px; }
+
     /* iMac */
     .dev-imac { width: min(1100px, 100%); }
     .imac-screen {
@@ -480,15 +493,15 @@
     /* phone */
     .dev-phone {
       width: min(380px, 100%); height: min(calc(100vh - 88px), 800px);
-      background: #07060f; border-radius: 54px; padding: 12px;
+      background: #2b2a31; border-radius: 30px; padding: 7px;
       box-shadow: 0 0 0 2px #2a2650, 0 40px 120px -30px rgba(244,114,182,.5);
     }
     .ph-screen {
-      flex: 1; min-height: 0; display: flex; flex-direction: column; overflow: hidden; border-radius: 44px;
-      background: radial-gradient(120% 60% at 0% 0%, #4c1d95, transparent 60%), radial-gradient(120% 60% at 100% 100%, #831843, transparent 60%), #0b0a1a;
+      flex: 1; min-height: 0; display: flex; flex-direction: column; overflow: hidden; border-radius: 24px; border: 3px solid #000;
+      background: radial-gradient(120% 60% at 100% 80%, rgba(255,255,255,.06), transparent 60%), linear-gradient(160deg, #3b0d1a, #7a1f35 55%, #1a0610);
     }
     .ph-status { display: flex; justify-content: space-between; align-items: center; padding: 12px 26px 6px; font: 600 13px var(--sans); flex-shrink: 0; }
-    .ph-island { width: 96px; height: 28px; background: #000; border-radius: 20px; }
+    .ph-island { width: 13px; height: 13px; background: #000; border-radius: 50%; box-shadow: 0 0 0 2px rgba(255,255,255,.06); }
     .ph-home { width: 120px; height: 5px; border-radius: 3px; background: rgba(255,255,255,.6); margin: 8px auto; flex-shrink: 0; }
     .ph-apps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px 6px; padding: 18px 14px 6px; }
     .app { display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 11px; color: #fff; }
@@ -565,8 +578,8 @@
       .imac-stand { display: none; }
       .dev-tablet { padding: 10px; border-radius: 26px; }
       .tab-screen { border-radius: 16px; }
-      .dev-phone { border-radius: 44px; padding: 9px; }
-      .ph-screen { border-radius: 36px; }
+      .dev-phone { border-radius: 26px; padding: 6px; }
+      .ph-screen { border-radius: 20px; }
     }
 
     /* ---------- RESPONSIVE ---------- */
@@ -1450,7 +1463,7 @@
         </div>`,
       phone: () => `
         <div class="ph-screen">
-          <div class="ph-status"><span class="ph-time">${$("#navTime").textContent}</span><span class="ph-island"></span><span>5G 🔋</span></div>
+          <div class="ph-status"><span class="ph-time">${$("#navTime").textContent}</span><span class="ph-island"></span><span>5G 87%</span></div>
           <div class="screen-body">
             <div class="ph-apps">${APPS.map(a => `<a class="app" href="${a.href || "#"}"${a.open ? ` data-open="${a.open}"` : ""}${a.ext ? ' target="_blank" rel="noopener"' : ""}><i style="--b:${a.b}">${a.icon}</i>${a.label}</a>`).join("")}</div>
           </div>
@@ -1541,8 +1554,16 @@
       if (id === "terminal") setTimeout(() => $("#termIn").focus({ preventScroll: true }), 60);
     }
 
+    // 3D odada masaüstü monitörün içinde açılır: kamera ekrana yaklaşır, arayüz ekranın üstüne oturur
+    let embed = null, embedSource = null;
+    function place() {
+      if (!embed) return;
+      const r = embed();
+      Object.assign(dev.style, { left: r.left + "px", top: r.top + "px", width: r.width + "px", height: r.height + "px" });
+    }
     function flip(reverse) {
       if (reduceMotion) return Promise.resolve();
+      if (embed) return dev.animate(reverse ? [{ opacity: 1 }, { opacity: 0, transform: "scale(1, .01)" }] : [{ opacity: 0, transform: "scale(1, .01)", filter: "brightness(3)" }, { opacity: 1, transform: "scale(1, 1)", filter: "brightness(1.6)", offset: .55 }, { opacity: 1, filter: "none" }], { duration: reverse ? 260 : 520, easing: "cubic-bezier(.2,.8,.2,1)", fill: reverse ? "forwards" : "none" }).finished;
       const s = (rectSource && rectSource(current)) || srcEl.getBoundingClientRect(), f = dev.getBoundingClientRect();
       const onScreen = s.width && s.bottom > 0 && s.top < innerHeight;
       const lying = onScreen
@@ -1553,11 +1574,20 @@
       return dev.animate(frames, { duration: reverse ? 420 : 720, easing: "cubic-bezier(.2,.8,.2,1)", fill: reverse ? "forwards" : "none" }).finished;
     }
 
+    let opening = false;  // açılış sürerken (kamera uçarken) gelen ikinci istek yok sayılır
     async function open(type, tab) {
       if (current === type) { if (tab) showTab(tab); return; }
+      if (opening) return;
+      opening = true;
+      try { await openNow(type, tab); } finally { opening = false; }
+    }
+    async function openNow(type, tab) {
       if (current) await close(true);
+      const em = embedSource ? await embedSource(type) : null;
+      embed = em && em.rect;
       current = type; srcEl = $(SRC[type]); lastFocus = document.activeElement;
-      dev.className = "device dev-" + type;
+      dev.className = "device dev-" + type + (embed ? " embed" : "");
+      stage.classList.toggle("embed", !!embed);
       dev.setAttribute("aria-label", LABEL[type]);
       dev.innerHTML = TPL[type]();
       const body = dev.querySelector(".screen-body");
@@ -1570,6 +1600,7 @@
       openHooks.forEach(fn => fn(type));
       sfx("whooshIn");
       stage.hidden = false;
+      place();
       document.documentElement.classList.add("locked");
       requestAnimationFrame(() => stage.classList.add("on"));
       closeBtn.focus({ preventScroll: true });
@@ -1585,6 +1616,7 @@
       giveBack();
       dev.getAnimations().forEach(a => a.cancel());
       dev.innerHTML = ""; current = null;
+      dev.removeAttribute("style"); stage.classList.remove("embed"); embed = null;
       if (switching) return;
       stage.hidden = true;
       document.documentElement.classList.remove("locked");
@@ -1592,6 +1624,7 @@
       closeHooks.forEach(fn => fn());
     }
 
+    addEventListener("resize", place);
     closeBtn.addEventListener("click", () => close());
     stage.addEventListener("click", e => { if (e.target === stage) close(); });
     document.addEventListener("keydown", e => { if (e.key === "Escape" && current) close(); });
@@ -1601,7 +1634,7 @@
       const [t, tab] = el.dataset.open.split(":");
       open(t, tab);
     });
-    return { open, close, setRectSource: fn => { rectSource = fn; }, onClose: fn => closeHooks.push(fn), onOpen: fn => openHooks.push(fn) };
+    return { open, close, setRectSource: fn => { rectSource = fn; }, onClose: fn => closeHooks.push(fn), onOpen: fn => openHooks.push(fn), setEmbedSource: fn => { embedSource = fn; } };
   })();
   window.Devices = Devices;
 
@@ -1716,6 +1749,22 @@
     });
     body.addEventListener("click", () => { if (!getSelection().toString()) inp.focus({ preventScroll: true }); });
     $("#termTips").innerHTML = ["help", "whoami", "deneyim", "yetenekler", "cay", "sudo ise-al", "clear"].map(c => `<button type="button">${c}</button>`).join("");
+    // klavyeye tıklanınca: komutlar monitördeki terminale tek tek yazılır (kullanıcı yazarsa durur)
+    let autoId = 0;
+    inp.addEventListener("keydown", () => { autoId++; }, true);
+    window.Term = {
+      async autoplay(cmds = ["whoami", "yetenekler", "deneyim", "sudo ise-al"]) {
+        const id = ++autoId, wait = ms => new Promise(r => setTimeout(r, reduceMotion ? 0 : ms));
+        out.innerHTML = ""; print(`<span class="c">dev-room v2.0</span> — klavye devrede ⌨️`);
+        await wait(500);
+        for (const c of cmds) {
+          for (const ch of c) { if (id !== autoId || $("#stage").hidden) return; inp.value += ch; sfx("key"); await wait(55 + Math.random() * 70); }
+          await wait(250); if (id !== autoId) return;
+          sfx("key", 1.4); run(inp.value); inp.value = ""; await wait(1100);
+        }
+        inp.focus({ preventScroll: true });
+      },
+    };
     $("#termTips").addEventListener("click", e => { const b = e.target.closest("button"); if (b) { run(b.textContent); inp.focus({ preventScroll: true }); } });
     print(`<span class="c">dev-room v2.0</span> — hoş geldin! 👋  Başlamak için <span class="a">help</span> yaz.`);
   })();

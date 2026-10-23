@@ -81,9 +81,7 @@ window.Sfx = (function () {
     const lp = ctx.createBiquadFilter(); lp.type = "lowpass"; lp.frequency.value = 380;
     const g = ctx.createGain(); g.gain.value = 0; g.gain.linearRampToValueAtTime(0.06, now() + 2.5);
     s.connect(lp); lp.connect(g); g.connect(master); s.start();
-    ambient = { s, g };
-    const schedule = () => { hornTimer = setTimeout(() => { if (on) S.horn(); schedule(); }, 70000 + Math.random() * 60000); };
-    schedule();
+    ambient = { s, g };  // vapur düdüğünü 3D oda çalar (vapur geçerken)
   }
   function stopAmbient() {
     if (!ambient) return;

@@ -12,6 +12,13 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script type="importmap">
+    { "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"
+    } }
+  </script>
+  <script type="module" src="js/room3d.js"></script>
   <style>
     :root {
       --bg: #0b0a1a;
@@ -120,7 +127,7 @@
       font-family: var(--mono); font-size: 12px; color: var(--text);
       background: rgba(11,10,26,.7); border: 1px solid var(--line);
       padding: 6px 10px; border-radius: 8px; backdrop-filter: blur(6px);
-      pointer-events: none; max-width: calc(100% - 32px);
+      pointer-events: none; max-width: calc(100% - 32px); z-index: 3;
     }
     .bubble {
       position: absolute; z-index: 5;
@@ -314,6 +321,27 @@
     }
     .toast.show { opacity: 1; transform: translate(-50%, 0); }
 
+    /* ---------- 3D ROOM ---------- */
+    #room3d { position: absolute; inset: 0; width: 100%; height: 100%; display: block; opacity: 0; transition: opacity .6s; touch-action: manipulation; }
+    .room-frame.is-3d { aspect-ratio: 16 / 10; }
+    .room-frame.is-3d > svg { visibility: hidden; position: absolute; inset: 0; }
+    .room-frame.is-3d #room3d { opacity: 1; }
+    .room-frame.is-3d .room-hint { top: auto; bottom: 16px; }
+    .room-loader {
+      position: absolute; right: 16px; top: 16px; z-index: 3;
+      font: 12px var(--mono); color: var(--amber); background: rgba(11,10,26,.7);
+      border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px;
+    }
+    .tag3d {
+      position: absolute; left: 0; top: 0; z-index: 2; pointer-events: none; white-space: nowrap;
+      font: 700 12px var(--mono); padding: 4px 10px; border-radius: 999px; opacity: 0; transition: opacity .4s;
+      animation: tagbob 2.4s ease-in-out infinite;
+    }
+    .is-3d .tag3d { opacity: 1; }
+    .tag3d.c { background: var(--cyan); color: #04211c; } .tag3d.v { background: var(--violet); color: #1a1238; } .tag3d.p { background: var(--pink); color: #3b0a24; }
+    @keyframes tagbob { 50% { margin-top: -5px; } }
+    @media (max-width: 560px) { .tag3d { font-size: 9px; padding: 2px 7px; } .room-loader { font-size: 10px; right: 8px; top: 8px; } }
+
     /* ---------- DEVICE STAGE ---------- */
     .tagbob { animation: bob 2.4s ease-in-out infinite; }
     @keyframes bob { 50% { transform: translateY(-6px); } }
@@ -483,6 +511,8 @@
     <div class="room-frame" id="room">
       <div class="room-hint">✨ Bilgisayara, tablete veya telefona tıklayarak keşfedebilirsiniz</div>
       <div class="bubble" id="bubble"></div>
+      <canvas id="room3d" aria-label="3D yazılımcı odası: bilgisayar, tablet ve telefona tıklayarak içeriği açabilirsiniz"></canvas>
+      <div class="room-loader" id="roomLoader">🍵 çay demleniyor <b>0%</b></div>
       <svg viewBox="0 0 1600 1000" role="img" aria-label="Gece, İstanbul manzaralı bir yazılımcı odası: masa, iki monitör, lamba, çay bardağı, kitaplık ve neon tabela">
         <defs>
           <linearGradient id="gWall" x1="0" y1="0" x2="0" y2="1">
@@ -1108,14 +1138,15 @@
   (function () {
     const room = $("#room"), svg = room.querySelector("svg"), bubble = $("#bubble");
     let bt;
-    function say(el, msg) {
-      const r = el.getBoundingClientRect(), rr = room.getBoundingClientRect();
+    function say(target, msg) {
+      const r = target.getBoundingClientRect ? target.getBoundingClientRect() : target, rr = room.getBoundingClientRect();
       let x = r.left + r.width / 2 - rr.left;
       x = Math.max(110, Math.min(rr.width - 110, x));
       bubble.style.left = x + "px"; bubble.style.top = (r.top - rr.top) + "px";
       bubble.textContent = msg; bubble.classList.add("show");
       clearTimeout(bt); bt = setTimeout(() => bubble.classList.remove("show"), 2200);
     }
+    window.roomSay = say;
     function on(id, fn) {
       const el = document.getElementById(id);
       el.addEventListener("click", () => fn(el));
@@ -1189,6 +1220,7 @@
         </div>`,
     };
     let current = null, srcEl = null, lastFocus = null, borrowed = [];
+    let rectSource = null, closeHooks = [];  // 3D oda: cihazın ekrandaki yeri ve kapanınca kamerayı geri çekme
 
     // section content is moved into the device screen and returned on close
     function borrow(id, into) {
@@ -1208,7 +1240,7 @@
 
     function flip(reverse) {
       if (reduceMotion) return Promise.resolve();
-      const s = srcEl.getBoundingClientRect(), f = dev.getBoundingClientRect();
+      const s = (rectSource && rectSource(current)) || srcEl.getBoundingClientRect(), f = dev.getBoundingClientRect();
       const onScreen = s.width && s.bottom > 0 && s.top < innerHeight;
       const lying = onScreen
         ? `translate(${s.left + s.width / 2 - (f.left + f.width / 2)}px, ${s.top + s.height / 2 - (f.top + f.height / 2)}px) scale(${s.width / f.width}, ${s.height / f.height}) rotateX(55deg)`
@@ -1249,6 +1281,7 @@
       stage.hidden = true;
       document.documentElement.classList.remove("locked");
       if (lastFocus) lastFocus.focus({ preventScroll: true });
+      closeHooks.forEach(fn => fn());
     }
 
     closeBtn.addEventListener("click", () => close());
@@ -1260,8 +1293,9 @@
       const [t, tab] = el.dataset.open.split(":");
       open(t, tab);
     });
-    return { open, close };
+    return { open, close, setRectSource: fn => { rectSource = fn; }, onClose: fn => closeHooks.push(fn) };
   })();
+  window.Devices = Devices;
 
   // ---------- EXPERIENCE ----------
   (function () {

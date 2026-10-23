@@ -1,147 +1,1162 @@
-<html>
-
+<!doctype html>
+<html lang="tr">
 <head>
-    <title>Ahmet BÖLÜKOĞLU</title>
-    <meta charset="UTF-8">
-    <meta name="apple-mobile-web-app-title" content="Ahmet BÖLÜKOĞLU - Portfolio">
-    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css"> -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ahmet Bölükoğlu · Dev Room</title>
+  <meta name="description" content="Ahmet Bölükoğlu — Kıdemli Yazılım Geliştirme Uzmanı. .NET Core, C#, mikroservis mimarileri, Redis, yapay zekâ ve MCP.">
+  <meta property="og:title" content="Ahmet Bölükoğlu · Kıdemli Yazılım Geliştirme Uzmanı">
+  <meta property="og:description" content="10+ yıllık backend tecrübesi, .NET Core, mikroservisler ve yapay zekâ destekli geliştirme.">
+  <meta name="theme-color" content="#0b0a1a">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%230b0a1a'/><text x='50' y='66' font-size='46' text-anchor='middle' fill='%235eead4' font-family='monospace' font-weight='700'>&lt;/&gt;</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b0a1a;
+      --bg-2: #110f26;
+      --panel: #15132e;
+      --panel-2: #1b1838;
+      --line: #2a2650;
+      --text: #e8e6f5;
+      --muted: #9a96bd;
+      --dim: #6b6790;
+      --cyan: #5eead4;
+      --pink: #f472b6;
+      --amber: #fbbf24;
+      --violet: #a78bfa;
+      --green: #86efac;
+      --blue: #7dd3fc;
+      --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+      --sans: "Space Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
+      --radius: 16px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      line-height: 1.6;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+    body::before {
+      content: "";
+      position: fixed; inset: 0; z-index: -1; pointer-events: none;
+      background:
+        radial-gradient(900px 500px at 15% -10%, rgba(167,139,250,.14), transparent 60%),
+        radial-gradient(700px 500px at 100% 10%, rgba(94,234,212,.08), transparent 60%),
+        radial-gradient(800px 600px at 50% 120%, rgba(244,114,182,.08), transparent 60%);
+    }
+    a { color: inherit; text-decoration: none; }
+    ::selection { background: rgba(94,234,212,.3); }
+    .wrap { width: min(1200px, 100% - 32px); margin-inline: auto; }
 
-    <link rel="stylesheet" href="css/main.css" />
-    <link rel="stylesheet" href="css/clock.css" />
-    <!-- <link rel="stylesheet" href="css/bootstrap.min.css" /> -->
-    <script type="text/javascript" src="js/jquery-3.4.1.min.js"></script>
-    <script type="text/javascript" src="js/bootstrap.js"></script>
-    <script type="text/javascript" src="js/main.js"></script>
-    <script type="text/javascript" src="js/clock.js"></script>
-    <!-- <script type="text/javascript" src="https://static.codepen.io/assets/common/stopExecutionOnTimeout-9bf952ccbbd13c245169a0a1190323a27ce073a3d304b8c0fdf421ab22794a58.js"></script> -->
+    /* ---------- NAV ---------- */
+    nav {
+      position: sticky; top: 0; z-index: 50;
+      backdrop-filter: blur(14px);
+      background: rgba(11,10,26,.72);
+      border-bottom: 1px solid var(--line);
+    }
+    nav .wrap { display: flex; align-items: center; justify-content: space-between; height: 64px; gap: 16px; }
+    .logo { font-family: var(--mono); font-weight: 700; font-size: 15px; white-space: nowrap; }
+    .logo .u { color: var(--cyan); } .logo .h { color: var(--violet); } .logo .p { color: var(--pink); }
+    .logo .cur { display: inline-block; width: 8px; height: 16px; background: var(--cyan); vertical-align: -2px; margin-left: 4px; animation: blink 1s steps(1) infinite; }
+    .nav-links { display: flex; gap: 4px; font-family: var(--mono); font-size: 13px; }
+    .nav-links a { padding: 8px 12px; border-radius: 8px; color: var(--muted); transition: .2s; }
+    .nav-links a:hover { color: var(--text); background: var(--panel); }
+    .nav-links a span { color: var(--dim); }
+    .nav-clock { font-family: var(--mono); font-size: 13px; color: var(--muted); white-space: nowrap; }
+    .nav-clock b { color: var(--green); font-weight: 500; }
+    @keyframes blink { 50% { opacity: 0; } }
+
+    /* ---------- HERO ---------- */
+    .hero { padding: 56px 0 32px; }
+    .hero-top { display: grid; grid-template-columns: 1.3fr 1fr; gap: 32px; align-items: end; margin-bottom: 32px; }
+    .status {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-family: var(--mono); font-size: 12px; color: var(--green);
+      border: 1px solid rgba(134,239,172,.25); background: rgba(134,239,172,.06);
+      padding: 6px 12px; border-radius: 999px; margin-bottom: 20px;
+    }
+    .status i { width: 8px; height: 8px; border-radius: 50%; background: var(--green); box-shadow: 0 0 10px var(--green); animation: pulse 2s infinite; }
+    @keyframes pulse { 50% { opacity: .35; } }
+    h1 { font-size: clamp(40px, 6vw, 72px); line-height: 1.02; letter-spacing: -.03em; font-weight: 700; }
+    h1 .grad { background: linear-gradient(90deg, var(--cyan), var(--violet) 55%, var(--pink)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .role { font-family: var(--mono); font-size: clamp(14px, 1.6vw, 18px); color: var(--muted); margin-top: 16px; min-height: 1.6em; }
+    .role .k { color: var(--pink); } .role .t { color: var(--cyan); }
+    .role .caret { display: inline-block; width: 2px; height: 1.1em; background: var(--cyan); vertical-align: -3px; animation: blink 1s steps(1) infinite; }
+    .hero-side p { color: var(--muted); font-size: 16px; margin-bottom: 20px; }
+    .hero-side p strong { color: var(--text); font-weight: 600; }
+    .cta { display: flex; flex-wrap: wrap; gap: 12px; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-family: var(--mono); font-size: 14px; font-weight: 500;
+      padding: 12px 18px; border-radius: 12px; border: 1px solid var(--line);
+      transition: transform .2s, box-shadow .2s, background .2s;
+    }
+    .btn:hover { transform: translateY(-2px); }
+    .btn-primary { background: var(--cyan); color: #04211c; border-color: var(--cyan); box-shadow: 0 8px 30px -8px rgba(94,234,212,.6); }
+    .btn-primary:hover { box-shadow: 0 12px 36px -8px rgba(94,234,212,.8); }
+    .btn-ghost { background: var(--panel); color: var(--text); }
+    .btn-ghost:hover { background: var(--panel-2); }
+    .btn svg { width: 16px; height: 16px; }
+
+    /* ---------- ROOM ---------- */
+    .room-frame {
+      position: relative;
+      border-radius: 24px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      background: #0f0d24;
+      box-shadow: 0 40px 120px -40px rgba(167,139,250,.35), 0 0 0 1px rgba(255,255,255,.02) inset;
+    }
+    .room-frame svg { display: block; width: 100%; height: auto; }
+    .room-hint {
+      position: absolute; left: 16px; top: 16px;
+      font-family: var(--mono); font-size: 12px; color: var(--text);
+      background: rgba(11,10,26,.7); border: 1px solid var(--line);
+      padding: 6px 10px; border-radius: 8px; backdrop-filter: blur(6px);
+      pointer-events: none;
+    }
+    .bubble {
+      position: absolute; z-index: 5;
+      transform: translate(-50%, calc(-100% - 12px)) scale(.9);
+      background: #fff; color: #15132e;
+      font-family: var(--mono); font-size: 13px; font-weight: 500;
+      padding: 8px 12px; border-radius: 10px; white-space: nowrap;
+      opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s;
+      box-shadow: 0 10px 30px rgba(0,0,0,.4);
+    }
+    .bubble::after { content: ""; position: absolute; left: 50%; bottom: -6px; width: 12px; height: 12px; background: #fff; transform: translateX(-50%) rotate(45deg); border-radius: 2px; }
+    .bubble.show { opacity: 1; transform: translate(-50%, calc(-100% - 12px)) scale(1); }
+    .hot { cursor: pointer; }
+    .hot:hover { filter: brightness(1.25) drop-shadow(0 0 6px rgba(255,255,255,.25)); }
+    .hot:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+
+    .twinkle { animation: twinkle 3s ease-in-out infinite; }
+    @keyframes twinkle { 50% { opacity: .2; } }
+    .neon { animation: flicker 6s infinite; }
+    @keyframes flicker { 0%, 18%, 22%, 25%, 53%, 57%, 100% { opacity: 1; } 20%, 24%, 55% { opacity: .35; } }
+    .steam path { animation: steam 3s ease-in-out infinite; opacity: 0; }
+    .steam path:nth-child(2) { animation-delay: 1s; } .steam path:nth-child(3) { animation-delay: 2s; }
+    @keyframes steam { 0% { transform: translateY(8px); opacity: 0; } 30% { opacity: .7; } 100% { transform: translateY(-26px); opacity: 0; } }
+    .led { animation: led 8s linear infinite; }
+    @keyframes led { 0% { stroke: #5eead4; } 33% { stroke: #a78bfa; } 66% { stroke: #f472b6; } 100% { stroke: #5eead4; } }
+    .wave { animation: wave 5s ease-in-out infinite; }
+    @keyframes wave { 50% { transform: translateX(14px); opacity: .4; } }
+    .bar { transform-box: fill-box; transform-origin: bottom; animation: bar 2.4s ease-in-out infinite; }
+    @keyframes bar { 50% { transform: scaleY(.45); } }
+    .duck-jump { animation: duck .5s ease; transform-box: fill-box; transform-origin: bottom; }
+    @keyframes duck { 30% { transform: translateY(-18px) rotate(-8deg); } 60% { transform: translateY(0) scaleY(.9); } }
+    .ball-roll { animation: roll 1.4s cubic-bezier(.3,.7,.4,1); transform-box: fill-box; transform-origin: center; }
+    @keyframes roll { 40% { transform: translateX(120px) rotate(360deg); } 100% { transform: translateX(0) rotate(0); } }
+    .shoot { animation: shoot 1.2s ease-out forwards; }
+    @keyframes shoot { from { transform: translate(0,0); opacity: 1; } to { transform: translate(-220px,120px); opacity: 0; } }
+    .lamp-off .lamp-light { opacity: 0; }
+    .lamp-off .lamp-bulb { fill: #3b3555; }
+    .lamp-light { transition: opacity .4s; }
+    .room-dim { transition: opacity .4s; opacity: 0; }
+    .lamp-off .room-dim { opacity: 1; }
+
+    /* ---------- SECTIONS ---------- */
+    section { padding: 72px 0; }
+    .sec-head { display: flex; align-items: baseline; gap: 16px; margin-bottom: 32px; flex-wrap: wrap; }
+    .sec-head .num { font-family: var(--mono); color: var(--cyan); font-size: 14px; }
+    .sec-head h2 { font-size: clamp(28px, 3.6vw, 40px); letter-spacing: -.02em; line-height: 1.1; }
+    .sec-head .cmd { font-family: var(--mono); font-size: 13px; color: var(--dim); margin-left: auto; }
+    .sec-head .cmd b { color: var(--pink); font-weight: 500; }
+
+    .window {
+      background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .win-bar {
+      display: flex; align-items: center; gap: 8px;
+      padding: 12px 16px; border-bottom: 1px solid var(--line);
+      background: var(--bg-2); font-family: var(--mono); font-size: 12px; color: var(--muted);
+    }
+    .win-bar i { width: 12px; height: 12px; border-radius: 50%; background: #ff5f57; }
+    .win-bar i:nth-child(2) { background: #febc2e; } .win-bar i:nth-child(3) { background: #28c840; }
+    .win-bar span { margin-left: 8px; }
+
+    /* about */
+    .about-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 24px; }
+    .code { font-family: var(--mono); font-size: 14px; padding: 20px 0; counter-reset: ln; }
+    .code p { padding: 0 20px 0 60px; position: relative; color: var(--muted); }
+    .code p::before { counter-increment: ln; content: counter(ln); position: absolute; left: 0; width: 40px; text-align: right; color: var(--dim); opacity: .6; }
+    .code .h { color: var(--pink); font-weight: 700; }
+    .code .s { color: var(--text); font-family: var(--sans); font-size: 16px; line-height: 1.7; }
+    .code .s b { color: var(--cyan); font-weight: 600; }
+    .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .stat {
+      background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
+      padding: 20px; position: relative; overflow: hidden; transition: border-color .2s, transform .2s;
+    }
+    .stat:hover { border-color: rgba(94,234,212,.4); transform: translateY(-3px); }
+    .stat .n { font-size: 40px; font-weight: 700; letter-spacing: -.03em; line-height: 1; }
+    .stat .l { color: var(--muted); font-size: 14px; margin-top: 8px; }
+    .stat .ico { position: absolute; right: 14px; top: 12px; font-size: 22px; opacity: .8; }
+    .stat:nth-child(1) .n { color: var(--cyan); } .stat:nth-child(2) .n { color: var(--violet); }
+    .stat:nth-child(3) .n { color: var(--pink); } .stat:nth-child(4) .n { color: var(--amber); }
+    .hobbies { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+    .hobby { font-size: 14px; padding: 8px 14px; border-radius: 999px; background: var(--panel); border: 1px solid var(--line); color: var(--muted); }
+
+    /* experience */
+    .timeline { position: relative; }
+    .commit { display: grid; grid-template-columns: 170px 32px 1fr; gap: 0 16px; }
+    .commit-date { font-family: var(--mono); font-size: 13px; color: var(--muted); text-align: right; padding-top: 22px; }
+    .commit-date small { display: block; color: var(--dim); font-size: 12px; }
+    .rail { position: relative; display: flex; justify-content: center; }
+    .rail::before { content: ""; position: absolute; top: 0; bottom: 0; width: 2px; background: linear-gradient(var(--line), var(--line)); }
+    .commit:first-child .rail::before { top: 28px; }
+    .commit:last-child .rail::before { bottom: calc(100% - 28px); }
+    .rail i {
+      position: relative; margin-top: 22px; width: 14px; height: 14px; border-radius: 50%;
+      background: var(--bg); border: 3px solid var(--violet); z-index: 1;
+    }
+    .commit.head .rail i { border-color: var(--cyan); box-shadow: 0 0 0 4px rgba(94,234,212,.15), 0 0 14px var(--cyan); }
+    .card {
+      background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
+      padding: 18px 20px; margin-bottom: 16px; transition: border-color .2s, background .2s;
+    }
+    .card:hover { border-color: rgba(167,139,250,.45); background: var(--panel-2); }
+    .card-top { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin-bottom: 4px; }
+    .hash { font-family: var(--mono); font-size: 12px; color: var(--amber); }
+    .tag-head { font-family: var(--mono); font-size: 11px; color: var(--cyan); border: 1px solid rgba(94,234,212,.4); border-radius: 6px; padding: 1px 6px; }
+    .badge { font-family: var(--mono); font-size: 11px; color: var(--muted); background: var(--bg-2); border: 1px solid var(--line); border-radius: 6px; padding: 1px 6px; }
+    .card h3 { font-size: 19px; line-height: 1.3; }
+    .card h3 .at { color: var(--violet); }
+    .card p { color: var(--muted); font-size: 15px; margin-top: 6px; }
+    .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+    .chip { font-family: var(--mono); font-size: 12px; padding: 3px 9px; border-radius: 6px; background: rgba(94,234,212,.07); color: var(--cyan); border: 1px solid rgba(94,234,212,.18); }
+    .more-btn { margin: 8px 0 0 218px; }
+
+    /* skills */
+    .skill-filter { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
+    .skill-filter button {
+      font-family: var(--mono); font-size: 13px; cursor: pointer;
+      padding: 8px 14px; border-radius: 10px; border: 1px solid var(--line);
+      background: var(--panel); color: var(--muted); transition: .2s;
+    }
+    .skill-filter button:hover { color: var(--text); }
+    .skill-filter button.on { background: var(--violet); color: #1a1238; border-color: var(--violet); }
+    .skills-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+    .skill-card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; transition: transform .25s, border-color .25s, opacity .25s; }
+    .skill-card:hover { transform: translateY(-3px); border-color: var(--c, var(--cyan)); }
+    .skill-card.hide { display: none; }
+    .skill-card h4 { font-family: var(--mono); font-size: 14px; font-weight: 500; color: var(--c, var(--cyan)); margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
+    .skill-card .desc { font-size: 13px; color: var(--dim); margin-bottom: 14px; }
+    .skill-card .chips .chip { color: var(--text); background: var(--bg-2); border-color: var(--line); }
+
+    /* education */
+    .edu-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+    .edu { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; }
+    .edu .yr { font-family: var(--mono); font-size: 12px; color: var(--amber); }
+    .edu h4 { font-size: 17px; margin: 6px 0 4px; line-height: 1.35; }
+    .edu p { color: var(--muted); font-size: 14px; }
+
+    /* terminal */
+    .term { font-family: var(--mono); font-size: 14px; }
+    .term-body { height: 380px; overflow-y: auto; padding: 18px 20px; cursor: text; background: #0c0b1c; }
+    .term-body::-webkit-scrollbar { width: 8px; } .term-body::-webkit-scrollbar-thumb { background: var(--line); border-radius: 4px; }
+    .term-line { white-space: pre-wrap; word-break: break-word; color: var(--muted); }
+    .term-line .pr, .term-input .pr { color: var(--green); }
+    .term-line .pa, .term-input .pa { color: var(--blue); }
+    .term-line .c { color: var(--cyan); } .term-line .p { color: var(--pink); } .term-line .a { color: var(--amber); } .term-line .v { color: var(--violet); } .term-line .w { color: var(--text); }
+    .term-line a { color: var(--cyan); text-decoration: underline; text-underline-offset: 3px; }
+    .term-input { display: flex; gap: 8px; align-items: center; }
+    .term-input input { flex: 1; min-width: 0; background: transparent; border: 0; outline: 0; color: var(--text); font: inherit; caret-color: var(--cyan); }
+    .term-tips { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 16px; border-top: 1px solid var(--line); background: var(--bg-2); }
+    .term-tips button { font: 12px var(--mono); padding: 5px 10px; border-radius: 6px; border: 1px solid var(--line); background: var(--panel); color: var(--muted); cursor: pointer; }
+    .term-tips button:hover { color: var(--cyan); border-color: rgba(94,234,212,.4); }
+
+    /* contact */
+    .contact {
+      position: relative; overflow: hidden;
+      border: 1px solid var(--line); border-radius: 24px; padding: clamp(28px, 5vw, 56px);
+      background: radial-gradient(600px 300px at 0% 0%, rgba(94,234,212,.12), transparent 60%),
+                  radial-gradient(600px 300px at 100% 100%, rgba(244,114,182,.12), transparent 60%), var(--panel);
+      text-align: center;
+    }
+    .contact h2 { font-size: clamp(30px, 4.5vw, 52px); letter-spacing: -.03em; line-height: 1.1; }
+    .contact p { color: var(--muted); max-width: 560px; margin: 16px auto 28px; }
+    .mail-box {
+      display: inline-flex; align-items: center; gap: 0; max-width: 100%;
+      font-family: var(--mono); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; background: var(--bg-2);
+    }
+    .mail-box a { padding: 14px 20px; font-size: clamp(14px, 2.2vw, 18px); color: var(--cyan); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .mail-box a:hover { background: rgba(94,234,212,.06); }
+    .mail-box button { border: 0; border-left: 1px solid var(--line); background: var(--panel-2); color: var(--text); font: 13px var(--mono); padding: 0 18px; align-self: stretch; cursor: pointer; white-space: nowrap; }
+    .mail-box button:hover { color: var(--cyan); }
+    .socials { display: flex; justify-content: center; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+    .social {
+      display: inline-flex; align-items: center; gap: 10px; padding: 12px 18px;
+      border-radius: 12px; border: 1px solid var(--line); background: var(--bg-2);
+      font-family: var(--mono); font-size: 14px; color: var(--muted); transition: .2s;
+    }
+    .social:hover { color: var(--text); border-color: var(--violet); transform: translateY(-2px); }
+    .social svg { width: 18px; height: 18px; fill: currentColor; }
+
+    footer { padding: 40px 0 56px; text-align: center; font-family: var(--mono); font-size: 13px; color: var(--dim); }
+    footer span { color: var(--pink); }
+
+    .reveal { opacity: 0; transform: translateY(24px); transition: opacity .7s ease, transform .7s ease; }
+    .reveal.in { opacity: 1; transform: none; }
+
+    .toast {
+      position: fixed; left: 50%; bottom: 24px; transform: translate(-50%, 20px); z-index: 99;
+      background: var(--cyan); color: #04211c; font: 500 14px var(--mono);
+      padding: 10px 16px; border-radius: 10px; opacity: 0; transition: .25s; pointer-events: none;
+    }
+    .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+    /* ---------- RESPONSIVE ---------- */
+    @media (max-width: 900px) {
+      .hero-top, .about-grid { grid-template-columns: 1fr; }
+      .nav-links { display: none; }
+      .commit { grid-template-columns: 20px 1fr; gap: 0 12px; }
+      .commit-date { grid-column: 2; grid-row: 1; text-align: left; padding-top: 0; margin-top: 4px; }
+      .rail { grid-column: 1; grid-row: 1 / span 2; }
+      .commit:first-child .rail::before { top: 8px; }
+      .rail i { margin-top: 8px; }
+      .commit .card { grid-column: 2; }
+      .commit-date small { display: inline; margin-left: 6px; }
+      .more-btn { margin-left: 32px; }
+      .sec-head .cmd { margin-left: 0; width: 100%; }
+    }
+    @media (max-width: 560px) {
+      .hero { padding-top: 32px; }
+      .room-hint { font-size: 10px; left: 8px; top: 8px; }
+      .stats { grid-template-columns: 1fr 1fr; }
+      .stat .n { font-size: 32px; }
+      .term-body { height: 320px; }
+      .nav-clock .d { display: none; }
+      .mail-box { flex-direction: column; width: 100%; }
+      .mail-box button { border-left: 0; border-top: 1px solid var(--line); padding: 12px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+      html { scroll-behavior: auto; }
+      .reveal { opacity: 1; transform: none; }
+    }
+  </style>
 </head>
-
 <body>
-    <div class="">
 
+<nav>
+  <div class="wrap">
+    <a href="#top" class="logo"><span class="u">ahmet</span>@<span class="h">dev-room</span>:<span class="p">~</span>$<span class="cur"></span></a>
+    <div class="nav-links">
+      <a href="#hakkimda"><span>~/</span>hakkımda</a>
+      <a href="#deneyim"><span>~/</span>deneyim</a>
+      <a href="#yetenekler"><span>~/</span>yetenekler</a>
+      <a href="#terminal"><span>~/</span>terminal</a>
+      <a href="#iletisim"><span>~/</span>iletişim</a>
     </div>
-    <div class="exampwrap">
-        <div class="filler1">
-            <div style="position: absolute; top: 160px; right: 300px; height: 200px; width: 200px;">
-                <div class="support"></div>
-                <div class="clock">
-                    <div class="numbers">
-                        <ul>
-                            <li>12</li>
-                            <li>3</li>
-                            <li>6</li>
-                            <li>9</li>
-                        </ul>
-                    </div>
-                    <div class="clockwise">
-                        <div class="center"></div>
-                        <div class="hand-second" id="analogsecond"></div>
-                        <div class="hand-minute" id="analogminute"></div>
-                        <div class="hand-hour" id="analoghour"></div>
-                    </div>
-                </div>
-            </div>
-            <label class="entph" for="pcint">
-                <input class="toggler" type="checkbox" id="pcint" />
-                <div class="cbody">
-                    <div class="cmain">
-                        <div class="ccontentwrap">
-                            <div class="ipcsafarilink"></div>
-                            <div class="ccontent">
-                                <iframe class="ccont" src="../../Challenge/Form/index.html" frameborder="0"></iframe>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="cbottom">
-                    </div>
-                    <div class="cleg">
-                    </div>
-                    <div class="cfootwrap">
-                        <div class="cfoot">
-                        </div>
-                    </div>
-                    <div class="keybody">
-                        <div class="keyr">
-                            <div class="keyc1"></div>
-                        </div>
-                        <div class="keyr">
-                            <div class="keyc2"></div>
-                        </div>
-                    </div>
-                </div>
-            </label>
-            <div class="plantwrap" style="display: none;">
-                <div class="plant">
-                    <div class="plantleaf"></div>
-                    <div class="plantleaf"></div>
-                    <div class="plantleaf"></div>
-                    <div class="plantleaf"></div>
-                    <div class="plantleaf"></div>
-                    <div class="plantleaf"></div>
-                    <div class="plantrock"></div>
-                    <div class="plantrock"></div>
-                    <div class="plantrock"></div>
-                    <div class="plantrock"></div>
-                    <div class="plantrock"></div>
-                    <div class="plantbase">
-                    </div>
-                </div>
-            </div>
+    <div class="nav-clock"><span class="d" id="navDate"></span> <b id="navTime">--:--</b></div>
+  </div>
+</nav>
 
-
+<header class="hero" id="top">
+  <div class="wrap">
+    <div class="hero-top">
+      <div>
+        <div class="status"><i></i> yeni projelere açık</div>
+        <h1>Merhaba, ben<br><span class="grad">Ahmet Bölükoğlu</span></h1>
+        <div class="role" id="role" aria-label="Kıdemli Yazılım Geliştirme Uzmanı"></div>
+      </div>
+      <div class="hero-side">
+        <p><strong>10 yılı aşkın</strong> süredir kurumsal ve freelance projelerde <strong>.NET Core, C#</strong> ve <strong>mikroservis</strong> mimarileriyle performanslı, ölçeklenebilir ve sürdürülebilir sistemler geliştiriyorum. Son dönemde yapay zekâ, agentic sistemler ve <strong>MCP</strong> ile çalışıyorum.</p>
+        <div class="cta">
+          <a class="btn btn-primary" href="#iletisim">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+            İletişime geç
+          </a>
+          <a class="btn btn-ghost" href="#deneyim">git log --deneyim</a>
         </div>
-        <div class="filler2">
-            <div style="float:left; width: 295px;">
-                <label class="entph" for="phoneint">
-                    <input class="toggler" type="checkbox" id="phoneint" />
-                    <div class="ibody">
-                        <div class="itop">
-                            <div class="icam"></div>
-                            <div class="iear">
-                                <div class="iear1"></div>
-                                <div class="iear2"></div>
-                                <div class="iear3"></div>
-                            </div>
-                        </div>
-                        <div class="imiddle">
-                            <div class="isafarilink"></div>
-                            <div class="icontent">
-                                <iframe class="cont" src="../../Challenge/Form/index.html" borderframe="0"></iframe>
-                            </div>
-                        </div>
-                        <div class="ibottom">
-                            <div class="ihomebutton">
-                            </div>
-                        </div>
-                    </div>
-                </label>
-            </div>
-            <div style="float:right; width: 735px;">
-                <label class="entph" for="itabletint">
-                    <input class="toggler" type="checkbox" id="itabletint" />
-                    <div class="itabletbody">
-                        <div class="itablettop">
-                            <div class="icam"></div>
-                            <!-- <div class="iear">
-                                <div class="iear1"></div>
-                                <div class="iear2"></div>
-                                <div class="iear3"></div>
-                            </div> -->
-                        </div>
-                        <div class="itabletmiddle">
-                            <div class="itabletsafarilink"></div>
-                            <div class="itabletcontent">
-                                <iframe class="itabletcont" src="../../Challenge/Form/index.html" borderframe="0"></iframe>
-                            </div>
-                        </div>
-                        <div class="itabletbottom">
-                            <div class="ihomebutton"></div>
-                        </div>
-                    </div>
-                </label>
-            </div>
-        </div>
+      </div>
     </div>
+
+    <!-- THE ROOM -->
+    <div class="room-frame" id="room">
+      <div class="room-hint">💡 odadaki nesnelere tıkla</div>
+      <div class="bubble" id="bubble"></div>
+      <svg viewBox="0 0 1600 1000" role="img" aria-label="Gece, İstanbul manzaralı bir yazılımcı odası: masa, iki monitör, lamba, çay bardağı, kitaplık ve neon tabela">
+        <defs>
+          <linearGradient id="gWall" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#1c1744"/><stop offset="1" stop-color="#120f2c"/>
+          </linearGradient>
+          <linearGradient id="gFloor" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#211a3d"/><stop offset="1" stop-color="#0c0a1a"/>
+          </linearGradient>
+          <linearGradient id="gSky" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#070b26"/><stop offset=".6" stop-color="#1d1650"/><stop offset="1" stop-color="#5b2a68"/>
+          </linearGradient>
+          <linearGradient id="gSea" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#2a1d55"/><stop offset="1" stop-color="#0b0a26"/>
+          </linearGradient>
+          <linearGradient id="gWood" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#8a5f3c"/><stop offset="1" stop-color="#5a3b24"/>
+          </linearGradient>
+          <linearGradient id="gWoodDark" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#4a2f1c"/><stop offset="1" stop-color="#2e1d12"/>
+          </linearGradient>
+          <radialGradient id="gMonGlow" cx=".5" cy=".5" r=".5">
+            <stop offset="0" stop-color="#5eead4" stop-opacity=".28"/><stop offset="1" stop-color="#5eead4" stop-opacity="0"/>
+          </radialGradient>
+          <radialGradient id="gPinkGlow" cx=".5" cy=".5" r=".5">
+            <stop offset="0" stop-color="#f472b6" stop-opacity=".22"/><stop offset="1" stop-color="#f472b6" stop-opacity="0"/>
+          </radialGradient>
+          <linearGradient id="gLamp" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#fde68a" stop-opacity=".55"/><stop offset="1" stop-color="#fbbf24" stop-opacity="0"/>
+          </linearGradient>
+          <radialGradient id="gMoon" cx=".5" cy=".5" r=".5">
+            <stop offset="0" stop-color="#fff7d6" stop-opacity=".5"/><stop offset="1" stop-color="#fff7d6" stop-opacity="0"/>
+          </radialGradient>
+          <linearGradient id="gTea" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#d9480f"/><stop offset="1" stop-color="#7c2d12"/>
+          </linearGradient>
+          <filter id="fGlow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+          <filter id="fSoft"><feGaussianBlur stdDeviation="3"/></filter>
+          <clipPath id="cWin"><rect x="130" y="100" width="420" height="360"/></clipPath>
+          <clipPath id="cScreen"><rect x="712" y="302" width="456" height="276" rx="4"/></clipPath>
+          <clipPath id="cScreen2"><rect x="1208" y="342" width="136" height="236" rx="3"/></clipPath>
+        </defs>
+
+        <!-- wall + floor -->
+        <rect width="1600" height="770" fill="url(#gWall)"/>
+        <g stroke="#ffffff" stroke-opacity=".025" stroke-width="2">
+          <path d="M0 120H1600M0 240H1600M0 360H1600M0 480H1600M0 600H1600"/>
+        </g>
+        <rect y="770" width="1600" height="230" fill="url(#gFloor)"/>
+        <g stroke="#000" stroke-opacity=".25" stroke-width="2">
+          <path d="M0 810H1600M0 860H1600M0 920H1600"/>
+          <path d="M200 770 120 1000M520 770 480 1000M840 770 840 1000M1160 770 1200 1000M1460 770 1560 1000"/>
+        </g>
+        <rect y="760" width="1600" height="14" fill="#0d0b1f"/>
+        <ellipse cx="940" cy="910" rx="520" ry="60" fill="#2b1f4d" opacity=".7"/>
+        <ellipse cx="940" cy="910" rx="470" ry="48" fill="none" stroke="#a78bfa" stroke-opacity=".25" stroke-width="3" stroke-dasharray="10 12"/>
+
+        <!-- ambient glows -->
+        <ellipse cx="940" cy="430" rx="520" ry="300" fill="url(#gMonGlow)"/>
+        <ellipse cx="860" cy="160" rx="360" ry="140" fill="url(#gPinkGlow)"/>
+
+        <!-- WINDOW -->
+        <g class="hot" id="hWindow" tabindex="0" role="button" aria-label="Pencere: kayan yıldız">
+          <rect x="112" y="82" width="456" height="396" rx="10" fill="#2b2556"/>
+          <g clip-path="url(#cWin)">
+            <rect x="130" y="100" width="420" height="360" fill="url(#gSky)"/>
+            <circle cx="470" cy="160" r="70" fill="url(#gMoon)"/>
+            <circle cx="470" cy="160" r="24" fill="#fff4cc"/>
+            <circle cx="482" cy="152" r="21" fill="#130f3a"/>
+            <g fill="#fff">
+              <circle class="twinkle" cx="170" cy="130" r="1.8"/>
+              <circle class="twinkle" cx="230" cy="180" r="1.4" style="animation-delay:.6s"/>
+              <circle class="twinkle" cx="300" cy="125" r="2" style="animation-delay:1.2s"/>
+              <circle class="twinkle" cx="390" cy="210" r="1.4" style="animation-delay:.3s"/>
+              <circle class="twinkle" cx="530" cy="240" r="1.6" style="animation-delay:1.8s"/>
+              <circle class="twinkle" cx="200" cy="250" r="1.3" style="animation-delay:2.2s"/>
+              <circle class="twinkle" cx="350" cy="160" r="1.2" style="animation-delay:1.5s"/>
+              <circle class="twinkle" cx="420" cy="110" r="1.5" style="animation-delay:.9s"/>
+            </g>
+            <g id="shootingStar" opacity="0">
+              <line x1="500" y1="120" x2="540" y2="100" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+            </g>
+            <!-- far shore skyline with mosques -->
+            <path d="M130 360 L130 330 Q170 318 210 326 L230 322 L250 330 L290 324 L330 332 L360 326 L400 332 L440 322 L480 330 L520 320 L550 326 L550 360Z" fill="#2a1f52"/>
+            <g fill="#1b1540">
+              <!-- mosque left -->
+              <path d="M180 345 Q205 300 230 345Z"/><rect x="176" y="340" width="58" height="22"/>
+              <rect x="168" y="290" width="5" height="60"/><path d="M168 290 L170.5 276 L173 290Z"/>
+              <rect x="237" y="290" width="5" height="60"/><path d="M237 290 L239.5 276 L242 290Z"/>
+              <!-- buildings -->
+              <rect x="260" y="318" width="24" height="44"/><rect x="290" y="326" width="18" height="36"/>
+              <!-- Galata-like tower -->
+              <rect x="420" y="282" width="22" height="80"/><path d="M416 284 L431 252 L446 284Z"/>
+              <rect x="350" y="312" width="30" height="50"/><rect x="460" y="320" width="26" height="42"/>
+              <!-- mosque right -->
+              <path d="M495 342 Q520 304 545 342Z"/><rect x="492" y="338" width="56" height="24"/>
+              <rect x="486" y="296" width="4" height="50"/><path d="M486 296 L488 284 L490 296Z"/>
+            </g>
+            <g fill="#fcd34d" opacity=".8">
+              <rect x="265" y="326" width="3" height="3"/><rect x="275" y="336" width="3" height="3"/><rect x="295" y="334" width="3" height="3"/>
+              <rect x="356" y="320" width="3" height="3"/><rect x="368" y="332" width="3" height="3"/><rect x="466" y="328" width="3" height="3"/>
+              <rect x="476" y="340" width="3" height="3"/><rect x="428" y="300" width="4" height="4"/>
+            </g>
+            <!-- Bosphorus -->
+            <rect x="130" y="360" width="420" height="100" fill="url(#gSea)"/>
+            <g stroke="#fcd34d" stroke-opacity=".5" stroke-width="2" stroke-linecap="round">
+              <path class="wave" d="M420 380h30M400 395h20M440 410h40"/>
+              <path class="wave" d="M170 385h24M220 400h30M300 420h20" style="animation-delay:1.5s" stroke="#a78bfa"/>
+            </g>
+            <!-- Maiden's Tower (Kız Kulesi) -->
+            <g transform="translate(300 0)">
+              <ellipse cx="0" cy="408" rx="44" ry="7" fill="#120f30"/>
+              <rect x="-34" y="388" width="68" height="20" fill="#2a2058"/>
+              <rect x="-12" y="350" width="24" height="40" fill="#3a2d70"/>
+              <rect x="-15" y="346" width="30" height="6" fill="#4a3a88"/>
+              <path d="M-9 346 L0 318 L9 346Z" fill="#4a3a88"/>
+              <rect x="-1" y="308" width="2" height="12" fill="#4a3a88"/>
+              <circle cx="0" cy="306" r="3" fill="#fde68a" filter="url(#fGlow)"/>
+              <rect x="-4" y="360" width="8" height="10" fill="#fcd34d" opacity=".9"/>
+              <rect x="-24" y="394" width="6" height="6" fill="#fcd34d" opacity=".6"/><rect x="18" y="394" width="6" height="6" fill="#fcd34d" opacity=".6"/>
+              <path d="M-20 420h40M-12 432h24" stroke="#fde68a" stroke-opacity=".35" stroke-width="3" class="wave"/>
+            </g>
+          </g>
+          <rect x="336" y="100" width="8" height="360" fill="#2b2556"/>
+          <rect x="130" y="276" width="420" height="8" fill="#2b2556"/>
+          <rect x="96" y="472" width="488" height="22" rx="6" fill="#352d66"/>
+          <!-- cactus on sill -->
+          <rect x="140" y="440" width="34" height="32" rx="4" fill="#c2410c"/>
+          <rect x="150" y="402" width="14" height="42" rx="7" fill="#22c55e"/>
+          <rect x="140" y="414" width="8" height="18" rx="4" fill="#16a34a"/>
+        </g>
+
+        <!-- NEON SIGN -->
+        <g class="neon" filter="url(#fGlow)">
+          <rect x="640" y="104" width="420" height="104" rx="18" fill="none" stroke="#f472b6" stroke-width="4"/>
+          <text x="850" y="170" text-anchor="middle" font-family="JetBrains Mono, monospace" font-weight="700" font-size="34" fill="#ffd1ea">çay · kod · tekrar</text>
+        </g>
+
+        <!-- CLOCK -->
+        <g id="clock" transform="translate(1150 160)">
+          <circle r="58" fill="#e8e6f5"/>
+          <circle r="58" fill="none" stroke="#a78bfa" stroke-width="6"/>
+          <g stroke="#15132e" stroke-width="4" stroke-linecap="round">
+            <path d="M0 -46v8M46 0h-8M0 46v-8M-46 0h8"/>
+          </g>
+          <g stroke="#15132e" stroke-width="2" opacity=".5">
+            <path d="M23 -39.8l-3 5.2M39.8 -23l-5.2 3M39.8 23l-5.2 -3M23 39.8l-3 -5.2M-23 39.8l3 -5.2M-39.8 23l5.2 -3M-39.8 -23l5.2 3M-23 -39.8l3 5.2"/>
+          </g>
+          <line id="hHour" y2="-26" stroke="#15132e" stroke-width="6" stroke-linecap="round"/>
+          <line id="hMin" y2="-38" stroke="#15132e" stroke-width="4" stroke-linecap="round"/>
+          <line id="hSec" y1="8" y2="-42" stroke="#f472b6" stroke-width="2" stroke-linecap="round"/>
+          <circle r="5" fill="#f472b6"/>
+        </g>
+
+        <!-- SHELF -->
+        <g class="hot" id="hShelf" tabindex="0" role="button" aria-label="Kitaplık: yeteneklere git">
+          <!-- top shelf -->
+          <rect x="1270" y="292" width="290" height="12" rx="3" fill="url(#gWood)"/>
+          <g font-family="JetBrains Mono, monospace" font-size="13" font-weight="700" text-anchor="middle">
+            <rect x="1284" y="210" width="30" height="82" rx="3" fill="#7c3aed"/><text transform="translate(1303 251) rotate(-90)" fill="#fff">C#</text>
+            <rect x="1316" y="196" width="34" height="96" rx="3" fill="#2563eb"/><text transform="translate(1337 244) rotate(-90)" fill="#fff">.NET</text>
+            <rect x="1352" y="218" width="26" height="74" rx="3" fill="#dc2626"/><text transform="translate(1369 255) rotate(-90)" fill="#fff">Redis</text>
+            <rect x="1380" y="204" width="30" height="88" rx="3" fill="#0891b2"/><text transform="translate(1399 248) rotate(-90)" fill="#fff">SQL</text>
+            <rect x="1416" y="214" width="28" height="78" rx="3" fill="#059669" transform="rotate(10 1430 292)"/>
+            <text transform="translate(1440 254) rotate(-80)" fill="#fff">gRPC</text>
+          </g>
+          <!-- small trophy -->
+          <path d="M1492 252h36v8q0 18-18 18t-18-18z" fill="#fbbf24"/>
+          <rect x="1505" y="276" width="10" height="8" fill="#fbbf24"/><rect x="1496" y="282" width="28" height="10" rx="2" fill="#b45309"/>
+          <!-- second shelf -->
+          <rect x="1440" y="420" width="120" height="12" rx="3" fill="url(#gWood)"/>
+          <g font-family="JetBrains Mono, monospace" font-size="12" font-weight="700" text-anchor="middle">
+            <rect x="1452" y="352" width="24" height="68" rx="3" fill="#0ea5e9"/><text transform="translate(1468 386) rotate(-90)" fill="#fff">React</text>
+            <rect x="1478" y="344" width="26" height="76" rx="3" fill="#f472b6"/><text transform="translate(1495 382) rotate(-90)" fill="#fff">MCP</text>
+            <rect x="1506" y="358" width="22" height="62" rx="3" fill="#eab308"/><text transform="translate(1521 389) rotate(-90)" fill="#1a1238">TS</text>
+          </g>
+          <circle cx="1543" cy="408" r="12" fill="#e8e6f5"/>
+          <path d="M1536 404l7 -5 7 5-3 8h-8z" fill="#15132e"/>
+        </g>
+
+        <!-- poster: MCPD cert -->
+        <g transform="translate(1440 462) scale(.85)">
+          <rect width="130" height="96" rx="6" fill="#e8e6f5" transform="rotate(-3)"/>
+          <g transform="rotate(-3)">
+            <rect x="8" y="8" width="114" height="80" rx="4" fill="none" stroke="#a78bfa" stroke-width="2"/>
+            <text x="65" y="40" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="16" font-weight="700" fill="#15132e">MCPD</text>
+            <text x="65" y="58" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#4b4670">Microsoft Certified</text>
+            <circle cx="65" cy="74" r="7" fill="#fbbf24"/>
+          </g>
+        </g>
+
+        <!-- DESK -->
+        <rect x="560" y="680" width="20" height="230" fill="url(#gWoodDark)"/>
+        <rect x="1180" y="676" width="230" height="230" rx="6" fill="url(#gWoodDark)"/>
+        <rect x="1196" y="696" width="198" height="56" rx="4" fill="#5a3b24"/>
+        <rect x="1196" y="764" width="198" height="56" rx="4" fill="#5a3b24"/>
+        <rect x="1196" y="832" width="198" height="56" rx="4" fill="#5a3b24"/>
+        <g fill="#c9a27a"><rect x="1275" y="720" width="40" height="6" rx="3"/><rect x="1275" y="788" width="40" height="6" rx="3"/><rect x="1275" y="856" width="40" height="6" rx="3"/></g>
+        <rect x="530" y="648" width="900" height="30" rx="6" fill="url(#gWood)"/>
+        <rect x="530" y="648" width="900" height="5" rx="2" fill="#b07d52"/>
+        <line class="led" x1="590" y1="684" x2="1170" y2="684" stroke-width="4" stroke-linecap="round" filter="url(#fGlow)"/>
+
+        <!-- football under desk -->
+        <g class="hot" id="hBall" tabindex="0" role="button" aria-label="Futbol topu">
+          <g id="ball">
+            <circle cx="760" cy="866" r="34" fill="#f8fafc"/>
+            <path d="M760 852l13 9-5 15h-16l-5-15z" fill="#15132e"/>
+            <path d="M760 832v20M773 861l19-6M768 876l11 16M752 876l-11 16M747 861l-19-6" stroke="#15132e" stroke-width="2.5"/>
+          </g>
+        </g>
+
+        <!-- LAMP -->
+        <g class="hot" id="hLamp" tabindex="0" role="button" aria-label="Masa lambası: aç / kapat">
+          <path class="lamp-light" d="M628 448 L560 648 L760 648 L684 448Z" fill="url(#gLamp)"/>
+          <ellipse cx="590" cy="645" rx="38" ry="8" fill="#1f1b3a"/>
+          <rect x="586" y="530" width="8" height="114" fill="#a78bfa"/>
+          <line x1="590" y1="534" x2="650" y2="440" stroke="#a78bfa" stroke-width="8" stroke-linecap="round"/>
+          <circle cx="590" cy="534" r="9" fill="#7c3aed"/>
+          <path d="M618 452 L690 452 L672 412 L636 412Z" fill="#7c3aed"/>
+          <ellipse class="lamp-bulb" cx="656" cy="454" rx="20" ry="6" fill="#fde68a"/>
+        </g>
+
+        <!-- TEA GLASS -->
+        <g class="hot" id="hTea" tabindex="0" role="button" aria-label="Çay bardağı: tazele">
+          <g class="steam" fill="none" stroke="#e8e6f5" stroke-opacity=".6" stroke-width="3" stroke-linecap="round">
+            <path d="M650 576 q-8 -10 0 -20 q8 -10 0 -20"/>
+            <path d="M664 578 q-8 -10 0 -20 q8 -10 0 -20"/>
+            <path d="M678 576 q-8 -10 0 -20 q8 -10 0 -20"/>
+          </g>
+          <ellipse cx="664" cy="644" rx="40" ry="7" fill="#e8e6f5"/>
+          <ellipse cx="664" cy="642" rx="32" ry="5" fill="#c4c0dc"/>
+          <!-- tulip glass -->
+          <path d="M644 584 Q640 604 652 612 Q644 624 648 640 L680 640 Q684 624 676 612 Q688 604 684 584Z" fill="#e8e6f5" fill-opacity=".25" stroke="#e8e6f5" stroke-opacity=".6" stroke-width="2"/>
+          <path id="teaFill" d="M645 594 Q642 606 653 612 Q645 624 649 638 L679 638 Q683 624 675 612 Q686 606 683 594Z" fill="url(#gTea)" opacity=".92"/>
+          <rect x="654" y="598" width="4" height="34" rx="2" fill="#fff" opacity=".35"/>
+        </g>
+
+        <!-- MAIN MONITOR -->
+        <g class="hot" id="hMonitor" tabindex="0" role="button" aria-label="Monitör: terminale git">
+          <rect x="912" y="590" width="36" height="52" fill="#1a1733"/>
+          <path d="M860 648 Q930 628 1000 648Z" fill="#1a1733"/>
+          <rect x="700" y="290" width="480" height="300" rx="12" fill="#07060f"/>
+          <rect x="712" y="302" width="456" height="276" rx="4" fill="#0d1117"/>
+          <g clip-path="url(#cScreen)">
+            <rect x="712" y="302" width="456" height="24" fill="#161b22"/>
+            <circle cx="726" cy="314" r="5" fill="#ff5f57"/><circle cx="742" cy="314" r="5" fill="#febc2e"/><circle cx="758" cy="314" r="5" fill="#28c840"/>
+            <text x="940" y="319" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="12" fill="#8b949e" id="fileName">Program.cs</text>
+            <g id="codeLines" font-family="JetBrains Mono, monospace" font-size="14" xml:space="preserve"></g>
+          </g>
+          <rect x="700" y="290" width="480" height="300" rx="12" fill="none" stroke="#2a2650" stroke-width="2"/>
+          <circle cx="940" cy="584" r="2" fill="#5eead4"/>
+        </g>
+
+        <!-- SECOND MONITOR (portrait dashboard) -->
+        <g>
+          <rect x="1260" y="590" width="28" height="52" fill="#1a1733"/>
+          <path d="M1228 648 Q1274 632 1320 648Z" fill="#1a1733"/>
+          <rect x="1198" y="332" width="156" height="256" rx="10" fill="#07060f"/>
+          <rect x="1208" y="342" width="136" height="236" rx="3" fill="#0d1117"/>
+          <g clip-path="url(#cScreen2)" font-family="JetBrains Mono, monospace">
+            <text x="1218" y="362" font-size="10" fill="#8b949e">grafana · prod</text>
+            <text x="1218" y="392" font-size="20" font-weight="700" fill="#5eead4">12ms</text>
+            <text x="1218" y="406" font-size="9" fill="#8b949e">p95 latency</text>
+            <path id="spark" d="M1218 450 L1240 438 L1258 444 L1276 424 L1294 432 L1312 414 L1334 420" fill="none" stroke="#a78bfa" stroke-width="2.5"/>
+            <text x="1218" y="478" font-size="9" fill="#8b949e">redis hit</text>
+            <text x="1300" y="478" font-size="10" font-weight="700" fill="#86efac">98.7%</text>
+            <rect x="1218" y="484" width="116" height="6" rx="3" fill="#1f2937"/>
+            <rect x="1218" y="484" width="112" height="6" rx="3" fill="#86efac"/>
+            <g fill="#f472b6">
+              <rect class="bar" x="1220" y="520" width="12" height="48"/>
+              <rect class="bar" x="1238" y="530" width="12" height="38" style="animation-delay:.3s"/>
+              <rect class="bar" x="1256" y="510" width="12" height="58" style="animation-delay:.6s" fill="#5eead4"/>
+              <rect class="bar" x="1274" y="534" width="12" height="34" style="animation-delay:.9s"/>
+              <rect class="bar" x="1292" y="516" width="12" height="52" style="animation-delay:1.2s" fill="#a78bfa"/>
+              <rect class="bar" x="1310" y="526" width="12" height="42" style="animation-delay:1.5s"/>
+            </g>
+          </g>
+          <rect x="1198" y="332" width="156" height="256" rx="10" fill="none" stroke="#2a2650" stroke-width="2"/>
+        </g>
+
+        <!-- KEYBOARD + MOUSE -->
+        <rect x="780" y="632" width="300" height="16" rx="5" fill="#1a1733"/>
+        <rect x="780" y="644" width="300" height="4" rx="2" fill="#a78bfa" opacity=".6" class="led" stroke-width="3" stroke="#a78bfa"/>
+        <g fill="#2e2a52">
+          <rect x="790" y="635" width="280" height="4" rx="1"/>
+          <rect x="790" y="641" width="280" height="3" rx="1" opacity=".7"/>
+        </g>
+        <path d="M1100 646 q0 -18 16 -18 q16 0 16 18z" fill="#1a1733"/>
+        <line x1="1116" y1="630" x2="1116" y2="638" stroke="#5eead4" stroke-width="2"/>
+
+        <!-- RUBBER DUCK -->
+        <g class="hot" id="hDuck" tabindex="0" role="button" aria-label="Lastik ördek: rubber duck debugging">
+          <g id="duck">
+            <ellipse cx="1166" cy="634" rx="22" ry="14" fill="#facc15"/>
+            <circle cx="1176" cy="612" r="12" fill="#facc15"/>
+            <path d="M1186 612 l12 3 -12 4z" fill="#f97316"/>
+            <circle cx="1179" cy="609" r="2.2" fill="#15132e"/>
+            <path d="M1150 628 q10 -8 18 2" fill="none" stroke="#eab308" stroke-width="3" stroke-linecap="round"/>
+          </g>
+        </g>
+
+        <!-- plant on cabinet side -->
+        <g transform="translate(1400 0)">
+          <path d="M-18 600 L18 600 L13 648 L-13 648Z" fill="#e8e6f5"/>
+          <g fill="#22c55e">
+            <path d="M0 600 Q-30 570 -24 540 Q-4 560 0 600Z"/>
+            <path d="M0 600 Q26 572 30 546 Q6 566 0 600Z" fill="#16a34a"/>
+            <path d="M0 600 Q-6 560 6 530 Q14 566 0 600Z" fill="#4ade80"/>
+          </g>
+        </g>
+
+        <!-- headphones hanging on monitor -->
+        <path d="M1150 300 q30 -40 60 0" fill="none" stroke="#f472b6" stroke-width="7" stroke-linecap="round"/>
+        <rect x="1142" y="296" width="16" height="30" rx="6" fill="#f472b6"/>
+        <rect x="1202" y="296" width="16" height="30" rx="6" fill="#f472b6"/>
+
+        <!-- dim overlay when lamp off -->
+        <rect class="room-dim" width="1600" height="1000" fill="#05040d" fill-opacity=".35" pointer-events="none"/>
+      </svg>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- ABOUT -->
+  <section id="hakkimda">
+    <div class="wrap">
+      <div class="sec-head reveal"><span class="num">01.</span><h2>Hakkımda</h2><span class="cmd"><b>cat</b> README.md</span></div>
+      <div class="about-grid">
+        <div class="window reveal">
+          <div class="win-bar"><i></i><i></i><i></i><span>README.md</span></div>
+          <div class="code">
+            <p class="h"># Ahmet Bölükoğlu</p>
+            <p>&nbsp;</p>
+            <p class="s">Kıdemli Yazılım Geliştirme Uzmanı olarak <b>10 yılı aşkın</b> süredir kurumsal ve freelance projelerde aktif rol aldım. <b>.NET Core, C#</b>, mikroservis mimarileri ve modern backend teknolojilerinde derin bilgi sahibiyim.</p>
+            <p>&nbsp;</p>
+            <p class="s">Performans, ölçeklenebilirlik ve sürdürülebilir kod konularında uzmanım. Projelerde yalnızca geliştirici değil; süreçleri iyileştiren ve ekip içi koordinasyonu güçlendiren bir <b>takım lideri</b> olarak da görev yaptım.</p>
+            <p>&nbsp;</p>
+            <p class="s"><b>Redis, Azure DevOps, Event Bus (Pub/Sub)</b> ve <b>gRPC/RPC</b> ile sistem optimizasyonları ve entegrasyon çözümleri geliştirdim. Yeni teknolojileri öğrenmeye ve iş süreçlerine entegre etmeye istekliyim — son dönemde odağım <b>yapay zekâ, agentic sistemler ve MCP</b>.</p>
+          </div>
+        </div>
+        <div class="stats">
+          <div class="stat reveal"><span class="ico">⏳</span><div class="n" data-count="10">0</div><div class="l">yıl+ deneyim</div></div>
+          <div class="stat reveal"><span class="ico">🏢</span><div class="n" data-count="9">0</div><div class="l">şirket &amp; kurum</div></div>
+          <div class="stat reveal"><span class="ico">🧰</span><div class="n" data-count="70">0</div><div class="l">teknoloji+</div></div>
+          <div class="stat reveal"><span class="ico">🍵</span><div class="n">∞</div><div class="l">bardak çay</div></div>
+          <div class="hobbies reveal">
+            <span class="hobby">⚽ Halı saha</span>
+            <span class="hobby">🎬 Dizi &amp; film</span>
+            <span class="hobby">🚀 Yeni teknolojiler</span>
+            <span class="hobby">🤝 Takım çalışması</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EXPERIENCE -->
+  <section id="deneyim">
+    <div class="wrap">
+      <div class="sec-head reveal"><span class="num">02.</span><h2>Deneyim</h2><span class="cmd"><b>git</b> log --graph --kariyer</span></div>
+      <div class="timeline" id="timeline"></div>
+      <button class="btn btn-ghost more-btn" id="moreBtn">git log --all  ↓ daha fazla göster</button>
+    </div>
+  </section>
+
+  <!-- SKILLS -->
+  <section id="yetenekler">
+    <div class="wrap">
+      <div class="sec-head reveal"><span class="num">03.</span><h2>Yetenekler</h2><span class="cmd"><b>cat</b> skills.json | jq</span></div>
+      <div class="skill-filter reveal" id="skillFilter"></div>
+      <div class="skills-grid" id="skillsGrid"></div>
+    </div>
+  </section>
+
+  <!-- EDUCATION -->
+  <section id="egitim" style="padding-top:24px">
+    <div class="wrap">
+      <div class="sec-head reveal"><span class="num">04.</span><h2>Eğitim &amp; Sertifika</h2><span class="cmd"><b>ls</b> ~/diplomalar</span></div>
+      <div class="edu-grid">
+        <div class="edu reveal"><div class="yr">2012 — 2014</div><h4>Bilgisayar Programcılığı</h4><p>İstanbul Üniversitesi MYO · Fatih Üniversitesi</p></div>
+        <div class="edu reveal"><div class="yr">2008 — 2012</div><h4>Bilgisayar Programcılığı</h4><p>Haydarpaşa Endüstri Meslek Lisesi</p></div>
+        <div class="edu reveal"><div class="yr">2013 · 100 puan</div><h4>Microsoft Certified Professional Developer</h4><p>Arı Bilgi Eğitim Kurumları</p></div>
+        <div class="edu reveal"><div class="yr">2013</div><h4>Bilge Adam &amp; Microsoft Semineri (msHOWTO)</h4><p>Windows, Azure, Active Directory ve daha fazlası</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TERMINAL -->
+  <section id="terminal">
+    <div class="wrap">
+      <div class="sec-head reveal"><span class="num">05.</span><h2>Bir komut dene</h2><span class="cmd"><b>./</b>ahmet.sh --interactive</span></div>
+      <div class="window term reveal">
+        <div class="win-bar"><i></i><i></i><i></i><span>ahmet@dev-room: ~ — zsh</span></div>
+        <div class="term-body" id="termBody">
+          <div id="termOut"></div>
+          <div class="term-input">
+            <span><span class="pr">ahmet@dev-room</span>:<span class="pa">~</span>$</span>
+            <input id="termIn" autocomplete="off" spellcheck="false" aria-label="Terminal komutu" placeholder="help yaz ve Enter'a bas">
+          </div>
+        </div>
+        <div class="term-tips" id="termTips"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="iletisim">
+    <div class="wrap">
+      <div class="contact reveal">
+        <div class="sec-head" style="justify-content:center;margin-bottom:12px"><span class="num">06. iletişim</span></div>
+        <h2>Bir fikrin mi var?<br><span class="grad" style="background:linear-gradient(90deg,var(--cyan),var(--pink));-webkit-background-clip:text;background-clip:text;color:transparent">Birlikte inşa edelim.</span></h2>
+        <p>Yeni bir proje, iş birliği ya da sadece bir merhaba — çayı demledim, mail kutum açık.</p>
+        <div class="mail-box">
+          <a href="mailto:ahmet.bolukoglu@hotmail.com" id="mailLink">ahmet.bolukoglu@hotmail.com</a>
+          <button id="copyMail" type="button">kopyala</button>
+        </div>
+        <div class="socials" id="socials"></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">© <span id="yr"></span> Ahmet Bölükoğlu · <span>🍵</span> ve &lt;/&gt; ile yapıldı</div>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  // ---------- DATA ----------
+  const EMAIL = "ahmet.bolukoglu@hotmail.com";
+
+  // Sosyal medya linklerini buradan düzenleyebilirsin
+  const SOCIALS = [
+    { name: "GitHub", url: "https://github.com/ahmetbolukoglu",
+      icon: '<path d="M12 .5a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2.2c-3.3.7-4-1.4-4-1.4-.6-1.4-1.4-1.8-1.4-1.8-1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.7-1.6-2.7-.3-5.5-1.3-5.5-5.9 0-1.3.5-2.4 1.2-3.2-.1-.3-.5-1.5.1-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0C17 4.6 18 4.9 18 4.9c.6 1.7.2 2.9.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .5z"/>' },
+    { name: "LinkedIn", url: "https://www.linkedin.com/in/ahmetbolukoglu",
+      icon: '<path d="M20.4 20.5h-3.6v-5.6c0-1.3 0-3-1.8-3s-2.1 1.4-2.1 2.9v5.7H9.3V9h3.4v1.6c.5-.9 1.6-1.8 3.4-1.8 3.6 0 4.3 2.4 4.3 5.5v6.2zM5.3 7.4a2.1 2.1 0 1 1 0-4.2 2.1 2.1 0 0 1 0 4.2zM7.1 20.5H3.5V9h3.6v11.5zM22.2 0H1.8C.8 0 0 .8 0 1.7v20.6c0 .9.8 1.7 1.8 1.7h20.4c1 0 1.8-.8 1.8-1.7V1.7C24 .8 23.2 0 22.2 0z"/>' },
+  ];
+
+  const EXPERIENCE = [
+    { from: "06.2024", to: "09.2025", dur: "1 yıl 3 ay", role: "Kıdemli Yazılım Geliştirme Uzmanı", company: "EnerjiSA", type: "Dış Kaynak Danışman",
+      desc: "Güneş Enerji Santrali projesinde inverter, sayaç ve diğer cihazlardan anlık üretilen elektrik verilerinin toplanıp raporlanmasını sağladım. Performans sorunlarını Redis Cache mekanizmaları kurarak giderdim ve ekranların hızlı yüklenmesini sağladım.",
+      tech: [".NET Core", "C#", "ABP Framework", "Redis", "Blazor", "MSSQL", "Azure DevOps", "Grafana", "Prometheus", "k6", "Power BI"] },
+    { from: "10.2023", to: "02.2024", dur: "5 ay", role: "Kıdemli Yazılım Geliştirme Uzmanı", company: "Agrio Finans", type: "Dış Kaynak Danışman",
+      desc: "QPay projesinin mikroservislerinin geliştirilmesinde yer aldım. gRPC → RPC dönüşümünü sağladım, PostgreSQL süreçlerini yönettim, FastEndpoints ile API'ler ve Event Bus (Pub/Sub) akışları geliştirdim. Amazon S3 ile dosya yükleme süreçlerini optimize edip Redis cache ile performansı artırdım.",
+      tech: [".NET Core", "C#", "FastEndpoints", "gRPC", "RPC", "Event Bus", "PostgreSQL", "Redis", "Amazon S3", "Entity Framework"] },
+    { from: "06.2020", to: "06.2023", dur: "3 yıl 1 ay", role: "Kıdemli Yazılım Geliştirme Uzmanı → Takım Lideri", company: "Ovinot", type: "Tam zamanlı",
+      desc: "Serbest meslek sahipleri, esnaf ve KOBİ'lerin ticari işlem, belge ve para süreçlerini yönetmesini sağlayan; ön muhasebe, e-SMM, e-Fatura, e-Arşiv ve online ödeme içeren platformda kuruluşundan itibaren tüm modüllerde çalıştım, sonrasında ekibe liderlik ettim.",
+      tech: [".NET Core", "C#", ".NET Core MVC", "Web API", "MSSQL", "T-SQL", "Entity Framework", "Dapper", "Hangfire", "jQuery"] },
+    { from: "03.2019", to: "06.2019", dur: "4 ay", role: "Yazılım Geliştirme Uzmanı", company: "INTERTECH", type: "Dış Kaynak Danışman",
+      desc: "Türkiye geneli bankamatik fatura ödeme servislerinin geliştirilmesi ve desteği, yabancı menşeili bankaların ürün geliştirmeleri ve evrak düzenleme projesi.",
+      tech: ["C#", ".NET", "Bankacılık", "Web Services"] },
+    { from: "10.2018", to: "06.2020", dur: "1 yıl 9 ay", role: "Kıdemli Yazılım Geliştirme Uzmanı", company: "Timbo ICT", type: "Freelance · Remote",
+      desc: "Projeleri sıfırdan uçtan uca geliştirdim; e-ticaret web sitesi yönetimi ve geliştirmesi, uzaktan proje yönetimi ve Ionic ile mobil uygulama geliştirme.",
+      tech: ["E-Ticaret", "Ionic", "Mobil", "Proje Yönetimi"] },
+    { from: "07.2018", to: "03.2019", dur: "9 ay", role: "Yazılım Geliştirme Uzmanı", company: "Akbank Bankacılık Merkezi", type: "Dış Kaynak Danışman",
+      desc: "Akbank Face projesi kapsamında Lotus ile yazılmış kurumsal bankacılık uygulamasının MVC 5, TypeScript ve MCA (Multi Channel Architecture) ile yeniden yazılmasında, 6 kişilik Scrum ekibinde frontend ve backend geliştirdim.",
+      tech: ["ASP.NET MVC5", "TypeScript", "Kendo UI", "JavaScript", "Java", "Scrum"] },
+    { from: "11.2017", to: "04.2018", dur: "6 ay", role: "Yazılım Geliştirme Uzmanı", company: "Mavi Bilişim ve Danışmanlık", type: "Tam zamanlı",
+      desc: "Antrepo Stok Takip web platformunun arayüz geliştirmesi, talep doğrultusunda değişiklikler, testler ve teknik destek.",
+      tech: ["C#", "ASP.NET MVC", "Entity Framework", "jQuery", "Bootstrap"] },
+    { from: "01.2014", to: "11.2016", dur: "2 yıl 11 ay", role: "Yazılım Geliştirme Uzmanı", company: "İstanbul Medipol Üniversitesi", type: "Tam zamanlı",
+      desc: "Öğrenci işlerinde kullanılan yazılımın Web ve Windows Forms arayüzlerinin geliştirilmesi, testleri ve teknik desteği.",
+      tech: ["C#", "ASP.NET MVC", "DevExpress", "Entity Framework", "WinForms"] },
+    { from: "09.2013", to: "01.2014", dur: "5 ay", role: "Yazılım Geliştirme Elemanı", company: "Arı Bilgi Bilişim Teknolojileri Akademisi", type: "Tam zamanlı",
+      desc: "Kurumsal web sitesini baştan yazıp geliştirdim, çalışanlara web sitesi konusunda destek verdim.",
+      tech: ["ASP.NET", "HTML", "CSS", "JavaScript"] },
+    { from: "09.2011", to: "06.2012", dur: "10 ay", role: "Bilgi İşlem Stajyeri", company: "İETT Genel Müdürlüğü", type: "Staj",
+      desc: "Ağ sistemleri, bilgisayar kurulum/onarım/toplama ve yazıcı kurulum/onarım görevlerinde yer aldım.",
+      tech: ["Ağ Sistemleri", "Donanım"] },
+  ];
+
+  const SKILLS = [
+    { cat: "ai", title: "Yapay Zekâ & MCP", icon: "🤖", c: "#f472b6", desc: "Agentic sistemler, MCP sunucu/istemci mimarisi",
+      items: ["MCP Sunucu/İstemci", "Agentic Sistemler", "Prompt Mühendisliği", "Bağlam Yönetimi", "Tool / Function Calling", "Multimodal API", "AI Video Üretimi", "Metinden 3D (Blender API)"] },
+    { cat: "ai", title: "AI Destekli Geliştirme", icon: "✨", c: "#f472b6", desc: "Günlük kullandığım editör ve araçlar",
+      items: ["Claude Code", "Cursor", "Windsurf", "GitHub Copilot", "Google AI Studio"] },
+    { cat: "backend", title: "Backend", icon: "⚙️", c: "#5eead4", desc: "Ana uzmanlık alanım",
+      items: [".NET Core", "ASP.NET Core", "C#", "ASP.NET MVC", "Web API", "Microservices", "FastEndpoints", "gRPC / RPC", "Event Bus (Pub/Sub)", "RESTful", "ABP Framework", "Node.js", "Fastify", "Java", "VB.NET", "Hangfire"] },
+    { cat: "data", title: "Veritabanı", icon: "🗄️", c: "#7dd3fc", desc: "İlişkisel veritabanları ve ORM'ler",
+      items: ["MS SQL Server", "PostgreSQL", "MySQL", "Oracle", "T-SQL", "Entity Framework", "Dapper", "ADO.NET", "DBeaver"] },
+    { cat: "data", title: "Önbellek & Performans", icon: "⚡", c: "#fbbf24", desc: "Hız, gözlemlenebilirlik ve yük testi",
+      items: ["Redis", "RedisInsight", "Prometheus", "Grafana", "k6", "k6 Browser"] },
+    { cat: "frontend", title: "Frontend & Mobil", icon: "🎨", c: "#a78bfa", desc: "Arayüz tarafında da evdeyim",
+      items: ["React", "React Native", "Angular", "TypeScript", "JavaScript", "Blazor", "Ionic", "HTML5", "CSS3", "SASS / LESS", "Bootstrap", "Kendo UI", "jQuery"] },
+    { cat: "devops", title: "DevOps & CI/CD", icon: "🚀", c: "#86efac", desc: "Kaynak kontrolü ve dağıtım",
+      items: ["Azure DevOps", "GitHub", "Git", "Jenkins", "Bitbucket", "TFS", "Sourcetree", "Orbstack"] },
+    { cat: "devops", title: "BaaS & Real-time", icon: "🔌", c: "#86efac", desc: "Sunucusuz ve anlık veri mimarileri",
+      items: ["Supabase", "Edge Functions", "Realtime / WebSockets", "Event-Driven", "Amazon S3", "Protobuf"] },
+    { cat: "fun", title: "Oyun & 3D", icon: "🎮", c: "#fb923c", desc: "Hobi değil, ciddi iş :)",
+      items: ["2D JS Oyun Motorları", "Canvas / WebGL", "Oyun Durumu Senkronizasyonu", "Blender Python API", "Prosedürel Üretim"] },
+    { cat: "fun", title: "Liderlik & Ürün", icon: "🧭", c: "#fb923c", desc: "Kodun ötesinde",
+      items: ["Takım Liderliği", "Proje Yönetimi", "Ürün Geliştirme", "Ürün Yönetimi", "Scrum", "İngilizce (Teknik)"] },
+  ];
+  const SKILL_CATS = [["all","hepsi"],["ai","yapay-zeka"],["backend","backend"],["data","veri"],["frontend","frontend"],["devops","devops"],["fun","diğer"]];
+
+  // ---------- HELPERS ----------
+  const $ = s => document.querySelector(s);
+  const esc = s => s.replace(/[&<>"]/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[c]));
+  const hash = s => { let h = 0; for (const ch of s) h = (h * 31 + ch.charCodeAt(0)) >>> 0; return h.toString(16).padStart(7, "0").slice(0, 7); };
+  const toast = msg => { const t = $("#toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove("show"), 1800); };
+  const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // ---------- CLOCKS ----------
+  function tick() {
+    const d = new Date();
+    $("#navTime").textContent = d.toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" });
+    $("#navDate").textContent = d.toLocaleDateString("tr-TR", { weekday: "short", day: "numeric", month: "short" });
+    const s = d.getSeconds(), m = d.getMinutes() + s / 60, h = (d.getHours() % 12) + m / 60;
+    $("#hSec").setAttribute("transform", `rotate(${s * 6})`);
+    $("#hMin").setAttribute("transform", `rotate(${m * 6})`);
+    $("#hHour").setAttribute("transform", `rotate(${h * 30})`);
+  }
+  tick(); setInterval(tick, 1000);
+  $("#yr").textContent = new Date().getFullYear();
+
+  // ---------- ROLE TYPER ----------
+  (function () {
+    const roles = ["Kıdemli Yazılım Geliştirme Uzmanı", ".NET Core & Mikroservis Mimarı", "Takım Lideri", "AI & MCP Meraklısı"];
+    const el = $("#role"); let r = 0, i = 0, del = false;
+    function step() {
+      const txt = roles[r];
+      el.innerHTML = `<span class="k">const</span> rol = <span class="t">"${esc(txt.slice(0, i))}"</span><span class="caret"></span>`;
+      if (reduceMotion) { i = txt.length; el.innerHTML = `<span class="k">const</span> rol = <span class="t">"${esc(txt)}"</span>`; return; }
+      if (!del && i < txt.length) i++;
+      else if (!del) { del = true; return setTimeout(step, 1800); }
+      else if (i > 0) i--;
+      else { del = false; r = (r + 1) % roles.length; }
+      setTimeout(step, del ? 35 : 65);
+    }
+    step();
+  })();
+
+  // ---------- MONITOR CODE ----------
+  (function () {
+    const NS = "http://www.w3.org/2000/svg";
+    const C = { k: "#ff7b72", t: "#79c0ff", s: "#a5d6ff", f: "#d2a8ff", c: "#8b949e", p: "#e6edf3", n: "#ffa657" };
+    // each line: array of [colorKey, text]
+    const files = [
+      { name: "Program.cs", lines: [
+        [["k","public class "],["t","Developer"]],
+        [["p","{"]],
+        [["k","  public string "],["p","Name => "],["s","\"Ahmet\""],["p",";"]],
+        [["k","  public int "],["p","Years => "],["n","10"],["p",";"]],
+        [["k","  public "],["t","Stack "],["p","Stack = "],["k","new"],["p","()"]],
+        [["p","  { "],["s","\".NET\""],["p",", "],["s","\"Redis\""],["p"," };"]],
+        [["c","  // çay demlendi, build başlıyor"]],
+        [["k","  public async "],["t","Task "],["f","ShipAsync"],["p","()"]],
+        [["p","    => "],["k","await "],["f","BuildGreatThings"],["p","();"]],
+        [["p","}"]],
+      ]},
+      { name: "mcp-server.ts", lines: [
+        [["k","import "],["p","{ Server } "],["k","from "],["s","\"@mcp/sdk\""]],
+        [["c","// yapay zekâya yeni bir araç"]],
+        [["k","const "],["p","server = "],["k","new "],["t","Server"],["p","({"]],
+        [["p","  name: "],["s","\"dev-room\""],["p",","]],
+        [["p","});"]],
+        [["p","server."],["f","tool"],["p","("],["s","\"brew_tea\""],["p",", "],["k","async "],["p","() => {"]],
+        [["k","  return "],["s","\"🍵 hazır\""],["p",";"]],
+        [["p","});"]],
+      ]},
+      { name: "cache.cs", lines: [
+        [["k","var "],["p","key = "],["s","$\"report:{plantId}\""],["p",";"]],
+        [["k","var "],["p","hit = "],["k","await "],["p","_redis."],["f","GetAsync"],["p","(key);"]],
+        [["k","if "],["p","(hit "],["k","is not null"],["p",")"]],
+        [["k","  return "],["p","hit; "],["c","// ⚡ 12ms"]],
+        [["k","var "],["p","data = "],["k","await "],["f","LoadSlowAsync"],["p","();"]],
+        [["k","await "],["p","_redis."],["f","SetAsync"],["p","(key, data);"]],
+      ]},
+    ];
+    const g = $("#codeLines");
+    let fi = 0;
+    function makeLine(y, n) {
+      const t = document.createElementNS(NS, "text");
+      t.setAttribute("x", 724); t.setAttribute("y", y);
+      const num = document.createElementNS(NS, "tspan");
+      num.setAttribute("fill", "#484f58"); num.textContent = String(n).padStart(2, " ") + "  ";
+      t.appendChild(num); g.appendChild(t); return t;
+    }
+    async function play() {
+      const f = files[fi]; $("#fileName").textContent = f.name;
+      g.innerHTML = "";
+      for (let li = 0; li < f.lines.length; li++) {
+        const t = makeLine(348 + li * 22, li + 1);
+        for (const [ck, txt] of f.lines[li]) {
+          const sp = document.createElementNS(NS, "tspan");
+          sp.setAttribute("fill", C[ck]); t.appendChild(sp);
+          if (reduceMotion) { sp.textContent = txt; continue; }
+          for (let i = 1; i <= txt.length; i++) { sp.textContent = txt.slice(0, i); await new Promise(r => setTimeout(r, 28 + Math.random() * 40)); }
+        }
+        await new Promise(r => setTimeout(r, reduceMotion ? 0 : 160));
+      }
+      if (reduceMotion) return;
+      await new Promise(r => setTimeout(r, 2600));
+      fi = (fi + 1) % files.length; play();
+    }
+    play();
+  })();
+
+  // ---------- ROOM INTERACTIONS ----------
+  (function () {
+    const room = $("#room"), svg = room.querySelector("svg"), bubble = $("#bubble");
+    let bt;
+    function say(el, msg) {
+      const r = el.getBoundingClientRect(), rr = room.getBoundingClientRect();
+      let x = r.left + r.width / 2 - rr.left;
+      x = Math.max(110, Math.min(rr.width - 110, x));
+      bubble.style.left = x + "px"; bubble.style.top = (r.top - rr.top) + "px";
+      bubble.textContent = msg; bubble.classList.add("show");
+      clearTimeout(bt); bt = setTimeout(() => bubble.classList.remove("show"), 2200);
+    }
+    function on(id, fn) {
+      const el = document.getElementById(id);
+      el.addEventListener("click", () => fn(el));
+      el.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); fn(el); } });
+    }
+    let lamp = true;
+    on("hLamp", el => { lamp = !lamp; svg.classList.toggle("lamp-off", !lamp); say(el, lamp ? "💡 Işıklar açık" : "🌙 Gece modu: sadece monitör"); });
+    let teaCount = 1;
+    on("hTea", el => {
+      teaCount++;
+      const f = $("#teaFill"); f.style.transition = "opacity .2s"; f.style.opacity = 0;
+      setTimeout(() => { f.style.opacity = .92; }, 400);
+      say(el, `🍵 Çay tazelendi! (${teaCount}. bardak)`);
+    });
+    const quacks = ["🦆 Quack! Bug'ı bana anlat…", "🦆 Satır satır anlat, bulacağız.", "🦆 Null mı geliyor yoksa?", "🦆 Cache'i temizledin mi?"];
+    let qi = 0;
+    on("hDuck", el => {
+      const d = $("#duck"); d.classList.remove("duck-jump"); void d.getBBox(); d.classList.add("duck-jump");
+      say(el, quacks[qi++ % quacks.length]);
+    });
+    on("hBall", el => {
+      const b = $("#ball"); b.classList.remove("ball-roll"); void b.getBBox(); b.classList.add("ball-roll");
+      say(el, "⚽ Halı saha akşam 21:00'de!");
+    });
+    on("hWindow", el => {
+      const s = $("#shootingStar"); s.classList.remove("shoot"); void s.getBBox(); s.classList.add("shoot");
+      say(el, "🌠 Kız Kulesi manzarası, bir dilek tut");
+    });
+    on("hMonitor", () => { location.hash = "#terminal"; setTimeout(() => $("#termIn").focus({ preventScroll: true }), 600); });
+    on("hShelf", () => { location.hash = "#yetenekler"; });
+  })();
+
+  // ---------- EXPERIENCE ----------
+  (function () {
+    const tl = $("#timeline"); const SHOW = 5;
+    tl.innerHTML = EXPERIENCE.map((e, i) => `
+      <div class="commit reveal${i === 0 ? " head" : ""}" ${i >= SHOW ? 'data-extra hidden' : ""}>
+        <div class="commit-date">${e.from} — ${e.to}<small>${e.dur}</small></div>
+        <div class="rail"><i></i></div>
+        <div class="card">
+          <div class="card-top">
+            <span class="hash">${hash(e.company + e.from)}</span>
+            ${i === 0 ? '<span class="tag-head">HEAD → son</span>' : ""}
+            <span class="badge">${esc(e.type)}</span>
+          </div>
+          <h3>${esc(e.role)} <span class="at">@ ${esc(e.company)}</span></h3>
+          <p>${esc(e.desc)}</p>
+          <div class="chips">${e.tech.map(t => `<span class="chip">${esc(t)}</span>`).join("")}</div>
+        </div>
+      </div>`).join("");
+    const btn = $("#moreBtn"); let open = false;
+    btn.addEventListener("click", () => {
+      open = !open;
+      tl.querySelectorAll("[data-extra]").forEach(el => { el.hidden = !open; if (open) requestAnimationFrame(() => el.classList.add("in")); });
+      btn.textContent = open ? "git log -n 5  ↑ daha az göster" : "git log --all  ↓ daha fazla göster";
+    });
+  })();
+
+  // ---------- SKILLS ----------
+  (function () {
+    $("#skillsGrid").innerHTML = SKILLS.map(s => `
+      <div class="skill-card reveal" data-cat="${s.cat}" style="--c:${s.c}">
+        <h4><span>${s.icon}</span>${esc(s.title)}</h4>
+        <div class="desc">${esc(s.desc)}</div>
+        <div class="chips">${s.items.map(t => `<span class="chip">${esc(t)}</span>`).join("")}</div>
+      </div>`).join("");
+    const f = $("#skillFilter");
+    f.innerHTML = SKILL_CATS.map(([k, l], i) => `<button type="button" data-k="${k}" class="${i ? "" : "on"}">${l}</button>`).join("");
+    f.addEventListener("click", e => {
+      const b = e.target.closest("button"); if (!b) return;
+      f.querySelectorAll("button").forEach(x => x.classList.toggle("on", x === b));
+      document.querySelectorAll(".skill-card").forEach(c => c.classList.toggle("hide", b.dataset.k !== "all" && c.dataset.cat !== b.dataset.k));
+    });
+  })();
+
+  // ---------- SOCIALS + MAIL ----------
+  $("#socials").innerHTML = SOCIALS.map(s => `<a class="social" href="${s.url}" target="_blank" rel="noopener"><svg viewBox="0 0 24 24">${s.icon}</svg>${s.name}</a>`).join("") +
+    `<a class="social" href="mailto:${EMAIL}"><svg viewBox="0 0 24 24"><path d="M2 5.5A1.5 1.5 0 0 1 3.5 4h17A1.5 1.5 0 0 1 22 5.5v13a1.5 1.5 0 0 1-1.5 1.5h-17A1.5 1.5 0 0 1 2 18.5v-13zm2 .9v.3l8 5.3 8-5.3v-.3H4zm16 2.7-7.4 4.9a1 1 0 0 1-1.2 0L4 9.1V18h16V9.1z"/></svg>E-posta</a>`;
+  async function copyMail() {
+    try { await navigator.clipboard.writeText(EMAIL); toast("📋 Mail adresi kopyalandı"); }
+    catch { toast(EMAIL); }
+  }
+  $("#copyMail").addEventListener("click", copyMail);
+
+  // ---------- TERMINAL ----------
+  (function () {
+    const out = $("#termOut"), inp = $("#termIn"), body = $("#termBody");
+    const hist = []; let hi = 0;
+    const print = html => { const d = document.createElement("div"); d.className = "term-line"; d.innerHTML = html; out.appendChild(d); body.scrollTop = body.scrollHeight; };
+    const prompt = cmd => print(`<span class="pr">ahmet@dev-room</span>:<span class="pa">~</span>$ <span class="w">${esc(cmd)}</span>`);
+    const CMDS = {
+      help: () => [
+        `<span class="w">Kullanılabilir komutlar:</span>`,
+        `  <span class="c">whoami</span>      kısaca ben`,
+        `  <span class="c">deneyim</span>     kariyer geçmişi`,
+        `  <span class="c">yetenekler</span>  teknoloji yığını`,
+        `  <span class="c">egitim</span>      eğitim & sertifikalar`,
+        `  <span class="c">iletisim</span>    bana ulaş`,
+        `  <span class="c">sosyal</span>      sosyal medya`,
+        `  <span class="c">cay</span>         bir bardak çay demle`,
+        `  <span class="c">sudo ise-al</span> 😉`,
+        `  <span class="c">clear</span>       ekranı temizle`,
+      ].join("\n"),
+      whoami: () => `<span class="w">Ahmet Bölükoğlu</span> — Kıdemli Yazılım Geliştirme Uzmanı\n10+ yıl · .NET Core · C# · Mikroservisler · Redis · AI & MCP\nPerformans, ölçeklenebilirlik ve temiz kod tutkunu. Takım lideri.`,
+      deneyim: () => EXPERIENCE.map(e => `<span class="a">${hash(e.company + e.from)}</span> <span class="v">${e.from}–${e.to}</span> ${esc(e.role)} <span class="c">@ ${esc(e.company)}</span>`).join("\n"),
+      yetenekler: () => "{\n" + SKILLS.map(s => `  <span class="p">"${esc(s.title)}"</span>: [${s.items.slice(0, 6).map(i => `<span class="c">"${esc(i)}"</span>`).join(", ")}${s.items.length > 6 ? ", …" : ""}]`).join(",\n") + "\n}",
+      egitim: () => `🎓 Bilgisayar Programcılığı — İstanbul Üniversitesi MYO · Fatih Üniversitesi (2012–2014)\n🎓 Bilgisayar Programcılığı — Haydarpaşa Endüstri Meslek Lisesi (2008–2012)\n📜 Microsoft Certified Professional Developer — 100 puan (2013)`,
+      iletisim: () => `📧 <a href="mailto:${EMAIL}">${EMAIL}</a>`,
+      sosyal: () => SOCIALS.map(s => `→ ${s.name}: <a href="${s.url}" target="_blank" rel="noopener">${s.url.replace(/^https?:\/\/(www\.)?/, "")}</a>`).join("\n"),
+      cay: () => `<span class="a">     ( (\n      ) )\n   ........\n   |      |]\n   \\      /\n    \`----'</span>\nÇay demlendi 🍵 Afiyet olsun!`,
+      "sudo ise-al": () => `<span class="p">[sudo] parola gerekmez.</span>\n✔ Harika seçim! Hemen bir mail at: <a href="mailto:${EMAIL}">${EMAIL}</a>`,
+      sudo: () => `<span class="p">sudo:</span> ne yapmak istersin? Belki <span class="c">sudo ise-al</span>?`,
+      ls: () => `<span class="v">deneyim/</span>  <span class="v">yetenekler/</span>  <span class="v">egitim/</span>  README.md  cv.pdf  cay.sh`,
+      date: () => new Date().toLocaleString("tr-TR"),
+      pwd: () => "/home/ahmet/dev-room",
+      "cat readme.md": () => CMDS.whoami(),
+      "rm -rf /": () => `<span class="p">Nice deneme 😄</span> Bu odada üretimde test yapmıyoruz.`,
+      exit: () => "Çıkış yok, burası çok rahat 🛋️",
+    };
+    const alias = { hakkimda: "whoami", experience: "deneyim", skills: "yetenekler", contact: "iletisim", "iletişim": "iletisim", "eğitim": "egitim", "çay": "cay", tea: "cay", social: "sosyal", "sudo hire-me": "sudo ise-al", "?": "help", yardim: "help", "yardım": "help" };
+    function run(raw) {
+      const cmd = raw.trim(); prompt(cmd); if (!cmd) return;
+      hist.push(cmd); hi = hist.length;
+      let k = cmd.toLowerCase(); k = alias[k] || k;
+      if (k === "clear" || k === "cls") { out.innerHTML = ""; return; }
+      const fn = CMDS[k];
+      print(fn ? fn() : `zsh: komut bulunamadı: <span class="p">${esc(cmd)}</span> — <span class="c">help</span> yazmayı dene`);
+    }
+    inp.addEventListener("keydown", e => {
+      if (e.key === "Enter") { run(inp.value); inp.value = ""; }
+      else if (e.key === "ArrowUp" && hist.length) { hi = Math.max(0, hi - 1); inp.value = hist[hi]; e.preventDefault(); }
+      else if (e.key === "ArrowDown") { hi = Math.min(hist.length, hi + 1); inp.value = hist[hi] || ""; e.preventDefault(); }
+      else if (e.key === "Tab") {
+        e.preventDefault(); const v = inp.value.toLowerCase();
+        const m = Object.keys(CMDS).filter(c => c.startsWith(v) && !c.includes(" ") || (v.length > 2 && c.startsWith(v)));
+        if (m.length === 1) inp.value = m[0]; else if (m.length) print(m.join("  "));
+      }
+    });
+    body.addEventListener("click", () => { if (!getSelection().toString()) inp.focus({ preventScroll: true }); });
+    $("#termTips").innerHTML = ["help", "whoami", "deneyim", "yetenekler", "cay", "sudo ise-al", "clear"].map(c => `<button type="button">${c}</button>`).join("");
+    $("#termTips").addEventListener("click", e => { const b = e.target.closest("button"); if (b) { run(b.textContent); inp.focus({ preventScroll: true }); } });
+    print(`<span class="c">dev-room v2.0</span> — hoş geldin! 👋  Başlamak için <span class="a">help</span> yaz.`);
+  })();
+
+  // ---------- REVEAL + COUNTERS ----------
+  (function () {
+    const io = new IntersectionObserver(es => es.forEach(e => {
+      if (!e.isIntersecting) return;
+      e.target.classList.add("in"); io.unobserve(e.target);
+      const n = e.target.querySelector("[data-count]");
+      if (n) {
+        const end = +n.dataset.count; let v = 0;
+        if (reduceMotion) { n.textContent = end + "+"; return; }
+        const t = setInterval(() => { v = Math.min(end, v + Math.ceil(end / 30)); n.textContent = v + (v === end ? "+" : ""); if (v === end) clearInterval(t); }, 30);
+      }
+    }), { threshold: .15 });
+    document.querySelectorAll(".reveal").forEach(el => io.observe(el));
+  })();
+</script>
 </body>
-
 </html>

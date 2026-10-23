@@ -288,7 +288,7 @@
 
     /* terminal */
     .term { font-family: var(--mono); font-size: 14px; }
-    .term-body { height: 380px; overflow-y: auto; padding: 18px 20px; cursor: text; background: #0c0b1c; }
+    .term-body { height: 380px; overflow-y: auto; overscroll-behavior: contain; padding: 18px 20px; cursor: text; background: #0c0b1c; }
     .term-body::-webkit-scrollbar { width: 8px; } .term-body::-webkit-scrollbar-thumb { background: var(--line); border-radius: 4px; }
     .term-line { white-space: pre-wrap; word-break: break-word; color: var(--muted); }
     .term-line .pr, .term-input .pr { color: var(--green); }
@@ -423,7 +423,8 @@
     /* ---------- DEVICE STAGE ---------- */
     .tagbob { animation: bob 2.4s ease-in-out infinite; }
     @keyframes bob { 50% { transform: translateY(-6px); } }
-    html.locked { overflow: hidden; }
+    /* cihaz açıkken sayfa kaydırması teker/dokunmayla engellenir; overflow:hidden yapışkan odayı yerinden koparıyordu */
+    html.locked { overscroll-behavior: none; }
     .stage {
       position: fixed; inset: 0; z-index: 100;
       display: grid; place-items: center; padding: 64px 16px 24px;
@@ -431,7 +432,7 @@
       background: rgba(5,4,13,0); transition: background .4s, backdrop-filter .4s;
     }
     .stage[hidden] { display: none; }
-    .stage.on { background: rgba(5,4,13,.8); backdrop-filter: blur(10px); }
+    .stage.on { background: rgba(5,4,13,.38); }
     .stage-close {
       position: fixed; top: 14px; right: 16px; z-index: 2;
       font: 500 13px var(--mono); color: var(--text); cursor: pointer;
@@ -526,6 +527,45 @@
     .dev-phone .mail-box a { font-size: 13px; padding: 12px; }
     .dev-phone .mail-box button { border-left: 0; border-top: 1px solid var(--line); padding: 12px; }
     .dev-phone .socials { display: none; }
+    /* akıllı saat: yuvarlak ekran, köşeler güvenli alan için içeride */
+    .dev-watch { width: min(340px, 86vw); height: min(340px, 86vw); padding: 12px; border-radius: 50%; background: #2a2c33; box-shadow: 0 0 0 3px #4b5563, 0 40px 100px -30px rgba(94,234,212,.5); }
+    .dev-watch.embed { padding: 0; background: none; border-radius: 50%; box-shadow: 0 0 0 7px #2a2c33, 0 0 0 9px #4b5563, 0 30px 80px -20px rgba(94,234,212,.35); }
+    .watch-screen { flex: 1; min-height: 0; display: flex; flex-direction: column; border-radius: 50%; overflow: hidden; background: radial-gradient(circle at 50% 30%, #111827, #030407 70%); color: #fff; }
+    .dev-watch .os-home { align-items: center; text-align: center; padding: 58px 40px 30px; overflow: hidden; }
+    .wf-time { font: 300 76px/1 var(--sans); letter-spacing: -.02em; }
+    .wf-date { font: 14px var(--sans); color: #9ca3af; margin-top: 6px; }
+    .wf-note { margin: 12px auto 14px; max-width: 220px; font: 12px var(--sans); color: #e5e7eb; background: #1f2937; border-radius: 999px; padding: 6px 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .wf-apps { display: grid; grid-template-columns: repeat(3, 52px); gap: 10px 14px; justify-content: center; }
+    .wf-apps .app i { width: 52px; height: 52px; border-radius: 50%; font-size: 22px; }
+    .dev-watch .os-bar { justify-content: center; background: none; border: 0; height: 52px; padding-top: 14px; }
+    .dev-watch .os-bar b { font: 600 14px var(--sans); }
+    .dev-watch .os-app { background: none; }
+    .dev-watch .os-app .screen-body { padding: 4px 46px 46px; text-align: center; }
+    .w-list { list-style: none; display: grid; gap: 8px; }
+    .w-list li { background: #1f2937; border-radius: 16px; padding: 8px 12px; text-align: left; }
+    .w-list b { display: block; font: 600 13px var(--sans); } .w-list small { font-size: 11px; color: #9ca3af; }
+    .w-center { display: grid; justify-items: center; gap: 4px; padding-top: 8px; }
+    .w-center small { font-size: 12px; color: #9ca3af; }
+    .w-big { font: 600 56px/1 var(--sans); }
+    .w-heart { font-size: 40px; color: #ef4444; animation: beat 0.85s ease-in-out infinite; }
+    @keyframes beat { 15% { transform: scale(1.25); } 30% { transform: scale(1); } 45% { transform: scale(1.15); } }
+    .w-ecg { width: 180px; height: 36px; fill: none; stroke: #ef4444; stroke-width: 2.5; stroke-dasharray: 400; animation: ecg 1.7s linear infinite; }
+    @keyframes ecg { from { stroke-dashoffset: 400; } to { stroke-dashoffset: 0; } }
+    .w-ringbox { position: relative; width: 156px; height: 156px; display: grid; place-items: center; text-align: center; }
+    .w-ringbox > div b { display: block; font: 600 32px/1 var(--sans); } .w-ringbox > div small { font-size: 12px; color: #9ca3af; }
+    .w-ring { position: absolute; inset: 0; width: 100%; height: 100%; transform: rotate(-90deg); }
+    .w-ring circle { fill: none; stroke: #1f2937; stroke-width: 10; } .w-ring circle + circle { stroke: #22c55e; stroke-linecap: round; transition: stroke-dasharray .8s; }
+    .w-icon { font-size: 44px; }
+    .w-ctrl { display: flex; gap: 18px; margin-top: 10px; }
+    .w-ctrl button { font-size: 22px; color: #fff; background: #1f2937; border: 0; border-radius: 50%; width: 46px; height: 46px; cursor: pointer; }
+    .w-ctrl .w-play { background: var(--pink); color: #fff; }
+    .w-eq { display: flex; gap: 5px; align-items: end; height: 40px; margin-bottom: 6px; }
+    .w-eq i { width: 7px; height: 8px; border-radius: 3px; background: var(--pink); }
+    .w-music.on .w-eq i { animation: weq .8s ease-in-out infinite; }
+    .w-music.on .w-eq i:nth-child(2) { animation-delay: .15s; } .w-music.on .w-eq i:nth-child(3) { animation-delay: .3s; }
+    .w-music.on .w-eq i:nth-child(4) { animation-delay: .45s; } .w-music.on .w-eq i:nth-child(5) { animation-delay: .6s; }
+    @keyframes weq { 50% { height: 38px; } }
+    .w-track { font: 600 16px var(--sans); }
     .app { background: none; border: 0; cursor: pointer; font-family: var(--sans); }
     .ph-home { display: block; border: 0; padding: 0; cursor: pointer; }
     .ph-app { flex: 1; min-height: 0; display: flex; flex-direction: column; background: var(--bg); }
@@ -1523,9 +1563,9 @@
   // ---------- DEVICES: pick up from desk ----------
   const Devices = (function () {
     const stage = $("#stage"), dev = $("#device"), closeBtn = $("#stageClose");
-    const SRC = { imac: "#hMonitor", tablet: "#hTablet", phone: "#hPhone", archive: "#room" };
-    const LABEL = { imac: "Masaüstü", tablet: "CV", phone: "İletişim", archive: "Proje arşivi" };
-    const PARTS = { imac: [], tablet: [], phone: [], archive: [] };  // ana ekranlı cihazlar bölümleri uygulama açılınca alır
+    const SRC = { imac: "#hMonitor", tablet: "#hTablet", phone: "#hPhone", archive: "#room", watch: "#room" };
+    const LABEL = { imac: "Masaüstü", tablet: "CV", phone: "İletişim", archive: "Proje arşivi", watch: "Akıllı saat" };
+    const PARTS = { imac: [], tablet: [], phone: [], archive: [], watch: [] };  // ana ekranlı cihazlar bölümleri uygulama açılınca alır
     const SHORT = { "İstanbul Medipol Üniversitesi": "Medipol", "Arı Bilgi Bilişim Teknolojileri Akademisi": "Arı Bilgi", "Akbank Bankacılık Merkezi": "Akbank", "Mavi Bilişim ve Danışmanlık": "Mavi Bilişim", "İETT Genel Müdürlüğü": "İETT" };
     const up = s => (SHORT[s] || s).toLocaleUpperCase("tr-TR");
     const yr = e => `${e.from.slice(3)} — ${e.to.slice(3)}`;
@@ -1561,11 +1601,39 @@
         } },
       ...Object.fromEntries(SOCIALS.map(s => [s.name.toLowerCase(), { label: s.name, file: s.name, b: s.name === "GitHub" ? "#24292f" : "#0a66c2", icon: `<svg viewBox="0 0 24 24">${s.icon}</svg>`, html: () => profile(s) }])),
     };
+    // akıllı saat uygulamaları (her açılışta biraz farklı: rastgele bildirimler, nabız, adım)
+    const rnd = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
+    const WATCH_POOL = ["✅ Build succeeded · main", "🚀 Deploy tamam · prod", "📧 Yeni mail: proje teklifi", "🍵 Çay molası zamanı", "🧪 128 test geçti",
+      "⚡ Redis hit oranı %98.7", "📦 PR #42 birleştirildi", "⚽ Halı saha 21:00", "🗓️ Daily standup 10:00", "🎮 PS5: arkadaşın çevrimiçi", "🔔 GitHub: yeni yıldız ⭐"];
+    Object.assign(OS_APPS, {
+      bildirim: { label: "Bildirimler", icon: "🔔", b: "#2563eb", html: () => `<ul class="w-list">${[...WATCH_POOL].sort(() => Math.random() - .5).slice(0, 5)
+        .map((t, i) => `<li><b>${esc(t)}</b><small>${i ? i * rnd(2, 9) + " dk önce" : "şimdi"}</small></li>`).join("")}</ul>` },
+      nabiz: { label: "Nabız", icon: "❤️", b: "#dc2626", html: () => `<div class="w-center"><div class="w-heart">❤</div><b class="w-big">${rnd(62, 84)}</b><small>bpm · dinlenme</small>
+        <svg class="w-ecg" viewBox="0 0 200 40"><polyline points="0,20 40,20 50,8 58,34 66,20 110,20 120,4 128,36 136,20 200,20"/></svg></div>` },
+      adim: { label: "Adım", icon: "👟", b: "#16a34a", html: () => { const n = rnd(4200, 11800), p = Math.min(1, n / 10000);
+        return `<div class="w-center"><div class="w-ringbox"><svg class="w-ring" viewBox="0 0 120 120"><circle cx="60" cy="60" r="50"/><circle cx="60" cy="60" r="50" style="stroke-dasharray:${314 * p} 314"/></svg>
+        <div><b>${n.toLocaleString("tr-TR")}</b><small>adım</small></div></div><small>Hedef 10.000 · %${Math.round(p * 100)}</small></div>`; } },
+      hava: { label: "Hava", icon: "⛅", b: "#0891b2", html: () => `<div class="w-center"><div class="w-icon">${["☀️", "⛅", "🌤️", "🌧️"][rnd(0, 3)]}</div><b class="w-big">${rnd(12, 24)}°</b><small>İstanbul · Üsküdar</small><small>Boğaz'da hafif poyraz</small></div>` },
+      takvim: { label: "Takvim", icon: "🗓️", b: "#7c3aed", html: () => `<ul class="w-list"><li><b>10:00 Daily standup</b><small>Ekip</small></li><li><b>14:00 Code review</b><small>PR #42</small></li><li><b>16:30 Redis tuning</b><small>EnerjiSA</small></li><li><b>21:00 Halı saha ⚽</b><small>Üsküdar</small></li></ul>` },
+      muzik: { label: "Müzik", icon: "🎵", b: "#db2777", html: () => `<div class="w-center w-music${Sfx.music.playing ? " on" : ""}"><div class="w-eq"><i></i><i></i><i></i><i></i><i></i></div>
+        <b class="w-track">${esc(Sfx.music.name)}</b><small>Odak listesi · lo-fi</small>
+        <div class="w-ctrl"><button type="button" data-m="-1" aria-label="Önceki">⏮</button><button type="button" class="w-play" data-m="0" aria-label="Çal/Duraklat">${Sfx.music.playing ? "⏸" : "▶"}</button><button type="button" data-m="1" aria-label="Sonraki">⏭</button></div></div>`,
+        setup: () => {
+          const box = dev.querySelector(".w-music");
+          box.addEventListener("click", e => {
+            const b = e.target.closest("[data-m]"); if (!b) return;
+            const d = +b.dataset.m;
+            if (d) box.querySelector(".w-track").textContent = Sfx.music.skip(d);
+            else { const on = Sfx.music.toggle(); box.classList.toggle("on", on); b.textContent = on ? "⏸" : "▶"; }
+          });
+        } },
+    });
     // her cihazın ana ekranı (telefonda altta iletişim kartı da durur)
     const HOME_APPS = {
       phone: ["mail", "github", "linkedin", "cv", "terminal", "hakkimda", "yetenekler", "archive"],
       imac: ["hakkimda", "yetenekler", "terminal", "cv", "archive", "iletisim"],
       tablet: ["cv", "hakkimda", "archive", "iletisim", "mail"],
+      watch: ["bildirim", "nabiz", "adim", "hava", "takvim", "muzik"],
     };
     const HOME_PARTS = { phone: ["iletisim"] };
     const appIcons = (type, cls) => HOME_APPS[type].map(k => { const a = OS_APPS[k]; return `<button type="button" class="app ${cls || ""}" data-app="${k}"><i style="--b:${a.b}">${a.icon}</i>${type === "phone" ? a.label : a.file}</button>`; }).join("");
@@ -1583,7 +1651,7 @@
       const app = OS_APPS[name];
       sfx("tick");
       home.hidden = true; view.hidden = false;
-      view.querySelector(".os-bar b").textContent = current === "phone" ? app.label : app.file;
+      view.querySelector(".os-bar b").textContent = current === "phone" || current === "watch" ? app.label : app.file;
       if (app.html) body.innerHTML = app.html();
       (app.parts || []).forEach(id => borrow(id, body));
       app.setup?.();
@@ -1627,6 +1695,19 @@
             <div class="screen-body"></div>
           </div>
           <button type="button" class="ph-home" aria-label="Ana ekran"></button>
+        </div>`,
+      watch: () => `
+        <div class="watch-screen os os-watch">
+          <div class="os-home screen-body">
+            <div class="wf-time" data-clock>${$("#navTime").textContent}</div>
+            <div class="wf-date">${new Date().toLocaleDateString("tr-TR", { weekday: "long", day: "numeric", month: "short" })}</div>
+            <div class="wf-note">${esc(WATCH_POOL[rnd(0, WATCH_POOL.length - 1)])}</div>
+            <div class="wf-apps">${HOME_APPS.watch.map(k => `<button type="button" class="app" data-app="${k}" aria-label="${OS_APPS[k].label}"><i style="--b:${OS_APPS[k].b}">${OS_APPS[k].icon}</i></button>`).join("")}</div>
+          </div>
+          <div class="os-app" hidden>
+            <div class="os-bar"><button type="button" class="os-back" aria-label="Geri">‹</button><b></b></div>
+            <div class="screen-body"></div>
+          </div>
         </div>`,
       archive: () => `
         <div class="ar-drawer">
@@ -1707,14 +1788,14 @@
     function giveBack() { borrowed.forEach(([w, ph]) => { w.hidden = false; ph.replaceWith(w); }); borrowed = []; }
 
     // 3D odada masaüstü monitörün içinde açılır: kamera ekrana yaklaşır, arayüz ekranın üstüne oturur
-    let embed = null, embedSource = null;
+    let embed = null, embedSource = null, preOpen = null;
     // monitörün "çözünürlüğü": arayüz bu genişlikte çizilir, ekrana ölçeklenir (gerçek bir ekran gibi)
-    const NATIVE = { imac: 1600, tablet: 1280 };
+    const NATIVE = { imac: 1600, tablet: 1280, watch: 360 };
     function place() {
       if (!embed) return;
       const r = embed();
       Object.assign(dev.style, { left: r.left + "px", top: r.top + "px", width: r.width + "px", height: r.height + "px" });
-      const inner = dev.querySelector(".imac-screen, .tab-screen"), vw = NATIVE[current];
+      const inner = dev.querySelector(".imac-screen, .tab-screen, .watch-screen"), vw = NATIVE[current];
       if (inner && vw) {
         const s = r.width / vw, vh = r.height / s;
         Object.assign(inner.style, { width: vw + "px", height: vh + "px", flex: "none", transform: `scale(${s})`, transformOrigin: "0 0" });
@@ -1723,7 +1804,7 @@
     }
     function flip(reverse) {
       if (reduceMotion) return Promise.resolve();
-      if (embed) return dev.animate(reverse ? [{ opacity: 1 }, { opacity: 0, transform: "scale(1, .01)" }] : [{ opacity: 0, transform: "scale(1, .01)", filter: "brightness(3)" }, { opacity: 1, transform: "scale(1, 1)", filter: "brightness(1.6)", offset: .55 }, { opacity: 1, filter: "none" }], { duration: reverse ? 260 : 520, easing: "cubic-bezier(.2,.8,.2,1)", fill: reverse ? "forwards" : "none" }).finished;
+      if (embed) return dev.animate(reverse ? [{ opacity: 1 }, { opacity: 0, transform: "scale(1, .01)" }] : [{ opacity: 0, transform: "scale(1, .01)", filter: "brightness(3)" }, { opacity: 1, transform: "scale(1, 1)", filter: "brightness(1.6)", offset: .55 }, { opacity: 1, filter: "none" }], { duration: reverse ? 260 : 520, easing: "cubic-bezier(.2,.8,.2,1)", fill: reverse ? "forwards" : "none" }).finished.catch(() => {});  // kapatılırken iptal edilen animasyon hata sayılmaz
       const s = (rectSource && rectSource(current)) || srcEl.getBoundingClientRect(), f = dev.getBoundingClientRect();
       const onScreen = s.width && s.bottom > 0 && s.top < innerHeight;
       const lying = onScreen
@@ -1731,7 +1812,7 @@
         : "translateY(60px) scale(.85) rotateX(35deg)";
       const from = { transform: lying, opacity: 0 }, to = { transform: "none", opacity: 1 };
       const frames = reverse ? [to, { opacity: 1, offset: .75 }, from] : [from, { opacity: 1, offset: .2 }, to];
-      return dev.animate(frames, { duration: reverse ? 420 : 720, easing: "cubic-bezier(.2,.8,.2,1)", fill: reverse ? "forwards" : "none" }).finished;
+      return dev.animate(frames, { duration: reverse ? 420 : 720, easing: "cubic-bezier(.2,.8,.2,1)", fill: reverse ? "forwards" : "none" }).finished.catch(() => {});
     }
 
     function osClick(e) {
@@ -1739,6 +1820,7 @@
       if (a) return openApp(a.dataset.app);
       if (e.target.closest(".os-back, .ph-home, .os-bar .dots i:first-child, .os-winbtn")) openApp(null);
     }
+    setInterval(() => { const t = $("#navTime").textContent; document.querySelectorAll("[data-clock]").forEach(el => { el.textContent = t; }); }, 1000);
     let opening = false;  // açılış sürerken (kamera uçarken) gelen ikinci istek yok sayılır
     async function open(type, tab) {
       if (current === type) { if (tab) openApp(tab); return; }
@@ -1749,6 +1831,7 @@
     async function openNow(type, tab) {
       if (current) await close(true);
       const em = embedSource ? await embedSource(type) : null;
+      if (!em && preOpen) await preOpen(type);
       embed = em && em.rect;
       current = type; srcEl = $(SRC[type]); lastFocus = document.activeElement;
       dev.className = "device dev-" + type + (embed ? " embed" : "") + (em && em.flat ? " flat" : "");
@@ -1793,6 +1876,14 @@
     }
 
     addEventListener("resize", place);
+    // sayfa kilidi: cihazın içindeki kaydırılabilir alanlar kayar, sayfa kaymaz
+    const lockScroll = e => {
+      for (let el = e.target; el && el !== stage; el = el.parentElement)
+        if (el.scrollHeight > el.clientHeight + 1 && /(auto|scroll)/.test(getComputedStyle(el).overflowY)) return;
+      e.preventDefault();
+    };
+    stage.addEventListener("wheel", lockScroll, { passive: false });
+    stage.addEventListener("touchmove", lockScroll, { passive: false });
     closeBtn.addEventListener("click", () => close());
     stage.addEventListener("click", e => { if (e.target === stage) close(); });
     document.addEventListener("keydown", e => { if (e.key === "Escape" && current) close(); });
@@ -1802,7 +1893,7 @@
       const [t, tab] = el.dataset.open.split(":");
       open(t, tab);
     });
-    return { open, close, setRectSource: fn => { rectSource = fn; }, onClose: fn => closeHooks.push(fn), onOpen: fn => openHooks.push(fn), setEmbedSource: fn => { embedSource = fn; } };
+    return { open, close, setRectSource: fn => { rectSource = fn; }, onClose: fn => closeHooks.push(fn), onOpen: fn => openHooks.push(fn), setEmbedSource: fn => { embedSource = fn; }, setPreOpen: fn => { preOpen = fn; } };
   })();
   window.Devices = Devices;
 

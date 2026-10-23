@@ -620,13 +620,26 @@ async function init() {
     }
   }
 
-  const DEV = { iMac: "imac", Monitor2: "tablet", Phone: "phone", Drawer: "archive" };
+  const DEV = { iMac: "imac", Monitor2: "tablet", Phone: "phone", Drawer: "archive", Watch: "watch" };
   Devices.setRectSource(type => {
     const name = Object.keys(DEV).find(k => DEV[k] === type);
     return frame.classList.contains("is-3d") && parts[name] ? rectOf(parts[name]) : null;
   });
   const openDrawer = async () => { if (drawerAmt < 0.99) { sfx("drawer"); const a0 = drawerAmt; await tween(600, t => setDrawer(a0 + (1 - a0) * t)); } drawerHold = true; };
   Devices.onOpen(type => { if (type === "archive") openDrawer(); });
+  // telefon ve arşiv: önce kamera cihaza gider (menüden açınca da), sonra arayüz açılır
+  Devices.setPreOpen(async type => {
+    if (!frame.classList.contains("is-3d")) return;
+    const fr = frame.getBoundingClientRect();
+    if (fr.top < 64 || fr.bottom > innerHeight) scrollTo({ top: scrollY + fr.top - Math.max(64, (innerHeight - fr.height) / 2), behavior: "instant" });
+    busy = true;
+    if (type === "phone") {
+      const c = new THREE.Box3().setFromObject(parts.Phone).getCenter(new THREE.Vector3());
+      await Promise.all([flyTo(c.clone().add(new THREE.Vector3(0, 0.15, 0.9)), c, 650), lift("Phone")]);
+    } else if (type === "archive") {
+      await Promise.all([openDrawer(), flyTo(stops[4].pos, stops[4].look, 800)]);
+    }
+  });
   // masaüstü monitörün içinde açılır: kamera ekranı kadraja sığdırır, arayüz ekranın üstüne oturur
   // ekran: ölçü (m) ve izleyiciye bakan normal
   const screens = {};
@@ -637,6 +650,7 @@ async function init() {
       const n = new THREE.Vector3().fromBufferAttribute(o.geometry.attributes.normal, 0).transformDirection(o.matrixWorld).normalize();
       screens.tablet = { mesh: o, w: 0.6, h: 0.338, normal: n };
     }
+    if (o.material.name === "W_Screen_Watch") screens.watch = { mesh: o, w: 0.04, h: 0.04, normal: new THREE.Vector3(0, 0, 1), fill: 0.62 };
   });
   Devices.setEmbedSource(async type => {
     const sc = screens[type], screenMesh = sc && sc.mesh;
@@ -645,7 +659,7 @@ async function init() {
     await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
     resize();
     const c = new THREE.Box3().setFromObject(screenMesh).getCenter(new THREE.Vector3());
-    const t = Math.tan(THREE.MathUtils.degToRad(camera.fov) / 2), fill = 0.9;
+    const t = Math.tan(THREE.MathUtils.degToRad(camera.fov) / 2), fill = sc.fill || 0.9;
     const d = Math.max(sc.h / (2 * t * fill), sc.w / (2 * t * camera.aspect * fill));
     const eye = c.clone().addScaledVector(sc.normal, d);  // ekranın tam karşısı (çapraz monitörde de düz görünür)
     const fr = frame.getBoundingClientRect();  // oda ekranın dışına taşıyorsa önce görünür alana al (sayfa kilitlenecek)
@@ -703,18 +717,11 @@ async function init() {
     if (n === "iMac" || n === "Shelf") {
       Devices.open("imac", n === "Shelf" ? "yetenekler" : undefined);
     } else if (n === "Drawer") {
-      busy = true;
-      await Promise.all([openDrawer(), flyTo(stops[4].pos, stops[4].look, 800)]);
-      busy = false;
       Devices.open("archive");
     } else if (n === "Monitor2") {
       Devices.open("tablet");
     } else if (n === "Phone") {
-      busy = true;
-      const o = parts[n], c = new THREE.Box3().setFromObject(o).getCenter(new THREE.Vector3());
-      await Promise.all([flyTo(c.clone().add(new THREE.Vector3(0, 0.15, 0.9)), c, 650), lift(n)]);
-      busy = false;
-      Devices.open(DEV[n]);
+      Devices.open("phone");
     } else if (n === "Tea") {
       sfx("spoon");
       say(p, `🍵 Çay tazelendi! (${++teaCount}. bardak)`);
@@ -738,7 +745,7 @@ async function init() {
     else if (n === "TV") { sfx("click"); say(p, "📺 65 inç · PS5 hazır: akşam bir maç? 🎮"); }
     else if (n === "PS5" || n === "Controllers") { sfx("thump"); say(p, "🎮 Kod molası: bir maç?"); }
     else if (n === "Headphones") { sfx("chime"); say(p, "🎧 Lo-fi açık, odak modu"); }
-    else if (n === "Watch") { sfx("tick"); say(p, "⌚ " + WATCH_NOTES[Math.floor(Date.now() / 5000) % WATCH_NOTES.length]); }
+    else if (n === "Watch") { sfx("tick"); Devices.open("watch"); }
     else if (n === "Modem") { sfx("tick"); say(p, "📶 Fiber hat: ping 4 ms, deploy hızlı"); }
     else if (n === "Chair") { sfx("thump"); say(p, "🪑 xDrive HEY 15: oyun ve kod koltuğu"); }
     else if (n === "Bottle") { sfx("spoon"); say(p, "💧 Sadece çay değil, su da içiyoruz 😄"); }

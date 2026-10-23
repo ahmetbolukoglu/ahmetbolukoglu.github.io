@@ -42,14 +42,20 @@ const MATS = {
   W_Notch: { color: "#1a120b", roughness: 1 }, W_Mat: { color: "#26282e", roughness: 1 }, W_Grill: { color: "#0c0c10", roughness: 1 },
   W_Grey: { color: "#6b7280", roughness: 0.5 }, W_White: { color: "#eef0f4", roughness: 0.35 },
   W_GlassDark: { color: "#0b1220", roughness: 0.05, transparent: true, opacity: 0.18, depthWrite: false },
-  W_RGB: { color: "#5eead4", emissive: "#38bdf8", emissiveIntensity: 3.5 },
+  W_RGB: { color: "#0b0b10", emissive: "#38bdf8", emissiveIntensity: 3.5 },
   W_Keys: { color: "#1b1c24", roughness: 0.6, emissive: "#1e3a8a", emissiveIntensity: 0.25 },
-  W_KeyGlow: { color: "#38bdf8", emissive: "#38bdf8", emissiveIntensity: 1.6 },
+  W_KeyGlow: { color: "#0b0b10", emissive: "#38bdf8", emissiveIntensity: 1.6 },
   W_Bottle: { color: "#60a5fa", roughness: 0.1, transparent: true, opacity: 0.5, depthWrite: false },
   W_Fabric: { color: "#b9a68a", roughness: 1 }, W_WoodLight: { color: "#d9b98a", roughness: 0.8 },
   W_Paper: { color: "#f5f3ff", roughness: 0.9 },
   W_PhoneBody: { color: "#2b2a31", roughness: 0.3, metalness: 0.7 }, W_LEDGreen: { color: "#22c55e", emissive: "#22c55e", emissiveIntensity: 2.5 },
   W_Chair: { color: "#1b1b21", roughness: 0.75 }, W_ChairAccent: { color: "#dc2626", roughness: 0.6 },
+  W_Gun: { color: "#6b7079", roughness: 0.35, metalness: 0.8 }, W_FanBlade: { color: "#2e323a", roughness: 0.5, emissive: "#ffffff", emissiveIntensity: 0.8 }, W_FanHub: { color: "#d6dae0", roughness: 0.4 },
+  W_KbPlate: { color: "#16171c", roughness: 0.4, metalness: 0.6 }, W_OLED: { color: "#e0f2fe", emissive: "#bae6fd", emissiveIntensity: 1.4 },
+  W_Graphite: { color: "#3b3e44", roughness: 0.6 }, W_DSWhite: { color: "#f1f2f4", roughness: 0.45 }, W_DSBlack: { color: "#16171b", roughness: 0.5 },
+  W_DSLight: { color: "#3b82f6", emissive: "#3b82f6", emissiveIntensity: 3 }, W_LEDAmber: { color: "#f59e0b", emissive: "#f59e0b", emissiveIntensity: 2.5 },
+  W_Steel: { color: "#1c1d21", roughness: 0.3, metalness: 0.85 }, W_Cushion: { color: "#121216", roughness: 1 }, W_Elastic: { color: "#22232a", roughness: 0.9 },
+  W_MonBack: { color: "#2a2c31", roughness: 0.45 },
   W_Cat: { color: "#d9822b", roughness: 0.95 }, W_CatDark: { color: "#8a4a14", roughness: 0.95 }, W_CatWhite: { color: "#f5efe6", roughness: 0.95 },
 };
 // raftaki kitaplar: her biri bir yetenek alanı (tıklanınca masaüstünde o kategori açılır)
@@ -76,17 +82,17 @@ const STOPS = [
   { pos: [0.12, 0.05, 1.12], look: [0.12, 1.3, 1.07], n: "02", h: "49 inç masaüstü", p: ".NET Core, C#, mikroservisler. Ekrana tıkla: README, yetenekler ve terminal." },
   { pos: [-0.42, 0.5, 1.02], look: [-0.35, 1.0, 0.8], n: "03", h: "Çay · kod · tekrar", p: "Performans, ölçeklenebilirlik ve sürdürülebilir kod. Bir de bol çay ve lastik ördek." },
   { pos: [0.835, 0.02, 1.08], look: [0.835, 0.72, 0.6], n: "04", h: "Projeler", p: "Çekmecede yeni projeler hazırlanıyor. Tıkla, dosyalara göz at: hepsi coming soon.", drawer: true },
-  { pos: [0.6, 0.35, 1.25], look: [0.92, 1.2, 1.0], n: "05", h: "Kasa ve RGB", p: "Sıvı soğutma, üç fan, beyaz kasa. Derleme hızlı, ışıklar daha hızlı." },
+  { pos: [0.6, 0.35, 1.25], look: [0.92, 1.2, 1.0], n: "05", h: "Kasa ve RGB", p: "TUF GT502, RTX 4090 Suprim, 360 sıvı soğutma ve 10 RGB fan. Derleme hızlı, ışıklar daha hızlı." },
   { pos: [0.78, 0.15, 1.62], look: [1.45, 1.5, 1.58], n: "06", h: "Kitaplık", p: "Yapay zekâ, MCP, Redis, gRPC… Yetenekler rafta dizili." },
   { pos: [-0.45, -0.6, 1.3], look: [-1.95, 0.15, 1.25], n: "07", h: "Oyun molası", p: "65 inç TV ve PS5. Kod bitince bir maç." },
   { pos: [0.15, -1.5, 1.42], look: [0.18, 1.3, 1.22] },
 ];
 const SCREENS = ["W_Screen_iMac", "W_Screen_Left", "W_Screen_TV", "W_Screen_Phone", "W_Screen_Watch", "W_Cert"];
-const CLICK = ["iMac", "Monitor2", "Phone", "Shelf", "Tea", "Duck", "Ball", "Window", "Cert", "Clock", "Neon", "Drawer", "Keyboard", "PC", "TV", "PS5", "Controllers", "Headphones", "Bottle", "Modem", "Watch", "Chair", "Cat"];
+const CLICK = ["iMac", "Monitor2", "Phone", "Shelf", "Tea", "Duck", "Ball", "Window", "Cert", "Clock", "Neon", "Drawer", "Keyboard", "PC", "TV", "PS5", "Controllers", "Headphones", "Bottle", "Modem", "Watch", "Chair", "Cat", "Mouse"];
 // imlecin yanında görünen adlar
 const NAMES = { iMac: "49\" masaüstü", Monitor2: "CV · 27\"", Phone: "İletişim · S22", Shelf: "Kitaplık", Tea: "Çay", Duck: "🦆 Ördeğe sor", Ball: "Top", Window: "Boğaz manzarası",
-  Cert: "Sertifika", Clock: "Saat", Neon: "Neon", Drawer: "Projeler", Keyboard: "Terminal", PC: "Kasa", TV: "65\" TV", PS5: "PS5", Controllers: "PS5 kolları",
-  Headphones: "Kulaklık", Bottle: "Su", Modem: "Modem", Watch: "Akıllı saat", Chair: "Koltuk", Cat: "😺 Tekir" };
+  Cert: "Sertifika", Clock: "Saat", Neon: "Neon", Drawer: "Projeler", Keyboard: "Apex 7 · terminal", PC: "TUF GT502 · RTX 4090", TV: "65\" TV", PS5: "PS5", Controllers: "DualSense ×2",
+  Headphones: "Arctis 7+ · müzik", Bottle: "Su", Modem: "Modem", Watch: "Akıllı saat", Chair: "Koltuk", Cat: "😺 Tekir", Mouse: "MX Master 3" };
 
 function webglOK() {
   try { const c = document.createElement("canvas"); return !!(c.getContext("webgl2") || c.getContext("webgl")); }
@@ -159,59 +165,192 @@ const PATTERNS = {
   }),
 };
 
-function skyTexture(day) {
-  return canvasTex(2048, 1024, (g, w, h, o = {}) => {
-    const shoot = o.shoot;
-    const sky = g.createLinearGradient(0, 0, 0, h * .62);
-    if (day) { sky.addColorStop(0, "#5aa7e8"); sky.addColorStop(1, "#f6c99a"); }
-    else { sky.addColorStop(0, "#060a24"); sky.addColorStop(.7, "#1d1650"); sky.addColorStop(1, "#5b2a68"); }
+// İstanbul saati ve mevsime göre yaklaşık gün doğumu / batımı (?saat=19.5 ile denenebilir)
+function istTime() {
+  const d = new Date(new Date().toLocaleString("en-US", { timeZone: "Europe/Istanbul" }));
+  const q = parseFloat(new URLSearchParams(location.search).get("saat"));
+  const h = Number.isFinite(q) ? q % 24 : d.getHours() + d.getMinutes() / 60;
+  const doy = Math.floor((d - new Date(d.getFullYear(), 0, 0)) / 864e5);
+  const k = Math.sin((doy - 80) / 365 * Math.PI * 2);
+  const half = 6.0 + 1.55 * k;  // gün uzunluğunun yarısı (41° K); öğle UTC+3 ile ~13:00
+  return { h, sr: 13 - half, ss: 13 + half };
+}
+// gökyüzü durakları: üst, orta, ufuk, deniz, uzak siluet, karanlık (0 gündüz … 1 gece)
+const PAL = {
+  night: ["#050818", "#0e1338", "#241c52", "#070a20", "#120f30", 1],
+  predawn: ["#0d1440", "#33306e", "#8a4f78", "#141533", "#1d1840", 0.8],
+  dawn: ["#3a5aa0", "#d58fa8", "#ffc58e", "#4a5a8a", "#4a3f6a", 0.35],
+  morning: ["#4a8ad6", "#8ec2ee", "#e2eef8", "#3c7ab8", "#7d8fb4", 0],
+  noon: ["#3b82e0", "#78b6f0", "#d2e8f8", "#2f6fb0", "#8496ba", 0],
+  afternoon: ["#4683d2", "#92bee8", "#f3dcb6", "#3a72a8", "#74789c", 0],
+  golden: ["#3e5ca6", "#e8a070", "#ffd27a", "#6a6a90", "#3c3256", 0.1],
+  sunset: ["#2a2d6c", "#c9587a", "#ff8a48", "#4a3a6a", "#261c40", 0.35],
+  blue: ["#111a4a", "#2c3678", "#6c4f8e", "#141a40", "#161236", 0.75],
+};
+const mixHex = (a, b, t) => {
+  const p = x => [1, 3, 5].map(i => parseInt(x.slice(i, i + 2), 16)), A = p(a), B = p(b);
+  return "#" + A.map((v, i) => Math.round(v + (B[i] - v) * t).toString(16).padStart(2, "0")).join("");
+};
+function skyPalette() {
+  const { h, sr, ss } = istTime();
+  const keys = [[sr - 1.6, "night"], [sr - 0.6, "predawn"], [sr + 0.25, "dawn"], [sr + 1.6, "morning"], [(sr + ss) / 2, "noon"],
+    [ss - 2.2, "afternoon"], [ss - 0.8, "golden"], [ss + 0.05, "sunset"], [ss + 0.7, "blue"], [ss + 1.6, "night"]];
+  let a = keys[keys.length - 1], b = keys[0], t = 0;
+  for (let i = 0; i < keys.length - 1; i++) if (h >= keys[i][0] && h < keys[i + 1][0]) { a = keys[i]; b = keys[i + 1]; }
+  if (a === keys[keys.length - 1]) t = 0; else t = (h - a[0]) / (b[0] - a[0]);
+  const A = PAL[a[1]], Bp = PAL[b[1]];
+  const c = A.slice(0, 5).map((x, i) => mixHex(x, Bp[i], t));
+  return { top: c[0], mid: c[1], hor: c[2], sea: c[3], sil: c[4], dark: A[5] + (Bp[5] - A[5]) * t, h, sr, ss };
+}
+const rnd1 = i => { const x = Math.sin(i * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
+
+function skyTexture() {
+  let last = skyPalette();
+  const tex = canvasTex(2048, 1024, (g, w, h, o = {}) => {
+    const P = last = skyPalette(), dk = P.dark, hz = 610;
+    // gökyüzü
+    const sky = g.createLinearGradient(0, 0, 0, hz);
+    sky.addColorStop(0, P.top); sky.addColorStop(0.55, P.mid); sky.addColorStop(1, P.hor);
     g.fillStyle = sky; g.fillRect(0, 0, w, h);
-    if (!day) {
+    if (dk > 0.3) {  // yıldızlar
       g.fillStyle = "#fff";
-      for (let i = 0; i < 160; i++) { const x = (i * 733) % w, y = (i * 389) % (h * .5); g.globalAlpha = .3 + (i % 5) / 7; g.fillRect(x, y, 2, 2); }
+      for (let i = 0; i < 220; i++) { g.globalAlpha = (dk - 0.3) * (0.4 + rnd1(i) * 0.6); g.fillRect(rnd1(i + 500) * w, rnd1(i + 900) * (hz - 120), 1.5 + rnd1(i + 7) * 1.5, 1.5 + rnd1(i + 7) * 1.5); }
       g.globalAlpha = 1;
-      const mg = g.createRadialGradient(1300, 200, 10, 1300, 200, 160); mg.addColorStop(0, "rgba(255,247,214,.5)"); mg.addColorStop(1, "rgba(255,247,214,0)");
-      g.fillStyle = mg; g.fillRect(1100, 0, 400, 400);
-      g.fillStyle = "#fff4cc"; g.beginPath(); g.arc(1300, 200, 46, 0, 7); g.fill();
-      g.fillStyle = "#14103c"; g.beginPath(); g.arc(1324, 186, 40, 0, 7); g.fill();
-      if (shoot) { g.strokeStyle = "#fff"; g.lineWidth = 4; g.beginPath(); g.moveTo(shoot.x, shoot.y); g.lineTo(shoot.x + 120, shoot.y - 60); g.stroke(); }
-    } else {
-      g.fillStyle = "#fffbe8"; g.beginPath(); g.arc(1300, 200, 60, 0, 7); g.fill();
     }
-    // Asya yakası tepeleri ve camiler
-    const hz = h * .62;
-    g.fillStyle = day ? "#6b7aa6" : "#2a1f52";
-    g.beginPath(); g.moveTo(0, hz);
-    for (let x = 0; x <= w; x += 64) g.lineTo(x, hz - 40 - Math.sin(x / 210) * 28 - Math.sin(x / 77) * 8);
-    g.lineTo(w, hz); g.fill();
-    const sil = day ? "#4a5785" : "#1b1540";
-    const lights = day ? null : "#fcd34d";
-    const mosque = (x, s) => {
-      g.fillStyle = sil;
-      g.beginPath(); g.ellipse(x, hz - 40 * s, 60 * s, 52 * s, 0, Math.PI, 0); g.fill();
-      g.fillRect(x - 70 * s, hz - 42 * s, 140 * s, 42 * s);
-      for (const dx of [-95, 95]) { g.fillRect(x + dx * s - 5 * s, hz - 170 * s, 10 * s, 170 * s); g.beginPath(); g.moveTo(x + dx * s - 6 * s, hz - 170 * s); g.lineTo(x + dx * s, hz - 205 * s); g.lineTo(x + dx * s + 6 * s, hz - 170 * s); g.fill(); }
-    };
-    mosque(420, 1.1); mosque(1650, .8);
+    // güneş: öğleden sonra batıda, tarihi yarımadanın arkasına iner (sabah arkamızda kalır)
+    const p = (P.h - P.sr) / (P.ss - P.sr);
+    let sun = null;
+    if (p > 0.42 && p < 1.03) {
+      const q = Math.min(1, (p - 0.42) / 0.6), alt = Math.max(0, Math.sin(Math.PI * Math.min(p, 1)));
+      sun = { x: 1500 - q * 560, y: hz + 6 - alt * 470, low: 1 - alt };
+      const gl = g.createRadialGradient(sun.x, sun.y, 10, sun.x, sun.y, 360);
+      gl.addColorStop(0, `rgba(255,226,170,${0.55 + sun.low * 0.3})`); gl.addColorStop(1, "rgba(255,200,140,0)");
+      g.fillStyle = gl; g.fillRect(sun.x - 360, sun.y - 360, 720, 720);
+      g.fillStyle = mixHex("#fffbe8", "#ff9a52", sun.low); g.beginPath(); g.arc(sun.x, sun.y, 36, 0, 7); g.fill();
+    }
+    if (dk > 0.5) {  // ay
+      const mx = 560 + ((P.h + 24 - P.ss) % 24) / 12 * 900, my = 150 + Math.abs(((P.h + 24 - P.ss) % 24) - 6) * 18;
+      const mg = g.createRadialGradient(mx, my, 8, mx, my, 150); mg.addColorStop(0, `rgba(255,247,214,${0.45 * dk})`); mg.addColorStop(1, "rgba(255,247,214,0)");
+      g.fillStyle = mg; g.fillRect(mx - 150, my - 150, 300, 300);
+      g.globalAlpha = dk; g.fillStyle = "#fff4cc"; g.beginPath(); g.arc(mx, my, 34, 0, 7); g.fill();
+      g.fillStyle = P.top; g.beginPath(); g.arc(mx + 15, my - 9, 30, 0, 7); g.fill(); g.globalAlpha = 1;
+      if (o.shoot) { g.strokeStyle = "#fff"; g.lineWidth = 4; g.beginPath(); g.moveTo(o.shoot.x, o.shoot.y); g.lineTo(o.shoot.x + 120, o.shoot.y - 60); g.stroke(); }
+    }
+    // bulutlar (yavaşça kayar), renkleri saate göre
+    const drift = (Date.now() / 60000 * 3) % w;
+    for (let i = 0; i < 7; i++) {
+      const cx = (rnd1(i + 40) * w + drift) % (w + 400) - 200, cy = 90 + rnd1(i + 60) * 300, cw = 140 + rnd1(i + 80) * 200;
+      g.fillStyle = dk > 0.6 ? `rgba(40,40,80,${0.35})` : mixHex("#ffffff", P.hor, 0.35 + dk * 0.5);
+      g.globalAlpha = dk > 0.6 ? 1 : 0.55;
+      for (let k = 0; k < 4; k++) { g.beginPath(); g.ellipse(cx + (k - 1.5) * cw * 0.32, cy - Math.sin(k * 1.7) * 14, cw * 0.32, 26 + k % 2 * 10, 0, 0, 7); g.fill(); }
+      g.globalAlpha = 1;
+    }
+    // tarihi yarımada silueti: Sarayburnu/Topkapı, Ayasofya, Sultanahmet (6 minare), Süleymaniye, Galata
+    const sil = P.sil, glow = dk > 0.4;
     g.fillStyle = sil;
-    for (let i = 0; i < 26; i++) { const x = 60 + i * 78, bh = 30 + (i * 53) % 60; g.fillRect(x, hz - bh, 50, bh); if (lights) { g.fillStyle = lights; for (let k = 0; k < 3; k++) if ((i + k) % 2) g.fillRect(x + 8 + k * 14, hz - bh + 10, 6, 6); g.fillStyle = sil; } }
-    // Galata
-    g.fillRect(1080, hz - 160, 44, 160); g.beginPath(); g.moveTo(1072, hz - 158); g.lineTo(1102, hz - 230); g.lineTo(1132, hz - 158); g.fill();
-    // Boğaz
+    g.beginPath(); g.moveTo(0, hz);
+    for (let x = 0; x <= w; x += 32) g.lineTo(x, hz - 18 - Math.max(0, Math.sin((x - 300) / 380)) * 34 - Math.sin(x / 61) * 4);
+    g.lineTo(w, hz); g.fill();
+    const minaret = (x, base, ht, wd = 7) => {
+      g.fillRect(x - wd / 2, base - ht, wd, ht); g.fillRect(x - wd / 2 - 2, base - ht * 0.72, wd + 4, 4);
+      g.beginPath(); g.moveTo(x - wd / 2 - 1, base - ht); g.lineTo(x, base - ht - wd * 4.2); g.lineTo(x + wd / 2 + 1, base - ht); g.fill();
+    };
+    const dome = (x, base, r, hgt = 0.62) => { g.beginPath(); g.ellipse(x, base, r, r * hgt * 1.4, 0, Math.PI, 0); g.fill(); g.fillRect(x - 1.5, base - r * hgt * 1.4 - 12, 3, 12); };
+    const mosque = (x, r, mins, tall) => {
+      const base = hz - 30;
+      g.fillRect(x - r * 1.9, base - 22, r * 3.8, 30);
+      dome(x - r * 1.15, base - 20, r * 0.42); dome(x + r * 1.15, base - 20, r * 0.42);
+      dome(x - r * 0.62, base - 26, r * 0.55); dome(x + r * 0.62, base - 26, r * 0.55);
+      g.fillRect(x - r * 0.9, base - 40, r * 1.8, 20); dome(x, base - 40, r);
+      mins.forEach(dx => minaret(x + dx * r, base + 4, tall));
+    };
+    // Sarayburnu ve Topkapı (alçak, ağaçlı)
+    for (let k = 0; k < 14; k++) { g.beginPath(); g.arc(380 + k * 22, hz - 26 - rnd1(k) * 10, 16 + rnd1(k + 3) * 8, 0, 7); g.fill(); }
+    g.fillRect(560, hz - 70, 18, 50); g.beginPath(); g.moveTo(556, hz - 70); g.lineTo(569, hz - 96); g.lineTo(582, hz - 70); g.fill();
+    mosque(800, 58, [-1.85, -1.55, 1.55, 1.85], 150);                    // Ayasofya: kalın 4 minare, büyük kubbe
+    mosque(990, 50, [-2.3, -1.6, -1.25, 1.25, 1.6, 2.3], 165);          // Sultanahmet: 6 ince minare
+    mosque(1300, 44, [-1.9, -1.5, 1.5, 1.9], 140);                       // Süleymaniye
+    g.fillRect(1640, hz - 150, 30, 120); g.fillRect(1636, hz - 160, 38, 12);   // Galata
+    g.beginPath(); g.moveTo(1634, hz - 160); g.lineTo(1655, hz - 205); g.lineTo(1676, hz - 160); g.fill();
+    for (let k = 0; k < 40; k++) { const x = 300 + k * 44 + rnd1(k + 20) * 20, bh = 14 + rnd1(k + 30) * 26; g.fillRect(x, hz - 28 - bh, 30, bh + 10); }
+    if (glow) {  // gece: camiler ışıklandırılmış, şehir ışıkları
+      const a = Math.min(1, (dk - 0.4) * 1.8);
+      g.globalAlpha = a * 0.55; g.fillStyle = "#f6c56b";
+      [[800, 58], [990, 50], [1300, 44]].forEach(([x, r]) => { const gr = g.createRadialGradient(x, hz - 70, 5, x, hz - 70, r * 2.6); gr.addColorStop(0, "rgba(255,200,110,.9)"); gr.addColorStop(1, "rgba(255,200,110,0)"); g.fillStyle = gr; g.fillRect(x - r * 2.6, hz - 70 - r * 2.6, r * 5.2, r * 5.2); });
+      g.globalAlpha = a * 0.75; g.fillStyle = "#d9a85a";  // ışıklandırılmış kubbe ve minareler
+      mosque(800, 58, [-1.85, -1.55, 1.55, 1.85], 150); mosque(990, 50, [-2.3, -1.6, -1.25, 1.25, 1.6, 2.3], 165); mosque(1300, 44, [-1.9, -1.5, 1.5, 1.9], 140);
+      g.fillRect(1640, hz - 150, 30, 120);
+      g.globalAlpha = a; g.fillStyle = "#ffd88a";
+      for (let k = 0; k < 160; k++) { const x = 280 + rnd1(k + 100) * 1650, y = hz - 18 - rnd1(k + 200) * 40; g.fillRect(x, y, 3, 3); }
+      g.globalAlpha = 1;
+    }
+    // deniz
     const sea = g.createLinearGradient(0, hz, 0, h);
-    sea.addColorStop(0, day ? "#3d78b5" : "#2a1d55"); sea.addColorStop(1, day ? "#1e4a7a" : "#0b0a26");
+    sea.addColorStop(0, mixHex(P.hor, P.sea, 0.45)); sea.addColorStop(0.35, P.sea); sea.addColorStop(1, mixHex(P.sea, "#000000", 0.45));
     g.fillStyle = sea; g.fillRect(0, hz, w, h - hz);
-    g.strokeStyle = day ? "rgba(255,255,255,.35)" : "rgba(252,211,77,.4)"; g.lineWidth = 3;
-    for (let i = 0; i < 40; i++) { const x = (i * 397) % w, y = hz + 20 + (i * 131) % (h - hz - 40); g.beginPath(); g.moveTo(x, y); g.lineTo(x + 30 + (i % 4) * 10, y); g.stroke(); }
-    // Kız Kulesi
-    const kx = 760, ky = hz + 110;
-    g.fillStyle = day ? "#d9d2c3" : "#3a2d70";
-    g.fillRect(kx - 70, ky - 34, 140, 34); g.fillRect(kx - 24, ky - 110, 48, 80); g.fillRect(kx - 30, ky - 118, 60, 10);
-    g.beginPath(); g.moveTo(kx - 18, ky - 118); g.lineTo(kx, ky - 175); g.lineTo(kx + 18, ky - 118); g.fill();
-    if (!day) { g.fillStyle = "#fcd34d"; g.fillRect(kx - 8, ky - 90, 16, 20); g.fillRect(kx - 50, ky - 24, 12, 12); g.fillRect(kx + 38, ky - 24, 12, 12); g.beginPath(); g.arc(kx, ky - 182, 7, 0, 7); g.fill(); }
+    g.lineWidth = 2;
+    for (let i = 0; i < 70; i++) {
+      const y = hz + 8 + Math.pow(rnd1(i + 300), 1.6) * (h - hz - 10), x = rnd1(i + 400) * w, len = 18 + (y - hz) * 0.12;
+      g.strokeStyle = dk > 0.5 ? "rgba(255,255,255,.08)" : "rgba(255,255,255,.22)";
+      g.beginPath(); g.moveTo(x, y); g.lineTo(x + len, y); g.stroke();
+    }
+    if (sun) {  // güneşin denizdeki yolu
+      for (let i = 0; i < 46; i++) {
+        const y = hz + 6 + i * 9, wd = 30 + i * 4 * (0.6 + rnd1(i) * 0.8);
+        g.fillStyle = `rgba(255,${Math.round(220 - sun.low * 70)},${Math.round(150 - sun.low * 60)},${(0.5 - i / 100) * (0.4 + sun.low * 0.6)})`;
+        g.fillRect(sun.x - wd / 2 + Math.sin(i * 2.3) * 12, y, wd, 3);
+      }
+    }
+    if (glow) {  // şehir ışıklarının yansıması
+      g.globalAlpha = Math.min(1, (dk - 0.4) * 1.6) * 0.35;
+      for (let k = 0; k < 60; k++) { const x = 300 + rnd1(k + 600) * 1600; g.fillStyle = "#ffcf7a"; for (let i = 0; i < 6; i++) g.fillRect(x + Math.sin(i + k) * 3, hz + 4 + i * 8, 3, 4); }
+      g.globalAlpha = 1;
+    }
+    // Kız Kulesi: kayalık adacık, sur, ana kule, sekizgen üst kat, kurşun külah, fener ve bayrak
+    // pencerenin orta dikmesine denk gelmesin: evden ve 01 durağından bakınca ayrı camlarda görünür
+    g.save(); g.translate(665, hz + 40); g.scale(0.66, 0.66);
+    const kx = 0, ky = 0;
+    const lit = glow ? mixHex("#ffe2b0", P.sil, 0.15) : mixHex("#efe7d6", P.hor, 0.25 + dk * 0.4), shade = mixHex(lit, "#000000", 0.28);
+    if (glow) { const gr = g.createRadialGradient(kx, ky - 80, 10, kx, ky - 80, 220); gr.addColorStop(0, `rgba(255,214,150,${0.35 * dk})`); gr.addColorStop(1, "rgba(255,214,150,0)"); g.fillStyle = gr; g.fillRect(kx - 220, ky - 300, 440, 440); }
+    g.fillStyle = mixHex(P.sea, "#000000", 0.35);                                        // kayalar
+    g.beginPath(); g.ellipse(kx, ky + 6, 120, 14, 0, 0, 7); g.fill();
+    g.fillStyle = shade; g.fillRect(kx - 96, ky - 30, 192, 32);                          // sur
+    g.fillStyle = lit; g.fillRect(kx - 96, ky - 30, 150, 32);
+    for (let k = 0; k < 12; k++) g.fillRect(kx - 96 + k * 16, ky - 38, 9, 8);            // mazgallar
+    g.fillStyle = lit; g.fillRect(kx - 70, ky - 56, 58, 28);                             // yan bina
+    g.fillStyle = shade; g.fillRect(kx - 70, ky - 60, 58, 5);
+    g.fillStyle = lit; g.fillRect(kx - 4, ky - 128, 44, 100);                            // ana kule
+    g.fillStyle = shade; g.fillRect(kx + 26, ky - 128, 14, 100);
+    g.fillStyle = mixHex(lit, "#ffffff", 0.1); g.fillRect(kx - 8, ky - 152, 52, 26);     // sekizgen üst kat
+    g.fillStyle = shade; g.fillRect(kx + 30, ky - 152, 14, 26);
+    g.fillStyle = glow ? "#ffd27a" : "#2a2f3a";                                          // pencereler
+    for (let k = 0; k < 3; k++) g.fillRect(kx + 2 + k * 13, ky - 146, 6, 12);
+    for (let k = 0; k < 3; k++) g.fillRect(kx + 4 + k * 12, ky - 104 + (k % 2) * 30, 5, 10);
+    g.fillStyle = glow ? "#4b4f60" : mixHex("#5b6270", P.hor, 0.2);                      // kurşun külah
+    g.beginPath(); g.moveTo(kx - 12, ky - 152); g.lineTo(kx + 18, ky - 210); g.lineTo(kx + 48, ky - 152); g.fill();
+    g.fillStyle = glow ? "#fff1c1" : lit; g.fillRect(kx + 14, ky - 222, 8, 13);         // fener
+    g.fillStyle = "#3f3f46"; g.fillRect(kx + 17.5, ky - 250, 1.5, 30);                  // gönder ve bayrak
+    g.fillStyle = "#e30a17"; g.fillRect(kx + 19, ky - 250, 22, 14);
+    g.fillStyle = "#fff"; g.beginPath(); g.arc(kx + 27, ky - 243, 4.2, 0, 7); g.fill();
+    g.fillStyle = "#e30a17"; g.beginPath(); g.arc(kx + 28.3, ky - 243, 3.4, 0, 7); g.fill();
+    g.fillStyle = "#fff"; g.beginPath(); g.arc(kx + 33.5, ky - 243, 1.3, 0, 7); g.fill();
+    // kulenin yansıması
+    g.globalAlpha = glow ? 0.35 : 0.18; g.fillStyle = glow ? "#ffd27a" : lit;
+    for (let i = 0; i < 12; i++) g.fillRect(kx - 4 + Math.sin(i * 1.9) * 5, ky + 14 + i * 9, 44 - i * 2, 4);
+    g.globalAlpha = 1;
+    g.restore();
+    // martılar (gündüz)
+    if (dk < 0.5) {
+      g.strokeStyle = mixHex("#ffffff", P.sil, 0.4); g.lineWidth = 2.5;
+      const t = Date.now() / 4000;
+      for (let k = 0; k < 6; k++) {
+        const x = (rnd1(k + 700) * 900 + 380 + Math.sin(t + k) * 30), y = 180 + rnd1(k + 800) * 220, s2 = 7 + rnd1(k) * 6;
+        g.beginPath(); g.moveTo(x - s2, y - s2 * 0.4); g.quadraticCurveTo(x - s2 / 2, y - s2 * 0.8, x, y); g.quadraticCurveTo(x + s2 / 2, y - s2 * 0.8, x + s2, y - s2 * 0.4); g.stroke();
+      }
+    }
     // Şehir Hatları vapuru (o.ferry = x)
     if (o.ferry != null) {
-      const fx = o.ferry, fy = hz + 215, white = day ? "#f8fafc" : "#aeb6c8";
+      const day = dk < 0.5, fx = o.ferry, fy = hz + 150, white = day ? "#f8fafc" : "#aeb6c8";
       g.strokeStyle = day ? "rgba(255,255,255,.5)" : "rgba(252,211,77,.25)"; g.lineWidth = 4;
       g.beginPath(); g.moveTo(fx - 160, fy + 4); g.lineTo(fx + 10, fy + 2); g.stroke();
       g.fillStyle = white; g.beginPath(); g.moveTo(fx, fy - 34); g.lineTo(fx + 280, fy - 34); g.lineTo(fx + 256, fy); g.lineTo(fx + 18, fy); g.fill();
@@ -225,6 +364,8 @@ function skyTexture(day) {
       if (!day) { g.fillStyle = "#ef4444"; g.beginPath(); g.arc(fx + 276, fy - 40, 5, 0, 7); g.fill(); }
     }
   });
+  Object.defineProperty(tex, "state", { get: () => last });
+  return tex;
 }
 
 // ---------------------------------------------------------------- ekran çizimleri
@@ -474,20 +615,27 @@ async function init() {
   const hemi = new THREE.HemisphereLight("#4a46a0", "#140f28", 1.1); scene.add(hemi);
   const moon = new THREE.DirectionalLight("#9db4ff", 1.2); moon.position.copy(B(-1.6, 6, 3.5)); moon.target.position.copy(B(0, 0.5, 0.6)); scene.add(moon, moon.target);
   const warm = new THREE.PointLight("#ffc285", 1.6, 0, 2); warm.position.copy(B(-0.3, 0.6, 1.9)); scene.add(warm);
-  const pcLight = new THREE.PointLight("#38bdf8", 0.9, 0, 2); pcLight.position.copy(B(0.72, 1.25, 1.0)); scene.add(pcLight);
+  const pcLight = new THREE.PointLight("#38bdf8", 1.4, 0, 2); pcLight.position.copy(B(0.7, 1.2, 1.0)); scene.add(pcLight);
   const tvLight = new THREE.PointLight("#818cf8", 0.7, 0, 2); tvLight.position.copy(B(-1.6, 0.15, 1.35)); scene.add(tvLight);
   const monLight = new THREE.PointLight("#5eead4", 0.9, 0, 2); monLight.position.copy(B(0.12, 1.0, 1.15)); scene.add(monLight);
   const ledLight = new THREE.PointLight("#5eead4", 0.7, 0, 2); ledLight.position.copy(B(0.0, 0.88, 0.55)); scene.add(ledLight);
   const neonLight = new THREE.PointLight("#f472b6", 0.8, 0, 2); neonLight.position.copy(B(0.12, 1.4, 2.1)); scene.add(neonLight);
 
   // dış manzara (Asya yakası, Boğaz, Kız Kulesi)
-  const hourIst = +new Date().toLocaleString("en-US", { timeZone: "Europe/Istanbul", hour: "numeric", hour12: false });
-  const day = hourIst >= 7 && hourIst < 18;
-  const sky = skyTexture(day);
+  const sky = skyTexture();
+  let day = sky.state.dark < 0.5;
   const outside = new THREE.Mesh(new THREE.PlaneGeometry(16, 8), new THREE.MeshBasicMaterial({ map: sky, toneMapped: false }));
   sky.flipY = true; sky.needsUpdate = true;
   outside.position.copy(B(-1.35, 9, 2.0)); scene.add(outside);
-  if (day) { hemi.intensity = 1.8; moon.color.set("#fff1d6"); moon.intensity = 2.2; }
+  // oda ışığı dışarıya uyar: gündüz aydınlık ve sıcak, gece mavi ay ışığı
+  const outdoor = () => {
+    const P = sky.state, k = 1 - P.dark;
+    day = P.dark < 0.5;
+    hemi.intensity = 1.1 + 0.7 * k; moon.intensity = 1.2 + 1.0 * k;
+    moon.color.set(mixHex("#9db4ff", mixHex("#fff1d6", P.hor, 0.4), k));
+  };
+  outdoor();
+  setInterval(() => { if (skyState.ferry == null) sky.redraw(skyState); outdoor(); }, 60000);
 
   // model
   const gltf = await new GLTFLoader().loadAsync("models/room.glb", e => {
@@ -504,6 +652,8 @@ async function init() {
   const setDrawer = a => { drawerAmt = a; if (parts.Drawer) parts.Drawer.position.z = drawerOpenZ - 0.33 * (1 - a); };
   setDrawer(0);
   // diğer çekmeceler: model açık, kapalı = 0.33 m içeride; tıklayınca aç/kapa
+  // kasa fanları: düğüm kökeni fan merkezinde; Blender ekseni z→three y, x→x, y→z
+  const fans = Object.keys(parts).filter(k => k.startsWith("Fan_")).map(k => [parts[k], { z: "y", x: "x", y: "z" }[k[4]]]);
   const extraDrawers = Object.keys(parts).filter(k => k.startsWith("Drawer_")).map(k => ({ o: parts[k], z: parts[k].position.z, amt: 0 }));
   extraDrawers.forEach(d => { d.o.position.z = d.z - 0.33; });
 
@@ -529,6 +679,7 @@ async function init() {
       m = new THREE.MeshStandardMaterial({ ...rest, map: printTex[name] || (map ? patterns[map] : null) });
       if (rest.emissive) m.emissive = new THREE.Color(rest.emissive);
       maskShader(m);
+      if (name === "W_RGB" || name === "W_KeyGlow" || name === "W_FanBlade") part.name.startsWith("Fan_") ? rainbow(m, RING[part.name[4]], "ring" + part.name[4]) : rainbow(m, WAVE, "wave");
       (partMats[part.name] ||= []).push(m);
     }
     m.name = name;
@@ -572,6 +723,7 @@ async function init() {
       if (p.name === "Room") return null;
       if (CLICK.includes(p.name) || p.name.startsWith("Book_") || p.name.startsWith("Drawer_")) return p;
       if (p.name.startsWith("Clock")) return parts.Clock;
+      if (p.name.startsWith("Fan_")) return parts.PC;
     }
     return null;
   }
@@ -671,7 +823,7 @@ async function init() {
       const n = new THREE.Vector3().fromBufferAttribute(o.geometry.attributes.normal, 0).transformDirection(o.matrixWorld).normalize();
       screens.tablet = { mesh: o, w: 0.6, h: 0.338, normal: n };
     }
-    if (o.material.name === "W_Screen_Watch") screens.watch = { mesh: o, w: 0.04, h: 0.04, normal: new THREE.Vector3(0, 0, 1), fill: 0.62 };
+    if (o.material.name === "W_Screen_Watch") screens.watch = { mesh: o, w: 0.035, h: 0.035, normal: new THREE.Vector3(0, 0, 1), fill: 0.62 };
   });
   Devices.setEmbedSource(async type => {
     const sc = screens[type], screenMesh = sc && sc.mesh;
@@ -771,10 +923,12 @@ async function init() {
       else if (!day) { const s = { x: 1500, y: 160 }; tween(900, t => sky.redraw({ ...skyState, shoot: { x: s.x - t * 500, y: s.y + t * 250 } })); }
       say(p, day ? "☀️ Üsküdar'dan Boğaz manzarası" : "🌠 Kız Kulesi manzarası, bir dilek tut");
     } else if (n === "Cert") { sfx("paper"); say(p, "📜 MCPD — 100 puan (2013)"); }
-    else if (n === "PC") { sfx("whooshIn"); rgbBoost = 1; say(p, "🖥️ Sıvı soğutma + 3 RGB fan. Derleme: 3 sn ⚡"); }
+    else if (n === "PC") { sfx("whooshIn"); rgbBoost = 1; say(p, "🖥️ TUF GT502 · RTX 4090 Suprim · 360 sıvı soğutma + 7 fan ⚡"); }
+    else if (n === "Mouse") { sfx("click"); say(p, "🖱️ MX Master 3: yan tekerlek, sonsuz kaydırma"); }
     else if (n === "TV") { sfx("click"); say(p, "📺 65 inç · PS5 hazır: akşam bir maç? 🎮"); }
-    else if (n === "PS5" || n === "Controllers") { sfx("thump"); say(p, "🎮 Kod molası: bir maç?"); }
-    else if (n === "Headphones") { sfx("chime"); say(p, "🎧 Lo-fi açık, odak modu"); }
+    else if (n === "PS5") { sfx("thump"); say(p, "🎮 Kod molası: bir maç?"); }
+    else if (n === "Controllers") { sfx("thump"); say(p, "🎮 İki DualSense şarjda, rakip aranıyor"); }
+    else if (n === "Headphones") { const on = Sfx.music.toggle(); say(p, on ? "🎧 Çalıyor: " + Sfx.music.name : "🎧 Müzik durdu"); }
     else if (n === "Watch") { sfx("tick"); Devices.open("watch"); }
     else if (n === "Modem") { sfx("tick"); say(p, "📶 Fiber hat: ping 4 ms, deploy hızlı"); }
     else if (n === "Chair") { sfx("thump"); say(p, "🪑 xDrive HEY 15: oyun ve kod koltuğu"); }
@@ -875,8 +1029,10 @@ async function init() {
     ledLight.color.setHSL(0.47 + hue * 0.45, 0.8, 0.6);
     rgbBoost *= 0.985;
     rgb.setHSL((now / (4000 - 3200 * rgbBoost)) % 1, 0.85, 0.55);
-    for (const m of [...(partMats.PC || []), ...(partMats.Keyboard || [])]) if (m.name === "W_RGB" || m.name === "W_KeyGlow") m.emissive.copy(rgb);
+    RB.uTime.value += dt * (reduceMotion ? 0.05 : 0.18 + 0.8 * rgbBoost);
     pcLight.color.copy(rgb);
+    const spin = dt * (reduceMotion ? 0.4 : 7 + 14 * rgbBoost);
+    fans.forEach(([o, ax]) => { o.rotation[ax] += spin; });
     const flick = reduceMotion ? 1 : ((now / 1000) % 6 > 5.6 && Math.sin(now / 30) > 0 ? 0.35 : 1);
     neon.material.opacity = flick; neonLight.intensity = 0.8 * flick;
     // buhar
@@ -967,6 +1123,28 @@ async function init() {
   if (boot.entered) intro(); else addEventListener("devroom:enter", intro, { once: true });
   boot.ready();
 }
+
+const RB = { uTime: { value: 0 } };
+function rainbow(m, coord, key) {
+  const prev = m.onBeforeCompile, k = Math.min(m.emissiveIntensity, 2.2);
+  m.onBeforeCompile = (sh, r) => {
+    prev(sh, r);
+    sh.uniforms.uTime = RB.uTime; sh.uniforms.uRbInt = { value: k };
+    sh.vertexShader = sh.vertexShader
+      .replace("#include <common>", "#include <common>\nvarying vec3 vRbL;\nvarying vec3 vRbW;")
+      .replace("#include <begin_vertex>", "#include <begin_vertex>\nvRbL = position;\nvRbW = (modelMatrix * vec4(position, 1.0)).xyz;");
+    sh.fragmentShader = sh.fragmentShader
+      .replace("#include <common>", "#include <common>\nuniform float uTime;\nuniform float uRbInt;\nvarying vec3 vRbL;\nvarying vec3 vRbW;")
+      .replace("#include <emissivemap_fragment>", `#include <emissivemap_fragment>
+        float hc = ${coord};
+        vec3 rb = clamp(abs(mod(fract(hc - uTime) * 6.0 + vec3(0.0, 4.0, 2.0), 6.0) - 3.0) - 1.0, 0.0, 1.0);  // tam doygun ton
+        totalEmissiveRadiance = rb * uRbInt;`);
+  };
+  m.customProgramCacheKey = () => "rb-" + key;
+}
+// fan halkası: pervane düğümünün yerel düzleminde açı (Blender ekseni z→three y, x→x, y→-z)
+const RING = { z: "atan(vRbL.z, vRbL.x) / 6.2831853", x: "atan(vRbL.z, vRbL.y) / 6.2831853", y: "atan(vRbL.y, vRbL.x) / 6.2831853" };
+const WAVE = "vRbW.x * 2.2 - vRbW.y * 1.4 + vRbW.z * 0.8";
 
 function maskShader(m) {
   m.onBeforeCompile = s => {

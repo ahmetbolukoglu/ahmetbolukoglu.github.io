@@ -541,7 +541,11 @@
     .dev-watch .os-bar { justify-content: center; background: none; border: 0; height: 52px; padding-top: 14px; }
     .dev-watch .os-bar b { font: 600 14px var(--sans); }
     .dev-watch .os-app { background: none; }
-    .dev-watch .os-app .screen-body { padding: 4px 46px 46px; text-align: center; }
+    .dev-watch .os-app { position: relative; }
+    .dev-watch .os-app .screen-body { padding: 4px 46px 84px; text-align: center; }
+    .w-back { position: absolute; left: 50%; bottom: 26px; transform: translateX(-50%); z-index: 2; padding: 9px 26px; border: 1px solid rgba(255,255,255,.14); border-radius: 999px;
+      background: #1f2937; color: #fff; font: 600 14px var(--sans); cursor: pointer; box-shadow: 0 6px 18px rgba(0,0,0,.45); }
+    .w-back:hover { background: #374151; } .w-back:active { transform: translateX(-50%) scale(.95); }
     .w-list { list-style: none; display: grid; gap: 8px; }
     .w-list li { background: #1f2937; border-radius: 16px; padding: 8px 12px; text-align: left; }
     .w-list b { display: block; font: 600 13px var(--sans); } .w-list small { font-size: 11px; color: #9ca3af; }
@@ -567,6 +571,22 @@
     .w-music.on .w-eq i:nth-child(4) { animation-delay: .45s; } .w-music.on .w-eq i:nth-child(5) { animation-delay: .6s; }
     @keyframes weq { 50% { height: 38px; } }
     .w-track { font: 600 16px var(--sans); }
+    .mp { display: grid; gap: 16px; padding: 20px; max-width: 820px; margin: 0 auto; }
+    .mp-now { display: flex; gap: 20px; align-items: center; padding: 18px; border-radius: 18px; background: linear-gradient(135deg, rgba(219,39,119,.22), rgba(124,58,237,.18)); border: 1px solid var(--line); }
+    .mp-art { flex: none; width: 110px; height: 110px; border-radius: 16px; display: grid; place-items: center; background: radial-gradient(circle at 30% 30%, #f472b6, #4c1d95); box-shadow: 0 16px 40px -12px rgba(219,39,119,.6); }
+    .mp-art .w-eq i { background: #fff; }
+    .mp.on .w-eq i { animation: weq .8s ease-in-out infinite; }
+    .mp.on .w-eq i:nth-child(2) { animation-delay: .15s; } .mp.on .w-eq i:nth-child(3) { animation-delay: .3s; } .mp.on .w-eq i:nth-child(4) { animation-delay: .45s; } .mp.on .w-eq i:nth-child(5) { animation-delay: .6s; }
+    .mp-meta { min-width: 0; } .mp-meta small { font: 11px var(--mono); color: var(--muted); }
+    .mp-name { display: block; font: 700 24px var(--sans); margin: 4px 0 2px; } .mp-style { color: #f9a8d4; font: 13px var(--mono); }
+    .mp-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+    .mp-list button { width: 100%; display: grid; grid-template-columns: auto 1fr auto; grid-template-rows: auto auto; column-gap: 14px; align-items: center; text-align: left; padding: 12px 14px; border-radius: 12px; background: var(--panel); border: 1px solid var(--line); color: var(--text); cursor: pointer; }
+    .mp-list .n { grid-row: span 2; font: 12px var(--mono); color: var(--muted); } .mp-list b { font-size: 15px; } .mp-list small { grid-column: 2; color: var(--muted); font: 12px var(--mono); }
+    .mp-list i { grid-row: 1 / span 2; grid-column: 3; font-style: normal; color: var(--pink); opacity: 0; }
+    .mp-list button:hover { border-color: rgba(244,114,182,.4); }
+    .mp-list button.cur { border-color: rgba(244,114,182,.6); background: rgba(219,39,119,.1); } .mp-list button.cur i { opacity: 1; }
+    .mp-note { color: var(--muted); font-size: 13px; margin: 0; }
+    .dev-phone .mp { padding: 6px 2px; } .dev-phone .mp-now { flex-direction: column; text-align: center; } .dev-phone .mp-now .w-ctrl { justify-content: center; }
     .app { background: none; border: 0; cursor: pointer; font-family: var(--sans); }
     .ph-home { display: block; border: 0; padding: 0; cursor: pointer; }
     .ph-app { flex: 1; min-height: 0; display: flex; flex-direction: column; background: var(--bg); }
@@ -1706,22 +1726,56 @@
       hava: { label: "Hava", icon: "⛅", b: "#0891b2", html: () => `<div class="w-center"><div class="w-icon">${["☀️", "⛅", "🌤️", "🌧️"][rnd(0, 3)]}</div><b class="w-big">${rnd(12, 24)}°</b><small>İstanbul · Üsküdar</small><small>Boğaz'da hafif poyraz</small></div>` },
       takvim: { label: "Takvim", icon: "🗓️", b: "#7c3aed", html: () => `<ul class="w-list"><li><b>10:00 Daily standup</b><small>Ekip</small></li><li><b>14:00 Code review</b><small>PR #42</small></li><li><b>16:30 Redis tuning</b><small>EnerjiSA</small></li><li><b>21:00 Halı saha ⚽</b><small>Üsküdar</small></li></ul>` },
       muzik: { label: "Müzik", icon: "🎵", b: "#db2777", html: () => `<div class="w-center w-music${Sfx.music.playing ? " on" : ""}"><div class="w-eq"><i></i><i></i><i></i><i></i><i></i></div>
-        <b class="w-track">${esc(Sfx.music.name)}</b><small>Odak listesi · lo-fi</small>
+        <b class="w-track">${esc(Sfx.music.name)}</b><small class="w-style">${Sfx.music.index + 1}/${Sfx.music.tracks.length} · ${Sfx.music.tracks[Sfx.music.index].style}</small>
         <div class="w-ctrl"><button type="button" data-m="-1" aria-label="Önceki">⏮</button><button type="button" class="w-play" data-m="0" aria-label="Çal/Duraklat">${Sfx.music.playing ? "⏸" : "▶"}</button><button type="button" data-m="1" aria-label="Sonraki">⏭</button></div></div>`,
         setup: () => {
           const box = dev.querySelector(".w-music");
           box.addEventListener("click", e => {
             const b = e.target.closest("[data-m]"); if (!b) return;
             const d = +b.dataset.m;
-            if (d) box.querySelector(".w-track").textContent = Sfx.music.skip(d);
-            else { const on = Sfx.music.toggle(); box.classList.toggle("on", on); b.textContent = on ? "⏸" : "▶"; }
+            d ? Sfx.music.skip(d) : Sfx.music.toggle();
           });
+          watchMusic(box, () => {
+            const m = Sfx.music;
+            box.classList.toggle("on", m.playing); box.querySelector(".w-play").textContent = m.playing ? "⏸" : "▶";
+            box.querySelector(".w-track").textContent = m.name; box.querySelector(".w-style").textContent = `${m.index + 1}/${m.tracks.length} · ${m.tracks[m.index].style}`;
+          });
+        } },
+    });
+    // çalma listesi: bilgisayarda ve telefonda aynı uygulama; çalan parça her yerde aynı (saat dahil)
+    function watchMusic(el, draw) { Sfx.music.onChange(() => { if (el.isConnected) draw(); }); }
+    Object.assign(OS_APPS, {
+      player: { label: "Müzik", file: "müzik.app", icon: "🎧", b: "#db2777", html: () => {
+        const m = Sfx.music;
+        return `<div class="mp${m.playing ? " on" : ""}">
+          <div class="mp-now"><div class="mp-art"><div class="w-eq"><i></i><i></i><i></i><i></i><i></i></div></div>
+            <div class="mp-meta"><small>şimdi çalıyor · telifsiz, kodla üretildi</small><b class="mp-name">${esc(m.name)}</b><span class="mp-style"></span>
+              <div class="w-ctrl"><button type="button" data-m="-1" aria-label="Önceki">⏮</button><button type="button" class="w-play" data-m="0" aria-label="Çal/Duraklat">▶</button><button type="button" data-m="1" aria-label="Sonraki">⏭</button></div></div></div>
+          <ol class="mp-list">${m.tracks.map((t, i) => `<li><button type="button" data-t="${i}"><span class="n">${String(i + 1).padStart(2, "0")}</span><b>${esc(t.name)}</b><small>${esc(t.style)} · ${t.bpm} BPM</small><i>♪</i></button></li>`).join("")}</ol>
+          <p class="mp-note">Kod yazarken dikkat dağıtmayan, sözsüz parçalar. Saatten ve telefondan da değiştirebilirsin.</p>
+        </div>`; },
+        setup: () => {
+          const box = dev.querySelector(".mp");
+          const draw = () => {
+            const m = Sfx.music;
+            box.classList.toggle("on", m.playing);
+            box.querySelector(".w-play").textContent = m.playing ? "⏸" : "▶";
+            box.querySelector(".mp-name").textContent = m.name;
+            box.querySelector(".mp-style").textContent = `${m.tracks[m.index].style} · ${m.tracks[m.index].bpm} BPM`;
+            box.querySelectorAll("[data-t]").forEach(b => b.classList.toggle("cur", +b.dataset.t === m.index));
+          };
+          box.addEventListener("click", e => {
+            const t = e.target.closest("[data-t]"), b = e.target.closest("[data-m]");
+            if (t) { +t.dataset.t === Sfx.music.index && Sfx.music.playing ? Sfx.music.toggle() : Sfx.music.play(+t.dataset.t); }
+            else if (b) { +b.dataset.m ? Sfx.music.skip(+b.dataset.m) : Sfx.music.toggle(); }
+          });
+          watchMusic(box, draw); draw();
         } },
     });
     // her cihazın ana ekranı (telefonda altta iletişim kartı da durur)
     const HOME_APPS = {
-      phone: ["mail", "github", "linkedin", "cv", "terminal", "hakkimda", "yetenekler", "hizmet", "ordek", "archive"],
-      imac: ["hakkimda", "ordek", "yetenekler", "hizmet", "terminal", "cv", "archive", "iletisim"],
+      phone: ["mail", "github", "linkedin", "cv", "terminal", "hakkimda", "yetenekler", "hizmet", "ordek", "player", "archive"],
+      imac: ["hakkimda", "ordek", "yetenekler", "hizmet", "player", "terminal", "cv", "archive", "iletisim"],
       tablet: ["cv", "hakkimda", "hizmet", "archive", "iletisim", "mail"],
       watch: ["bildirim", "nabiz", "adim", "hava", "takvim", "muzik"],
     };
@@ -1795,8 +1849,9 @@
             <div class="wf-apps">${HOME_APPS.watch.map(k => `<button type="button" class="app" data-app="${k}" aria-label="${OS_APPS[k].label}"><i style="--b:${OS_APPS[k].b}">${OS_APPS[k].icon}</i></button>`).join("")}</div>
           </div>
           <div class="os-app" hidden>
-            <div class="os-bar"><button type="button" class="os-back" aria-label="Geri">‹</button><b></b></div>
+            <div class="os-bar"><b></b></div>
             <div class="screen-body"></div>
+            <button type="button" class="w-back">Geri</button>
           </div>
         </div>`,
       archive: () => `
@@ -1907,7 +1962,7 @@
     function osClick(e) {
       const a = e.target.closest("[data-app]");
       if (a) return openApp(a.dataset.app);
-      if (e.target.closest(".os-back, .ph-home, .os-bar .dots i:first-child, .os-winbtn")) openApp(null);
+      if (e.target.closest(".os-back, .w-back, .ph-home, .os-bar .dots i:first-child, .os-winbtn")) openApp(null);
     }
     setInterval(() => { const t = $("#navTime").textContent; document.querySelectorAll("[data-clock]").forEach(el => { el.textContent = t; }); }, 1000);
     let opening = false;  // açılış sürerken (kamera uçarken) gelen ikinci istek yok sayılır

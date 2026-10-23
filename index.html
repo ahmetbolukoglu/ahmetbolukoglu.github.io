@@ -661,6 +661,7 @@
     }
     .ar-head { display: flex; justify-content: space-between; align-items: center; padding: 14px 24px; font: 12px var(--mono); letter-spacing: .14em; color: #e8c98a; text-transform: uppercase; border-bottom: 1px solid rgba(232,201,138,.15); }
     .ar-head b { color: var(--pink); font-weight: 500; }
+    .ar-soon { padding: 3px 8px; border: 1px dashed currentColor; border-radius: 6px; }
     .ar-list { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
     .ar-row {
       display: grid; grid-template-columns: 48px 1fr auto 32px; align-items: center; gap: 16px; width: 100%;
@@ -770,7 +771,7 @@
       <a href="#deneyim" data-open="tablet:cv"><span>~/</span>deneyim</a>
       <a href="#yetenekler" data-open="imac:yetenekler"><span>~/</span>yetenekler</a>
       <a href="#terminal" data-open="imac:terminal"><span>~/</span>terminal</a>
-      <a href="#arsiv" data-open="archive"><span>~/</span>arşiv</a>
+      <a href="#projeler" data-open="archive"><span>~/</span>projeler</a>
       <a href="#iletisim" data-open="phone"><span>~/</span>iletişim</a>
     </div>
     <div class="nav-clock"><button type="button" class="snd" id="sndBtn" aria-pressed="false" aria-label="Sesi aç/kapat">ses<span class="bars"><i></i><i></i><i></i></span></button><span class="d" id="navDate"></span> <b id="navTime">--:--</b></div>
@@ -1564,11 +1565,10 @@
   const Devices = (function () {
     const stage = $("#stage"), dev = $("#device"), closeBtn = $("#stageClose");
     const SRC = { imac: "#hMonitor", tablet: "#hTablet", phone: "#hPhone", archive: "#room", watch: "#room" };
-    const LABEL = { imac: "Masaüstü", tablet: "CV", phone: "İletişim", archive: "Proje arşivi", watch: "Akıllı saat" };
+    const LABEL = { imac: "Masaüstü", tablet: "CV", phone: "İletişim", archive: "Projeler", watch: "Akıllı saat" };
     const PARTS = { imac: [], tablet: [], phone: [], archive: [], watch: [] };  // ana ekranlı cihazlar bölümleri uygulama açılınca alır
-    const SHORT = { "İstanbul Medipol Üniversitesi": "Medipol", "Arı Bilgi Bilişim Teknolojileri Akademisi": "Arı Bilgi", "Akbank Bankacılık Merkezi": "Akbank", "Mavi Bilişim ve Danışmanlık": "Mavi Bilişim", "İETT Genel Müdürlüğü": "İETT" };
-    const up = s => (SHORT[s] || s).toLocaleUpperCase("tr-TR");
-    const yr = e => `${e.from.slice(3)} — ${e.to.slice(3)}`;
+    // projeler: hepsi hazırlanıyor (coming soon); ad, tür ve teknoloji geldikçe buraya yazılır
+    const PROJECTS = Array.from({ length: 8 }, (_, i) => ({ name: "Proje " + String(i + 1).padStart(2, "0"), type: "Yakında", tech: [] }));
     // uygulamalar: sayfa bölümleri cihazın içine taşınır ya da uygulamaya özel ekran çizilir
     const profile = s => `
       <div class="ph-profile">
@@ -1583,7 +1583,7 @@
       yetenekler: { label: "Yetenekler", file: "skills.json", icon: "🧠", b: "#be185d", parts: ["yetenekler"] },
       terminal: { label: "Terminal", file: "terminal.sh", icon: "⌨️", b: "#0f172a", parts: ["terminal"] },
       cv: { label: "CV", file: "cv.pdf", icon: "📄", b: "#7c3aed", parts: ["deneyim", "egitim"] },
-      archive: { label: "Arşiv", file: "arşiv/", icon: "🗂️", b: "#b45309", html: () => TPL.archive(), setup: () => setupArchive() },
+      archive: { label: "Projeler", file: "projeler/", icon: "🗂️", b: "#b45309", html: () => TPL.archive(), setup: () => setupArchive() },
       iletisim: { label: "İletişim", file: "iletişim.vcf", icon: "💬", b: "#0891b2", parts: ["iletisim"] },
       mail: { label: "Mail", file: "Yeni e-posta", icon: "✉️", b: "#2563eb", html: () => `
         <form class="ph-mail" id="phMail">
@@ -1711,12 +1711,12 @@
         </div>`,
       archive: () => `
         <div class="ar-drawer">
-          <div class="ar-head"><span>~/çekmece/<b>projeler</b></span><span>${EXPERIENCE.length} dosya</span></div>
-          <div class="ar-list">${EXPERIENCE.map((e, i) => `
+          <div class="ar-head"><span>~/çekmece/<b>projeler</b></span><span>${PROJECTS.length} proje · coming soon</span></div>
+          <div class="ar-list">${PROJECTS.map((p, i) => `
             <button type="button" class="ar-row" data-i="${i}">
               <span class="ar-n">${String(i + 1).padStart(2, "0")}</span>
-              <span class="ar-name">${esc(up(e.company))}</span>
-              <span class="ar-meta">${yr(e)} · ${esc(e.type)}</span>
+              <span class="ar-name">${esc(p.name.toLocaleUpperCase("tr-TR"))}</span>
+              <span class="ar-meta"><span class="ar-soon">coming soon</span></span>
               <span class="ar-arrow">↗</span>
             </button>`).join("")}
           </div>
@@ -1725,38 +1725,37 @@
         </div>`,
     };
 
-    // çekmece arşivi: dev isim listesi, imleci izleyen dosya önizlemesi, açılan dosya kâğıdı
+    // projeler çekmecesi: dev isim listesi, imleci izleyen dosya önizlemesi, açılan dosya kâğıdı
     function setupArchive() {
       const box = dev.querySelector(".ar-drawer"), pv = dev.querySelector(".ar-preview"), det = dev.querySelector(".ar-detail");
       let shown = -1;
-      const card = e => `<div class="fold" data-tab="${esc(up(e.company))}"><small>${yr(e)} · ${esc(e.dur)}</small><b>${esc(e.role)}</b><div class="chips">${e.tech.slice(0, 4).map(t => `<span class="chip">${esc(t)}</span>`).join("")}</div></div>`;
+      const card = p => `<div class="fold" data-tab="${esc(p.name.toLocaleUpperCase("tr-TR"))}"><small>durum</small><b>Coming soon 🚧</b><small>Detaylar hazırlanıyor</small></div>`;
       box.addEventListener("pointermove", e => {
         const r = box.getBoundingClientRect(), row = e.target.closest(".ar-row");
         pv.style.left = Math.min(r.width - 150, Math.max(150, e.clientX - r.left + 170)) + "px";
         pv.style.top = (e.clientY - r.top) + "px";
-        if (row && +row.dataset.i !== shown) { shown = +row.dataset.i; pv.innerHTML = card(EXPERIENCE[shown]); sfx("tick"); }
+        if (row && +row.dataset.i !== shown) { shown = +row.dataset.i; pv.innerHTML = card(PROJECTS[shown]); sfx("tick"); }
         pv.classList.toggle("show", !!row && det.hidden);
         if (!row) shown = -1;
       });
       box.addEventListener("pointerleave", () => { pv.classList.remove("show"); shown = -1; });
       function openFile(i) {
-        const e = EXPERIENCE[i], n = EXPERIENCE.length;
+        const p = PROJECTS[i], n = PROJECTS.length;
         sfx("paper");
         pv.classList.remove("show");
         det.hidden = false;
         det.innerHTML = `
           <article class="ar-paper">
-            <div class="ar-stamp">${i === 0 ? "SON DOSYA" : "TESLİM ✓"}</div>
-            <div class="no">DOSYA #${String(i + 1).padStart(2, "0")} / ${String(n).padStart(2, "0")}</div>
-            <h3>${esc(up(e.company))}</h3>
+            <div class="ar-stamp">COMING SOON</div>
+            <div class="no">PROJE #${String(i + 1).padStart(2, "0")} / ${String(n).padStart(2, "0")}</div>
+            <h3>${esc(p.name.toLocaleUpperCase("tr-TR"))}</h3>
             <dl class="ar-fields">
-              <div><dt>Rol</dt><dd>${esc(e.role)}</dd></div>
-              <div><dt>Dönem</dt><dd>${e.from} — ${e.to}</dd></div>
-              <div><dt>Süre</dt><dd>${esc(e.dur)}</dd></div>
-              <div><dt>Tür</dt><dd>${esc(e.type)}</dd></div>
+              <div><dt>Durum</dt><dd>Hazırlanıyor 🚧</dd></div>
+              <div><dt>Tür</dt><dd>—</dd></div>
+              <div><dt>Teknolojiler</dt><dd>—</dd></div>
+              <div><dt>Yayın</dt><dd>Yakında</dd></div>
             </dl>
-            <p>${esc(e.desc)}</p>
-            <div class="chips">${e.tech.map(t => `<span class="chip">${esc(t)}</span>`).join("")}</div>
+            <p>Bu proje dosyası henüz boş. Detaylar, ekran görüntüleri ve bağlantılar çok yakında burada olacak.</p>
             <div class="ar-nav">
               <button type="button" data-go="back">← çekmeceye dön</button>
               <button type="button" data-go="${(i - 1 + n) % n}">‹ önceki</button>
@@ -1962,7 +1961,7 @@
         `  <span class="c">deneyim</span>     kariyer geçmişi`,
         `  <span class="c">yetenekler</span>  teknoloji yığını`,
         `  <span class="c">egitim</span>      eğitim & sertifikalar`,
-        `  <span class="c">arsiv</span>       çekmecedeki proje dosyaları`,
+        `  <span class="c">projeler</span>    çekmecedeki projeler (yakında)`,
         `  <span class="c">iletisim</span>    bana ulaş`,
         `  <span class="c">sosyal</span>      sosyal medya`,
         `  <span class="c">cay</span>         bir bardak çay demle`,
@@ -1975,7 +1974,7 @@
       egitim: () => `🎓 Bilgisayar Programcılığı — İstanbul Üniversitesi MYO · Fatih Üniversitesi (2012–2014)\n🎓 Bilgisayar Programcılığı — Haydarpaşa Endüstri Meslek Lisesi (2008–2012)\n📜 Microsoft Certified Professional Developer — 100 puan (2013)`,
       iletisim: () => `📧 <a href="mailto:${EMAIL}">${EMAIL}</a>`,
       sosyal: () => SOCIALS.map(s => `→ ${s.name}: <a href="${s.url}" target="_blank" rel="noopener">${s.url.replace(/^https?:\/\/(www\.)?/, "")}</a>`).join("\n"),
-      arsiv: () => { setTimeout(() => Devices.open("archive"), 300); return `🗂️ Çekmece açılıyor… <span class="c">${EXPERIENCE.length}</span> proje dosyası`; },
+      projeler: () => { setTimeout(() => Devices.open("archive"), 300); return `🗂️ Çekmece açılıyor… <span class="c">${PROJECTS.length}</span> proje, hepsi <span class="a">coming soon</span>`; },
       cay: () => `<span class="a">     ( (\n      ) )\n   ........\n   |      |]\n   \\      /\n    \`----'</span>\nÇay demlendi 🍵 Afiyet olsun!`,
       "sudo ise-al": () => `<span class="p">[sudo] parola gerekmez.</span>\n✔ Harika seçim! Hemen bir mail at: <a href="mailto:${EMAIL}">${EMAIL}</a>`,
       sudo: () => `<span class="p">sudo:</span> ne yapmak istersin? Belki <span class="c">sudo ise-al</span>?`,
@@ -1986,7 +1985,7 @@
       "rm -rf /": () => `<span class="p">Nice deneme 😄</span> Bu odada üretimde test yapmıyoruz.`,
       exit: () => "Çıkış yok, burası çok rahat 🛋️",
     };
-    const alias = { hakkimda: "whoami", experience: "deneyim", skills: "yetenekler", contact: "iletisim", "iletişim": "iletisim", "eğitim": "egitim", "çay": "cay", tea: "cay", social: "sosyal", "sudo hire-me": "sudo ise-al", "?": "help", yardim: "help", "yardım": "help" };
+    const alias = { arsiv: "projeler", "arşiv": "projeler", projects: "projeler", hakkimda: "whoami", experience: "deneyim", skills: "yetenekler", contact: "iletisim", "iletişim": "iletisim", "eğitim": "egitim", "çay": "cay", tea: "cay", social: "sosyal", "sudo hire-me": "sudo ise-al", "?": "help", yardim: "help", "yardım": "help" };
     function run(raw) {
       const cmd = raw.trim(); prompt(cmd); if (!cmd) return;
       hist.push(cmd); hi = hist.length;

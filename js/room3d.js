@@ -73,7 +73,7 @@ const STOPS = [
   { pos: [-0.95, 0.45, 1.7], look: [-1.4, 5.0, 1.75], n: "01", h: "Üsküdar'dan Boğaz'a", p: "Kız Kulesi'ne bakan bir oda. 10 yılı aşkın süredir kod burada demleniyor." },
   { pos: [0.12, 0.05, 1.12], look: [0.12, 1.3, 1.07], n: "02", h: "49 inç masaüstü", p: ".NET Core, C#, mikroservisler. Ekrana tıkla: README, yetenekler ve terminal." },
   { pos: [-0.42, 0.5, 1.02], look: [-0.35, 1.0, 0.8], n: "03", h: "Çay · kod · tekrar", p: "Performans, ölçeklenebilirlik ve sürdürülebilir kod. Bir de bol çay ve lastik ördek." },
-  { pos: [0.835, 0.02, 1.08], look: [0.835, 0.72, 0.6], n: "04", h: "Proje arşivi", p: "Çekmecede 10 yıllık iş: EnerjiSA'dan Ovinot'a. Tıkla, dosyaları karıştır.", drawer: true },
+  { pos: [0.835, 0.02, 1.08], look: [0.835, 0.72, 0.6], n: "04", h: "Projeler", p: "Çekmecede yeni projeler hazırlanıyor. Tıkla, dosyalara göz at: hepsi coming soon.", drawer: true },
   { pos: [0.6, 0.35, 1.25], look: [0.92, 1.2, 1.0], n: "05", h: "Kasa ve RGB", p: "Sıvı soğutma, üç fan, beyaz kasa. Derleme hızlı, ışıklar daha hızlı." },
   { pos: [0.78, 0.15, 1.62], look: [1.45, 1.5, 1.58], n: "06", h: "Kitaplık", p: "Yapay zekâ, MCP, Redis, gRPC… Yetenekler rafta dizili." },
   { pos: [-0.45, -0.6, 1.3], look: [-1.95, 0.15, 1.25], n: "07", h: "Oyun molası", p: "65 inç TV ve PS5. Kod bitince bir maç." },
@@ -536,7 +536,7 @@ async function init() {
     { text: "🖥️ masaüstü", at: B(0.12, 1.3, 1.31), cls: "c" },
     { text: "📄 cv.pdf", at: B(-0.84, 1.13, 1.25), cls: "v" },
     { text: "📱 iletişim", at: B(0.98, 1.0, 0.97), cls: "p" },
-    { text: "🗂️ arşiv", at: B(0.835, 0.88, 0.6), cls: "a" },
+    { text: "🗂️ projeler", at: B(0.835, 0.88, 0.6), cls: "a" },
   ].map(t => { const el = document.createElement("div"); el.className = "tag3d " + t.cls; el.textContent = t.text; frame.appendChild(el); return { ...t, el }; });
 
   // ---------------------------------------------------------------- etkileşim
@@ -627,7 +627,7 @@ async function init() {
   });
   const openDrawer = async () => { if (drawerAmt < 0.99) { sfx("drawer"); const a0 = drawerAmt; await tween(600, t => setDrawer(a0 + (1 - a0) * t)); } drawerHold = true; };
   Devices.onOpen(type => { if (type === "archive") openDrawer(); });
-  // telefon ve arşiv: önce kamera cihaza gider (menüden açınca da), sonra arayüz açılır
+  // telefon ve projeler: önce kamera cihaza gider (menüden açınca da), sonra arayüz açılır
   Devices.setPreOpen(async type => {
     if (!frame.classList.contains("is-3d")) return;
     const fr = frame.getBoundingClientRect();

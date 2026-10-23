@@ -37,9 +37,25 @@ const MATS = {
   W_Book_red: { color: "#dc2626", roughness: 0.7 }, W_Book_cyan: { color: "#0891b2", roughness: 0.7 },
   W_Book_green: { color: "#059669", roughness: 0.7 }, W_Book_pink: { color: "#db2777", roughness: 0.7 },
   W_Book_yellow: { color: "#eab308", roughness: 0.7 },
+  W_Folder: { color: "#e8c98a", roughness: 0.85 }, W_Folder2: { color: "#d9b56f", roughness: 0.85 },
+  W_FolderRed: { color: "#c2410c", roughness: 0.8 },
 };
+const sfx = (name, ...a) => window.Sfx && window.Sfx.play(name, ...a);
+const boot = window.Boot || { progress() {}, ready() {}, entered: true };
+
+// scroll turu durakları (Blender koordinatı) ve yazıları
+const STOPS = [
+  { pos: [0.15, -1.5, 1.42], look: [0.18, 1.3, 1.22] },
+  { pos: [-0.55, 0.35, 1.5], look: [-1.25, 5.0, 1.45], n: "01", h: "Üsküdar'dan Boğaz'a", p: "Kız Kulesi'ne bakan bir oda. 10 yılı aşkın süredir kod burada demleniyor." },
+  { pos: [0.12, 0.5, 1.16], look: [0.12, 1.36, 1.1], n: "02", h: "Masaüstü", p: ".NET Core, C#, mikroservisler. Ekrana tıkla: README, yetenekler ve terminal." },
+  { pos: [-0.12, 0.6, 0.99], look: [-0.24, 1.05, 0.8], n: "03", h: "Çay · kod · tekrar", p: "Performans, ölçeklenebilirlik ve sürdürülebilir kod. Bir de bol çay." },
+  { pos: [0.8, 0.02, 1.08], look: [0.8, 0.72, 0.6], n: "04", h: "Proje arşivi", p: "Çekmecede 10 yıllık iş: EnerjiSA'dan Ovinot'a. Tıkla, dosyaları karıştır.", drawer: true },
+  { pos: [0.78, 0.15, 1.62], look: [1.45, 1.5, 1.58], n: "05", h: "Kitaplık", p: "Yapay zekâ, MCP, Redis, gRPC… Yetenekler rafta dizili." },
+  { pos: [0.58, 0.5, 1.02], look: [0.62, 1.2, 0.9], n: "06", h: "Bana ulaş", p: "Telefona dokun: mail, GitHub, LinkedIn. Tablet: CV." },
+  { pos: [0.15, -1.5, 1.42], look: [0.18, 1.3, 1.22] },
+];
 const SCREENS = ["W_Screen_iMac", "W_Screen_Tablet", "W_Screen_Phone", "W_Cert"];
-const CLICK = ["iMac", "Tablet", "Phone", "Shelf", "Lamp", "Tea", "Duck", "Ball", "Window", "Cert", "Plant", "Clock", "Neon"];
+const CLICK = ["iMac", "Tablet", "Phone", "Shelf", "Lamp", "Tea", "Duck", "Ball", "Window", "Cert", "Plant", "Clock", "Neon", "Drawer"];
 
 function webglOK() {
   try { const c = document.createElement("canvas"); return !!(c.getContext("webgl2") || c.getContext("webgl")); }
@@ -268,7 +284,7 @@ function neonTexture() {
 // ---------------------------------------------------------------- sahne
 
 async function init() {
-  if (!canvas || !webglOK()) { frame?.classList.add("no3d"); return; }
+  if (!canvas || !webglOK()) { frame?.classList.add("no3d"); boot.ready(); return; }
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: "high-performance" });
   renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -279,7 +295,9 @@ async function init() {
   scene.background = new THREE.Color("#0f0d24");
   const camera = new THREE.PerspectiveCamera(40, 16 / 10, 0.03, 60);
   const HOME = { pos: B(0.15, -1.5, 1.42), look: B(0.18, 1.3, 1.22) };
-  camera.position.copy(HOME.pos); camera.lookAt(HOME.look);
+  const INTRO = { pos: B(0.12, 1.02, 1.12), look: B(0.12, 1.36, 1.11) };  // açılışta ekranın içinden geri çekilir
+  camera.position.copy(INTRO.pos); camera.lookAt(INTRO.look);
+  const stops = STOPS.map(s => ({ ...s, pos: B(...s.pos), look: B(...s.look) }));
 
   // ışıklar
   const hemi = new THREE.HemisphereLight("#4a46a0", "#140f28", 1.1); scene.add(hemi);
@@ -300,11 +318,18 @@ async function init() {
 
   // model
   const gltf = await new GLTFLoader().loadAsync("models/room.glb", e => {
-    if (loaderEl && e.total) loaderEl.querySelector("b").textContent = Math.round(e.loaded / e.total * 100) + "%";
+    if (!e.total) return;
+    if (loaderEl) loaderEl.querySelector("b").textContent = Math.round(e.loaded / e.total * 100) + "%";
+    boot.progress(e.loaded / e.total);
   });
   const root = gltf.scene; scene.add(root);
   const parts = {};
   root.children.forEach(o => { parts[o.name] = o; });
+  // çekmece: model açık konumda; kapalı = 0.33 m içeride (Blender -Y dışarı = three +Z)
+  const drawerOpenZ = parts.Drawer ? parts.Drawer.position.z : 0;
+  let drawerAmt = 0, drawerHold = false;
+  const setDrawer = a => { drawerAmt = a; if (parts.Drawer) parts.Drawer.position.z = drawerOpenZ - 0.33 * (1 - a); };
+  setDrawer(0);
 
   const screenTex = { W_Screen_iMac: imacScreen(), W_Screen_Tablet: tabletScreen(), W_Screen_Phone: phoneScreen(), W_Cert: certScreen() };
   const patterns = {};
@@ -348,6 +373,7 @@ async function init() {
     { text: "🖥️ masaüstü", at: B(0.12, 1.36, 1.36), cls: "c" },
     { text: "📲 cv.pdf", at: B(0.72, 1.3, 1.12), cls: "v" },
     { text: "📱 iletişim", at: B(0.52, 1.07, 0.96), cls: "p" },
+    { text: "🗂️ arşiv", at: B(0.8, 0.84, 0.58), cls: "a" },
   ].map(t => { const el = document.createElement("div"); el.className = "tag3d " + t.cls; el.textContent = t.text; frame.appendChild(el); return { ...t, el }; });
 
   // ---------------------------------------------------------------- etkileşim
@@ -393,7 +419,8 @@ async function init() {
       requestAnimationFrame(step);
     });
   }
-  const camLook = HOME.look.clone();
+  const camLook = INTRO.look.clone();
+  const base = { pos: HOME.pos.clone(), look: HOME.look.clone() };  // turun o anki durağı; paralaks bunun üstüne
   async function flyTo(pos, look, ms = 900) {
     const p0 = camera.position.clone(), l0 = camLook.clone();
     await tween(ms, t => { camera.position.lerpVectors(p0, pos, t); camLook.lerpVectors(l0, look, t); });
@@ -413,12 +440,18 @@ async function init() {
     }
   }
 
-  const DEV = { iMac: "imac", Tablet: "tablet", Phone: "phone" };
+  const DEV = { iMac: "imac", Tablet: "tablet", Phone: "phone", Drawer: "archive" };
   Devices.setRectSource(type => {
     const name = Object.keys(DEV).find(k => DEV[k] === type);
     return frame.classList.contains("is-3d") && parts[name] ? rectOf(parts[name]) : null;
   });
-  Devices.onClose(async () => { drop(); busy = true; await flyTo(HOME.pos, HOME.look, 800); busy = false; });
+  const openDrawer = async () => { if (drawerAmt < 0.99) { sfx("drawer"); const a0 = drawerAmt; await tween(600, t => setDrawer(a0 + (1 - a0) * t)); } drawerHold = true; };
+  Devices.onOpen(type => { if (type === "archive") openDrawer(); });
+  Devices.onClose(async () => {
+    drop();
+    if (drawerHold) { drawerHold = false; sfx("drawer"); }
+    busy = true; await flyTo(base.pos, base.look, 800); busy = false;
+  });
 
   async function act(p) {
     if (!p || busy) return;
@@ -428,6 +461,11 @@ async function init() {
       await flyTo(B(0.12, 0.55, 1.12), B(0.12, 1.36, 1.1));
       busy = false;
       Devices.open("imac", n === "Shelf" ? "yetenekler" : undefined);
+    } else if (n === "Drawer") {
+      busy = true;
+      await Promise.all([openDrawer(), flyTo(stops[4].pos, stops[4].look, 800)]);
+      busy = false;
+      Devices.open("archive");
     } else if (n === "Tablet" || n === "Phone") {
       busy = true;
       const o = parts[n], c = new THREE.Box3().setFromObject(o).getCenter(new THREE.Vector3());
@@ -436,28 +474,33 @@ async function init() {
       Devices.open(DEV[n]);
     } else if (n === "Lamp") {
       lampOn = !lampOn;
+      sfx("click");
       lampLight.intensity = lampOn ? 2.2 : 0;
       (partMats.Lamp || []).filter(m => m.name === "W_Bulb").forEach(m => { m.emissiveIntensity = lampOn ? 3 : 0; });
       hemi.intensity = (day ? 1.8 : 1.1) * (lampOn ? 1 : 0.6);
       say(p, lampOn ? "💡 Işıklar açık" : "🌙 Gece modu: sadece monitör");
     } else if (n === "Tea") {
+      sfx("spoon");
       say(p, `🍵 Çay tazelendi! (${++teaCount}. bardak)`);
       puffs.forEach(s => { s.userData.t = Math.random() * 0.3; });
     } else if (n === "Duck") {
       const y0 = p.position.y;
       tween(500, t => { p.position.y = y0 + Math.sin(t * Math.PI) * 0.06; p.rotation.y = Math.sin(t * Math.PI * 2) * 0.4; });
+      sfx("quack");
       say(p, QUACK[qi++ % QUACK.length]);
     } else if (n === "Ball") {
       const x0 = p.position.x;
       tween(1400, t => { const k = Math.sin(t * Math.PI); p.position.x = x0 + k * 0.5; p.rotation.z = -k * 0.5 / 0.11; });
+      sfx("thump");
       say(p, "⚽ Halı saha akşam 21:00'de!");
     } else if (n === "Window") {
+      sfx("horn");
       if (!day) { const s = { x: 1500, y: 160 }; tween(900, t => sky.redraw({ x: s.x - t * 500, y: s.y + t * 250 })).then(() => sky.redraw()); }
       say(p, day ? "☀️ Üsküdar'dan Boğaz manzarası" : "🌠 Kız Kulesi manzarası, bir dilek tut");
-    } else if (n === "Cert") say(p, "📜 MCPD — 100 puan (2013)");
-    else if (n === "Plant") say(p, "🌿 Su verildi, teşekkürler!");
-    else if (n === "Clock") say(p, "🕐 " + new Date().toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" }));
-    else if (n === "Neon") say(p, "🍵 çay · kod · tekrar");
+    } else if (n === "Cert") { sfx("paper"); say(p, "📜 MCPD — 100 puan (2013)"); }
+    else if (n === "Plant") { sfx("rustle"); say(p, "🌿 Su verildi, teşekkürler!"); }
+    else if (n === "Clock") { sfx("tick"); say(p, "🕐 " + new Date().toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" })); }
+    else if (n === "Neon") { sfx("click"); say(p, "🍵 çay · kod · tekrar"); }
   }
 
   let mouse = { x: 0, y: 0 };
@@ -486,6 +529,47 @@ async function init() {
   const tmp = new THREE.Vector3();
   let last = 0, lastType = 0;
 
+  // ---------------------------------------------------------------- scroll turu
+  // #tour uzun bir kap; içindeki giriş (sticky) sabit kalır, kaydırma ilerlemesi kamerayı duraktan durağa taşır
+  const tourEl = document.getElementById("tour"), heroTop = document.querySelector(".hero-top");
+  const capEl = document.getElementById("tourCap");
+  let tourS = 0, capIdx = -1, h0 = 0, mb0 = 0;
+  const smooth = t => t * t * (3 - 2 * t);
+  function measureHero() {
+    heroTop.style.height = ""; heroTop.style.marginBottom = "";
+    h0 = heroTop.offsetHeight; mb0 = parseFloat(getComputedStyle(heroTop).marginBottom) || 0;
+  }
+  measureHero(); addEventListener("resize", () => { measureHero(); tour(true); });
+  function tour(force) {
+    if (!tourEl) return;
+    const total = tourEl.offsetHeight - tourEl.firstElementChild.offsetHeight;
+    const p = total > 10 && innerWidth > 900 ? THREE.MathUtils.clamp(-tourEl.getBoundingClientRect().top / total, 0, 1) : 0;
+    const k = THREE.MathUtils.clamp(p / 0.07, 0, 1);
+    if (force || heroTop.dataset.k !== k.toFixed(3)) {
+      heroTop.dataset.k = k.toFixed(3);
+      heroTop.style.height = k ? h0 * (1 - k) + "px" : "";
+      heroTop.style.marginBottom = k ? mb0 * (1 - k) + "px" : "";
+      heroTop.style.opacity = 1 - Math.min(1, k * 1.6);
+      heroTop.style.overflow = k ? "hidden" : "";
+    }
+    tourS = THREE.MathUtils.clamp((p - 0.07) / 0.93, 0, 1) * (stops.length - 1);
+    const i = Math.min(stops.length - 2, Math.floor(tourS)), t = smooth(tourS - i);
+    base.pos.lerpVectors(stops[i].pos, stops[i + 1].pos, t);
+    base.look.lerpVectors(stops[i].look, stops[i + 1].look, t);
+    const near = Math.round(tourS), st = stops[near];
+    const idx = st.h && Math.abs(tourS - near) < 0.32 ? near : -1;
+    if (idx !== capIdx && capEl) {
+      capIdx = idx;
+      capEl.classList.remove("show");
+      if (idx >= 0) {
+        capEl.innerHTML = `<span>${st.n} / 06</span><h3>${st.h}</h3><p>${st.p}</p>`;
+        requestAnimationFrame(() => capEl.classList.add("show"));
+        sfx("whooshOut");
+      }
+    }
+    frame.classList.toggle("touring", tourS > 0.3 && tourS < stops.length - 1.3);
+  }
+
   function frameLoop(now) {
     requestAnimationFrame(frameLoop);
     if (!visible || document.hidden || !stage.hidden) return;
@@ -494,7 +578,8 @@ async function init() {
     const d = new Date(), s = d.getSeconds() + d.getMilliseconds() / 1000, m = d.getMinutes() + s / 60, hr = (d.getHours() % 12) + m / 60;
     if (parts.ClockSec) { parts.ClockSec.rotation.z = -s / 60 * Math.PI * 2; parts.ClockMin.rotation.z = -m / 60 * Math.PI * 2; parts.ClockHour.rotation.z = -hr / 12 * Math.PI * 2; }
     // ekranlar
-    if (!reduceMotion && now - lastType > 45) { screenTex.W_Screen_iMac.step(); lastType = now; }
+    if (!reduceMotion && now - lastType > 45) { screenTex.W_Screen_iMac.step(); lastType = now; if (Math.random() < 0.3) sfx("key", 0.3); }
+    tour();
     if (now % 30000 < 20) screenTex.W_Screen_Phone.redraw();
     // ışık nabızları
     const hue = (now / 8000) % 1;
@@ -509,10 +594,16 @@ async function init() {
       p.position.set(Math.sin(t * 6 + i) * 0.012, t * 0.16, 0);
       p.material.opacity = Math.sin(t * Math.PI) * 0.6; p.scale.setScalar(0.03 + t * 0.05);
     });
-    // kamera: fareyle hafif paralaks
+    // kamera: tur durağı + fareyle hafif paralaks (yumuşak takip = kaydırmada atalet)
     if (!busy && stage.hidden && !Object.keys(lifted).length) {
-      tmp.copy(HOME.pos).add(new THREE.Vector3(mouse.x * 0.18, -mouse.y * 0.1, 0));
-      camera.position.lerp(tmp, 0.05);
+      const amp = tourS < 0.3 || tourS > stops.length - 1.3 ? 1 : 0.3;
+      tmp.copy(base.pos).add(new THREE.Vector3(mouse.x * 0.18 * amp, -mouse.y * 0.1 * amp, 0));
+      camera.position.lerp(tmp, 0.08);
+      camLook.lerp(base.look, 0.08);
+    }
+    if (!drawerHold) {
+      const want = stops.reduce((a, st, i) => st.drawer ? Math.max(a, 1 - Math.min(1, Math.abs(tourS - i) * 1.4)) : a, 0);
+      if (Math.abs(want - drawerAmt) > 0.002) setDrawer(drawerAmt + (want - drawerAmt) * 0.12);
     }
     camera.lookAt(camLook);
     // etiketler
@@ -529,7 +620,12 @@ async function init() {
   frame.classList.remove("no3d");
   frame.classList.add("is-3d");
   loaderEl?.remove();
+  busy = true;
   requestAnimationFrame(frameLoop);
+  // açılış: "Sesle/Sessiz gir" seçilince kamera ekranın içinden odaya geri çekilir
+  const intro = async () => { await flyTo(base.pos, base.look, reduceMotion ? 0 : 2400); busy = false; };
+  if (boot.entered) intro(); else addEventListener("devroom:enter", intro, { once: true });
+  boot.ready();
 }
 
 function maskShader(m) {
@@ -549,4 +645,5 @@ init().catch(err => {
   loaderEl?.remove();
   frame.classList.remove("is-3d");
   frame.classList.add("no3d");
+  boot.ready();
 });

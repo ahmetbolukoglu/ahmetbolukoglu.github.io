@@ -268,7 +268,7 @@ function neonTexture() {
 // ---------------------------------------------------------------- sahne
 
 async function init() {
-  if (!canvas || !webglOK()) return;
+  if (!canvas || !webglOK()) { frame?.classList.add("no3d"); return; }
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: "high-performance" });
   renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -473,7 +473,9 @@ async function init() {
   function resize() {
     const w = frame.clientWidth, h = frame.clientHeight;
     renderer.setSize(w, h, false); camera.aspect = w / h;
-    camera.fov = w / h < 1.2 ? 52 : 40;
+    // yatay görüş açısı sabit kalsın: geniş çerçevede oda taşmasın, darda kesilmesin
+    const hfov = (camera.aspect < 1.4 ? 60 : 66) * Math.PI / 180;
+    camera.fov = THREE.MathUtils.clamp(2 * Math.atan(Math.tan(hfov / 2) / camera.aspect) * 180 / Math.PI, 26, 62);
     camera.updateProjectionMatrix();
   }
   new ResizeObserver(resize).observe(frame);
@@ -524,6 +526,7 @@ async function init() {
 
   resize();
   renderer.compile(scene, camera);
+  frame.classList.remove("no3d");
   frame.classList.add("is-3d");
   loaderEl?.remove();
   requestAnimationFrame(frameLoop);
@@ -545,4 +548,5 @@ init().catch(err => {
   console.warn("3D oda yüklenemedi, SVG sürüm kullanılıyor:", err);
   loaderEl?.remove();
   frame.classList.remove("is-3d");
+  frame.classList.add("no3d");
 });

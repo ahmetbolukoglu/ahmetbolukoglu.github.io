@@ -18,6 +18,17 @@
       "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"
     } }
   </script>
+  <script>
+    // WebGL varsa SVG oda hiç görünmesin (3D yüklenene kadar yer tutucu); 3D gelmezse SVG'ye dönülür
+    (function () {
+      try { var c = document.createElement("canvas"); if (!(c.getContext("webgl2") || c.getContext("webgl"))) return; } catch (e) { return; }
+      document.documentElement.classList.add("webgl");
+      setTimeout(function () {
+        var f = document.getElementById("room");
+        if (f && !f.classList.contains("is-3d")) f.classList.add("no3d");
+      }, 15000);
+    })();
+  </script>
   <script type="module" src="js/room3d.js"></script>
   <style>
     :root {
@@ -81,8 +92,16 @@
     @keyframes blink { 50% { opacity: 0; } }
 
     /* ---------- HERO ---------- */
-    .hero { padding: 56px 0 32px; }
-    .hero-top { display: grid; grid-template-columns: 1.3fr 1fr; gap: 32px; align-items: end; margin-bottom: 32px; }
+    .hero { padding: clamp(16px, 3vh, 40px) 0 clamp(12px, 2.5vh, 28px); }
+    .hero-top { display: grid; grid-template-columns: 1.3fr 1fr; gap: 32px; align-items: end; margin-bottom: clamp(14px, 2.5vh, 28px); }
+    /* 3D modda giriş + oda tek ekrana sığar: oda kalan yüksekliği doldurur */
+    html.webgl .hero { height: calc(100svh - 64px); min-height: 560px; display: flex; flex-direction: column; }
+    html.webgl .hero > .wrap { flex: 1; min-height: 0; display: flex; flex-direction: column; width: min(1680px, 100% - 32px); }
+    html.webgl .hero .status { margin-bottom: clamp(8px, 1.6vh, 20px); }
+    @media (max-width: 900px) {
+      html.webgl .hero { height: auto; min-height: 0; }
+      html.webgl .room-frame:not(.no3d) { flex: none !important; height: min(64vw, 70svh); }
+    }
     .status {
       display: inline-flex; align-items: center; gap: 8px;
       font-family: var(--mono); font-size: 12px; color: var(--green);
@@ -91,7 +110,7 @@
     }
     .status i { width: 8px; height: 8px; border-radius: 50%; background: var(--green); box-shadow: 0 0 10px var(--green); animation: pulse 2s infinite; }
     @keyframes pulse { 50% { opacity: .35; } }
-    h1 { font-size: clamp(40px, 6vw, 72px); line-height: 1.02; letter-spacing: -.03em; font-weight: 700; }
+    h1 { font-size: clamp(34px, min(5.4vw, 7.2vh), 72px); line-height: 1.02; letter-spacing: -.03em; font-weight: 700; }
     h1 .grad { background: linear-gradient(90deg, var(--cyan), var(--violet) 55%, var(--pink)); -webkit-background-clip: text; background-clip: text; color: transparent; }
     .role { font-family: var(--mono); font-size: clamp(14px, 1.6vw, 18px); color: var(--muted); margin-top: 16px; min-height: 1.6em; }
     .role .k { color: var(--pink); } .role .t { color: var(--cyan); }
@@ -323,8 +342,10 @@
 
     /* ---------- 3D ROOM ---------- */
     #room3d { position: absolute; inset: 0; width: 100%; height: 100%; display: block; opacity: 0; transition: opacity .6s; touch-action: manipulation; }
-    .room-frame.is-3d { aspect-ratio: 16 / 10; }
-    .room-frame.is-3d > svg { visibility: hidden; position: absolute; inset: 0; }
+    html.webgl .room-frame:not(.no3d) { flex: 1; min-height: 300px; }
+    html.webgl .room-frame:not(.no3d) > svg { visibility: hidden; position: absolute; inset: 0; width: 100%; height: 100%; }
+    .room-frame.no3d #room3d, .room-frame.no3d .room-loader { display: none; }
+    html.webgl .room-frame:not(.is-3d):not(.no3d) .room-loader { right: auto; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 14px; padding: 10px 16px; }
     .room-frame.is-3d #room3d { opacity: 1; }
     .room-frame.is-3d .room-hint { top: auto; bottom: 16px; }
     .room-loader {
@@ -455,7 +476,9 @@
       .sec-head .cmd { margin-left: 0; width: 100%; }
     }
     @media (max-width: 560px) {
-      .hero { padding-top: 32px; }
+      .hero { padding-top: 24px; }
+      html.webgl .hero { height: auto; min-height: 0; }
+      html.webgl .room-frame:not(.no3d) { flex: none; height: 84vw; min-height: 280px; }
       .room-hint { font-size: 10px; left: 8px; top: 8px; }
       .stats { grid-template-columns: 1fr 1fr; }
       .stat .n { font-size: 32px; }

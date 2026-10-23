@@ -120,7 +120,7 @@
       font-family: var(--mono); font-size: 12px; color: var(--text);
       background: rgba(11,10,26,.7); border: 1px solid var(--line);
       padding: 6px 10px; border-radius: 8px; backdrop-filter: blur(6px);
-      pointer-events: none;
+      pointer-events: none; max-width: calc(100% - 32px);
     }
     .bubble {
       position: absolute; z-index: 5;
@@ -314,6 +314,104 @@
     }
     .toast.show { opacity: 1; transform: translate(-50%, 0); }
 
+    /* ---------- DEVICE STAGE ---------- */
+    .tagbob { animation: bob 2.4s ease-in-out infinite; }
+    @keyframes bob { 50% { transform: translateY(-6px); } }
+    html.locked { overflow: hidden; }
+    .stage {
+      position: fixed; inset: 0; z-index: 100;
+      display: grid; place-items: center; padding: 64px 16px 24px;
+      perspective: 1800px;
+      background: rgba(5,4,13,0); transition: background .4s, backdrop-filter .4s;
+    }
+    .stage[hidden] { display: none; }
+    .stage.on { background: rgba(5,4,13,.8); backdrop-filter: blur(10px); }
+    .stage-close {
+      position: fixed; top: 14px; right: 16px; z-index: 2;
+      font: 500 13px var(--mono); color: var(--text); cursor: pointer;
+      background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 9px 14px;
+      opacity: 0; transition: opacity .3s .25s, border-color .2s;
+    }
+    .stage-close:hover { border-color: var(--cyan); }
+    .stage-close kbd { font: 11px var(--mono); color: var(--dim); border: 1px solid var(--line); border-radius: 4px; padding: 0 5px; margin-left: 6px; }
+    .stage.on .stage-close { opacity: 1; }
+    .device { display: flex; flex-direction: column; max-height: calc(100vh - 88px); transform-origin: center; will-change: transform; }
+    .screen-body { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+    .screen-body::-webkit-scrollbar { width: 8px; } .screen-body::-webkit-scrollbar-thumb { background: var(--line); border-radius: 4px; }
+    .screen-body > .wrap { width: auto; margin: 0; padding: 28px clamp(16px, 3vw, 32px); }
+    .screen-body .sec-head { margin-bottom: 20px; }
+    .screen-body .sec-head h2 { font-size: clamp(22px, 2.6vw, 30px); }
+
+    /* iMac */
+    .dev-imac { width: min(1100px, 100%); }
+    .imac-screen {
+      height: min(64vh, 640px); display: flex; flex-direction: column; overflow: hidden;
+      background: var(--bg); border: 14px solid #07060f; border-bottom-width: 18px; border-radius: 20px 20px 0 0;
+      box-shadow: 0 0 90px -10px rgba(94,234,212,.35);
+    }
+    .vs-bar { display: flex; align-items: center; gap: 12px; height: 42px; flex-shrink: 0; padding-left: 12px; background: var(--bg-2); border-bottom: 1px solid var(--line); }
+    .dots { display: flex; gap: 6px; } .dots i { width: 11px; height: 11px; border-radius: 50%; background: #ff5f57; }
+    .dots i:nth-child(2) { background: #febc2e; } .dots i:nth-child(3) { background: #28c840; }
+    .vs-tabs { display: flex; height: 100%; overflow-x: auto; scrollbar-width: none; }
+    .vs-tabs button {
+      font: 13px var(--mono); color: var(--muted); background: none; cursor: pointer; white-space: nowrap;
+      border: 0; border-right: 1px solid var(--line); border-top: 2px solid transparent; padding: 0 16px;
+    }
+    .vs-tabs button:hover { color: var(--text); }
+    .vs-tabs button[aria-selected="true"] { color: var(--text); background: var(--bg); border-top-color: var(--cyan); }
+    .imac-chin { height: 46px; flex-shrink: 0; display: grid; place-items: center; background: linear-gradient(#d4d7e0, #a3a8b6); border-radius: 0 0 20px 20px; }
+    .imac-chin span { font: 700 16px var(--mono); color: #4b5060; }
+    .imac-stand { width: 150px; height: 52px; margin: 0 auto; flex-shrink: 0; background: linear-gradient(90deg, #8e93a1, #c6c9d3 50%, #8e93a1); clip-path: polygon(22% 0, 78% 0, 92% 100%, 8% 100%); }
+
+    /* tablet */
+    .dev-tablet {
+      width: min(860px, 100%); height: min(calc(100vh - 88px), 1100px);
+      background: #07060f; border-radius: 40px; padding: 22px;
+      box-shadow: 0 0 0 2px #2a2650, 0 40px 120px -30px rgba(167,139,250,.5);
+    }
+    .tab-screen { flex: 1; min-height: 0; display: flex; flex-direction: column; overflow: hidden; border-radius: 20px; background: var(--bg); }
+    .safari { flex-shrink: 0; display: flex; justify-content: center; padding: 10px; background: var(--bg-2); border-bottom: 1px solid var(--line); }
+    .safari span { font: 12px var(--mono); color: var(--muted); background: var(--panel); border-radius: 8px; padding: 6px 14px; }
+    .safari b { color: var(--cyan); font-weight: 500; }
+
+    /* phone */
+    .dev-phone {
+      width: min(380px, 100%); height: min(calc(100vh - 88px), 800px);
+      background: #07060f; border-radius: 54px; padding: 12px;
+      box-shadow: 0 0 0 2px #2a2650, 0 40px 120px -30px rgba(244,114,182,.5);
+    }
+    .ph-screen {
+      flex: 1; min-height: 0; display: flex; flex-direction: column; overflow: hidden; border-radius: 44px;
+      background: radial-gradient(120% 60% at 0% 0%, #4c1d95, transparent 60%), radial-gradient(120% 60% at 100% 100%, #831843, transparent 60%), #0b0a1a;
+    }
+    .ph-status { display: flex; justify-content: space-between; align-items: center; padding: 12px 26px 6px; font: 600 13px var(--sans); flex-shrink: 0; }
+    .ph-island { width: 96px; height: 28px; background: #000; border-radius: 20px; }
+    .ph-home { width: 120px; height: 5px; border-radius: 3px; background: rgba(255,255,255,.6); margin: 8px auto; flex-shrink: 0; }
+    .ph-apps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px 6px; padding: 18px 14px 6px; }
+    .app { display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 11px; color: #fff; }
+    .app i { width: 56px; height: 56px; border-radius: 15px; display: grid; place-items: center; font: normal 24px/1 var(--sans); background: var(--b); box-shadow: 0 6px 16px rgba(0,0,0,.35); transition: transform .15s; }
+    .app:hover i { transform: scale(1.08); }
+    .app svg { width: 28px; height: 28px; fill: #fff; }
+    .dev-phone .screen-body > .wrap { padding: 8px 12px 16px; }
+    .dev-phone .contact { padding: 24px 16px; border-radius: 26px; }
+    .dev-phone .contact h2 { font-size: 26px; }
+    .dev-phone .contact p { font-size: 14px; margin: 12px auto 18px; }
+    .dev-phone .mail-box { flex-direction: column; width: 100%; }
+    .dev-phone .mail-box a { font-size: 13px; padding: 12px; }
+    .dev-phone .mail-box button { border-left: 0; border-top: 1px solid var(--line); padding: 12px; }
+    .dev-phone .socials { display: none; }
+    @media (max-height: 760px) { .imac-stand { display: none; } }
+    @media (max-width: 600px) {
+      .stage { padding: 60px 8px 12px; }
+      .imac-screen { height: 72vh; border-width: 8px; border-bottom-width: 10px; border-radius: 14px 14px 0 0; }
+      .imac-chin { height: 28px; border-radius: 0 0 14px 14px; }
+      .imac-stand { display: none; }
+      .dev-tablet { padding: 10px; border-radius: 26px; }
+      .tab-screen { border-radius: 16px; }
+      .dev-phone { border-radius: 44px; padding: 9px; }
+      .ph-screen { border-radius: 36px; }
+    }
+
     /* ---------- RESPONSIVE ---------- */
     @media (max-width: 900px) {
       .hero-top, .about-grid { grid-template-columns: 1fr; }
@@ -351,11 +449,11 @@
   <div class="wrap">
     <a href="#top" class="logo"><span class="u">ahmet</span>@<span class="h">dev-room</span>:<span class="p">~</span>$<span class="cur"></span></a>
     <div class="nav-links">
-      <a href="#hakkimda"><span>~/</span>hakkımda</a>
-      <a href="#deneyim"><span>~/</span>deneyim</a>
-      <a href="#yetenekler"><span>~/</span>yetenekler</a>
-      <a href="#terminal"><span>~/</span>terminal</a>
-      <a href="#iletisim"><span>~/</span>iletişim</a>
+      <a href="#hakkimda" data-open="imac"><span>~/</span>hakkımda</a>
+      <a href="#deneyim" data-open="tablet"><span>~/</span>deneyim</a>
+      <a href="#yetenekler" data-open="imac:yetenekler"><span>~/</span>yetenekler</a>
+      <a href="#terminal" data-open="imac:terminal"><span>~/</span>terminal</a>
+      <a href="#iletisim" data-open="phone"><span>~/</span>iletişim</a>
     </div>
     <div class="nav-clock"><span class="d" id="navDate"></span> <b id="navTime">--:--</b></div>
   </div>
@@ -372,18 +470,18 @@
       <div class="hero-side">
         <p><strong>10 yılı aşkın</strong> süredir kurumsal ve freelance projelerde <strong>.NET Core, C#</strong> ve <strong>mikroservis</strong> mimarileriyle performanslı, ölçeklenebilir ve sürdürülebilir sistemler geliştiriyorum. Son dönemde yapay zekâ, agentic sistemler ve <strong>MCP</strong> ile çalışıyorum.</p>
         <div class="cta">
-          <a class="btn btn-primary" href="#iletisim">
+          <a class="btn btn-primary" href="#iletisim" data-open="phone">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
             İletişime geç
           </a>
-          <a class="btn btn-ghost" href="#deneyim">git log --deneyim</a>
+          <a class="btn btn-ghost" href="#deneyim" data-open="tablet">git log --deneyim</a>
         </div>
       </div>
     </div>
 
     <!-- THE ROOM -->
     <div class="room-frame" id="room">
-      <div class="room-hint">💡 odadaki nesnelere tıkla</div>
+      <div class="room-hint">✨ Bilgisayara, tablete veya telefona tıklayarak keşfedebilirsiniz</div>
       <div class="bubble" id="bubble"></div>
       <svg viewBox="0 0 1600 1000" role="img" aria-label="Gece, İstanbul manzaralı bir yazılımcı odası: masa, iki monitör, lamba, çay bardağı, kitaplık ve neon tabela">
         <defs>
@@ -426,7 +524,9 @@
           <filter id="fSoft"><feGaussianBlur stdDeviation="3"/></filter>
           <clipPath id="cWin"><rect x="130" y="100" width="420" height="360"/></clipPath>
           <clipPath id="cScreen"><rect x="712" y="302" width="456" height="276" rx="4"/></clipPath>
-          <clipPath id="cScreen2"><rect x="1208" y="342" width="136" height="236" rx="3"/></clipPath>
+          <linearGradient id="gPhone" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#7c3aed"/><stop offset="1" stop-color="#db2777"/>
+          </linearGradient>
         </defs>
 
         <!-- wall + floor -->
@@ -639,45 +739,57 @@
           <circle cx="940" cy="584" r="2" fill="#5eead4"/>
         </g>
 
-        <!-- SECOND MONITOR (portrait dashboard) -->
-        <g>
-          <rect x="1260" y="590" width="28" height="52" fill="#1a1733"/>
-          <path d="M1228 648 Q1274 632 1320 648Z" fill="#1a1733"/>
-          <rect x="1198" y="332" width="156" height="256" rx="10" fill="#07060f"/>
-          <rect x="1208" y="342" width="136" height="236" rx="3" fill="#0d1117"/>
-          <g clip-path="url(#cScreen2)" font-family="JetBrains Mono, monospace">
-            <text x="1218" y="362" font-size="10" fill="#8b949e">grafana · prod</text>
-            <text x="1218" y="392" font-size="20" font-weight="700" fill="#5eead4">12ms</text>
-            <text x="1218" y="406" font-size="9" fill="#8b949e">p95 latency</text>
-            <path id="spark" d="M1218 450 L1240 438 L1258 444 L1276 424 L1294 432 L1312 414 L1334 420" fill="none" stroke="#a78bfa" stroke-width="2.5"/>
-            <text x="1218" y="478" font-size="9" fill="#8b949e">redis hit</text>
-            <text x="1300" y="478" font-size="10" font-weight="700" fill="#86efac">98.7%</text>
-            <rect x="1218" y="484" width="116" height="6" rx="3" fill="#1f2937"/>
-            <rect x="1218" y="484" width="112" height="6" rx="3" fill="#86efac"/>
-            <g fill="#f472b6">
-              <rect class="bar" x="1220" y="520" width="12" height="48"/>
-              <rect class="bar" x="1238" y="530" width="12" height="38" style="animation-delay:.3s"/>
-              <rect class="bar" x="1256" y="510" width="12" height="58" style="animation-delay:.6s" fill="#5eead4"/>
-              <rect class="bar" x="1274" y="534" width="12" height="34" style="animation-delay:.9s"/>
-              <rect class="bar" x="1292" y="516" width="12" height="52" style="animation-delay:1.2s" fill="#a78bfa"/>
-              <rect class="bar" x="1310" y="526" width="12" height="42" style="animation-delay:1.5s"/>
-            </g>
+        <!-- TABLET on stand (opens CV) -->
+        <g class="hot" id="hTablet" tabindex="0" role="button" aria-label="Tablet: CV'yi eline al">
+          <path d="M1254 586 L1240 648 L1312 648 L1298 586Z" fill="#1a1733"/>
+          <rect x="1198" y="356" width="156" height="236" rx="16" fill="#07060f" stroke="#3a3560" stroke-width="2"/>
+          <circle cx="1276" cy="365" r="2.5" fill="#2a2650"/>
+          <rect x="1208" y="374" width="136" height="208" rx="6" fill="#f5f3ff"/>
+          <circle cx="1230" cy="398" r="13" fill="#a78bfa"/>
+          <text x="1230" y="402" text-anchor="middle" font-family="Space Grotesk, sans-serif" font-size="11" font-weight="700" fill="#fff">AB</text>
+          <rect x="1250" y="390" width="78" height="7" rx="3" fill="#15132e"/>
+          <rect x="1250" y="402" width="52" height="5" rx="2.5" fill="#a78bfa"/>
+          <rect x="1218" y="422" width="116" height="2" fill="#ddd8f5"/>
+          <line x1="1222" y1="440" x2="1222" y2="560" stroke="#ddd8f5" stroke-width="2"/>
+          <g>
+            <circle cx="1222" cy="440" r="5" fill="#5eead4"/><rect x="1234" y="435" width="60" height="5" rx="2" fill="#15132e"/><rect x="1234" y="444" width="92" height="4" rx="2" fill="#c4c0dc"/><rect x="1234" y="452" width="70" height="4" rx="2" fill="#c4c0dc"/>
+            <circle cx="1222" cy="480" r="5" fill="#a78bfa"/><rect x="1234" y="475" width="52" height="5" rx="2" fill="#15132e"/><rect x="1234" y="484" width="88" height="4" rx="2" fill="#c4c0dc"/><rect x="1234" y="492" width="64" height="4" rx="2" fill="#c4c0dc"/>
+            <circle cx="1222" cy="520" r="5" fill="#a78bfa"/><rect x="1234" y="515" width="66" height="5" rx="2" fill="#15132e"/><rect x="1234" y="524" width="80" height="4" rx="2" fill="#c4c0dc"/><rect x="1234" y="532" width="90" height="4" rx="2" fill="#c4c0dc"/>
+            <circle cx="1222" cy="560" r="5" fill="#a78bfa"/><rect x="1234" y="555" width="48" height="5" rx="2" fill="#15132e"/><rect x="1234" y="564" width="76" height="4" rx="2" fill="#c4c0dc"/>
           </g>
-          <rect x="1198" y="332" width="156" height="256" rx="10" fill="none" stroke="#2a2650" stroke-width="2"/>
         </g>
 
         <!-- KEYBOARD + MOUSE -->
-        <rect x="780" y="632" width="300" height="16" rx="5" fill="#1a1733"/>
-        <rect x="780" y="644" width="300" height="4" rx="2" fill="#a78bfa" opacity=".6" class="led" stroke-width="3" stroke="#a78bfa"/>
+        <rect x="780" y="632" width="250" height="16" rx="5" fill="#1a1733"/>
+        <rect x="780" y="644" width="250" height="4" rx="2" fill="#a78bfa" opacity=".6" class="led" stroke-width="3" stroke="#a78bfa"/>
         <g fill="#2e2a52">
-          <rect x="790" y="635" width="280" height="4" rx="1"/>
-          <rect x="790" y="641" width="280" height="3" rx="1" opacity=".7"/>
+          <rect x="790" y="635" width="230" height="4" rx="1"/>
+          <rect x="790" y="641" width="230" height="3" rx="1" opacity=".7"/>
         </g>
-        <path d="M1100 646 q0 -18 16 -18 q16 0 16 18z" fill="#1a1733"/>
-        <line x1="1116" y1="630" x2="1116" y2="638" stroke="#5eead4" stroke-width="2"/>
+        <path d="M1044 646 q0 -18 16 -18 q16 0 16 18z" fill="#1a1733"/>
+        <line x1="1060" y1="630" x2="1060" y2="638" stroke="#5eead4" stroke-width="2"/>
+
+        <!-- PHONE on stand (opens contact) -->
+        <g class="hot" id="hPhone" tabindex="0" role="button" aria-label="Telefon: iletişimi eline al">
+          <rect x="1086" y="636" width="56" height="12" rx="4" fill="#1a1733"/>
+          <rect x="1092" y="554" width="44" height="86" rx="9" fill="#07060f" stroke="#3a3560" stroke-width="2"/>
+          <rect x="1096" y="559" width="36" height="76" rx="6" fill="url(#gPhone)"/>
+          <rect x="1108" y="562" width="12" height="3.5" rx="1.75" fill="#07060f"/>
+          <text id="phoneTime" x="1114" y="582" text-anchor="middle" font-family="Space Grotesk, sans-serif" font-size="9" font-weight="700" fill="#fff">--:--</text>
+          <rect x="1099" y="592" width="30" height="16" rx="4" fill="#fff" fill-opacity=".92"/>
+          <path d="M1106 596h16v9h-16z M1106 596l8 5 8-5" fill="none" stroke="#7c3aed" stroke-width="1.4"/>
+          <circle cx="1129" cy="592" r="4" fill="#ef4444"/>
+        </g>
+
+        <!-- device tags -->
+        <g font-family="JetBrains Mono, monospace" font-size="14" font-weight="700" text-anchor="middle" pointer-events="none">
+          <g class="tagbob"><rect x="880" y="252" width="120" height="28" rx="14" fill="#5eead4"/><text x="940" y="271" fill="#04211c">🖥️ masaüstü</text></g>
+          <g class="tagbob" style="animation-delay:.8s"><rect x="1222" y="318" width="108" height="28" rx="14" fill="#a78bfa"/><text x="1276" y="337" fill="#1a1238">📲 cv.pdf</text></g>
+          <g class="tagbob" style="animation-delay:1.6s"><rect x="1062" y="516" width="104" height="28" rx="14" fill="#f472b6"/><text x="1114" y="535" fill="#3b0a24">📱 iletişim</text></g>
+        </g>
 
         <!-- RUBBER DUCK -->
-        <g class="hot" id="hDuck" tabindex="0" role="button" aria-label="Lastik ördek: rubber duck debugging">
+        <g class="hot" id="hDuck" tabindex="0" role="button" aria-label="Lastik ördek: rubber duck debugging" transform="translate(18 0)">
           <g id="duck">
             <ellipse cx="1166" cy="634" rx="22" ry="14" fill="#facc15"/>
             <circle cx="1176" cy="612" r="12" fill="#facc15"/>
@@ -709,7 +821,7 @@
   </div>
 </header>
 
-<main>
+<main id="parts" hidden>
   <!-- ABOUT -->
   <section id="hakkimda">
     <div class="wrap">
@@ -813,6 +925,11 @@
   <div class="wrap">© <span id="yr"></span> Ahmet Bölükoğlu · <span>🍵</span> ve &lt;/&gt; ile yapıldı</div>
 </footer>
 
+<div class="stage" id="stage" hidden>
+  <button class="stage-close" id="stageClose" type="button">↩ masaya geri koy<kbd>Esc</kbd></button>
+  <div class="device" id="device" role="dialog" aria-modal="true"></div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -894,7 +1011,7 @@
   // ---------- CLOCKS ----------
   function tick() {
     const d = new Date();
-    $("#navTime").textContent = d.toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" });
+    $("#navTime").textContent = $("#phoneTime").textContent = d.toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" });
     $("#navDate").textContent = d.toLocaleDateString("tr-TR", { weekday: "short", day: "numeric", month: "short" });
     const s = d.getSeconds(), m = d.getMinutes() + s / 60, h = (d.getHours() % 12) + m / 60;
     $("#hSec").setAttribute("transform", `rotate(${s * 6})`);
@@ -1027,8 +1144,123 @@
       const s = $("#shootingStar"); s.classList.remove("shoot"); void s.getBBox(); s.classList.add("shoot");
       say(el, "🌠 Kız Kulesi manzarası, bir dilek tut");
     });
-    on("hMonitor", () => { location.hash = "#terminal"; setTimeout(() => $("#termIn").focus({ preventScroll: true }), 600); });
-    on("hShelf", () => { location.hash = "#yetenekler"; });
+    on("hMonitor", () => Devices.open("imac"));
+    on("hShelf", () => Devices.open("imac", "yetenekler"));
+    on("hTablet", () => Devices.open("tablet"));
+    on("hPhone", () => Devices.open("phone"));
+  })();
+
+  // ---------- DEVICES: pick up from desk ----------
+  const Devices = (function () {
+    const stage = $("#stage"), dev = $("#device"), closeBtn = $("#stageClose");
+    const SRC = { imac: "#hMonitor", tablet: "#hTablet", phone: "#hPhone" };
+    const LABEL = { imac: "Masaüstü", tablet: "CV", phone: "İletişim" };
+    const PARTS = { imac: ["hakkimda", "yetenekler", "terminal"], tablet: ["deneyim", "egitim"], phone: ["iletisim"] };
+    const IMAC_TABS = [["hakkimda", "📄 README.md"], ["yetenekler", "{ } skills.json"], ["terminal", "▶ terminal.sh"]];
+    const APPS = [
+      { label: "Mail", href: "mailto:" + EMAIL, b: "#2563eb", icon: "✉️" },
+      ...SOCIALS.map(s => ({ label: s.name, href: s.url, b: s.name === "GitHub" ? "#24292f" : "#0a66c2", icon: `<svg viewBox="0 0 24 24">${s.icon}</svg>`, ext: true })),
+      { label: "CV", open: "tablet", b: "#7c3aed", icon: "📄" },
+      { label: "Terminal", open: "imac:terminal", b: "#0f172a", icon: "⌨️" },
+      { label: "README", open: "imac", b: "#0d9488", icon: "🖥️" },
+    ];
+    const TPL = {
+      imac: () => `
+        <div class="imac-screen">
+          <div class="vs-bar"><span class="dots"><i></i><i></i><i></i></span>
+            <div class="vs-tabs" role="tablist">${IMAC_TABS.map(([id, l]) => `<button type="button" role="tab" data-tab="${id}">${l}</button>`).join("")}</div>
+          </div>
+          <div class="screen-body"></div>
+        </div>
+        <div class="imac-chin"><span>&lt;/&gt;</span></div>
+        <div class="imac-stand"></div>`,
+      tablet: () => `
+        <div class="tab-screen">
+          <div class="safari"><span>🔒 ahmetbolukoglu.github.io/<b>cv</b></span></div>
+          <div class="screen-body"></div>
+        </div>`,
+      phone: () => `
+        <div class="ph-screen">
+          <div class="ph-status"><span class="ph-time">${$("#navTime").textContent}</span><span class="ph-island"></span><span>5G 🔋</span></div>
+          <div class="screen-body">
+            <div class="ph-apps">${APPS.map(a => `<a class="app" href="${a.href || "#"}"${a.open ? ` data-open="${a.open}"` : ""}${a.ext ? ' target="_blank" rel="noopener"' : ""}><i style="--b:${a.b}">${a.icon}</i>${a.label}</a>`).join("")}</div>
+          </div>
+          <div class="ph-home"></div>
+        </div>`,
+    };
+    let current = null, srcEl = null, lastFocus = null, borrowed = [];
+
+    // section content is moved into the device screen and returned on close
+    function borrow(id, into) {
+      const w = document.getElementById(id).querySelector(".wrap"), ph = document.createComment(id);
+      w.before(ph); w.dataset.part = id;
+      w.querySelectorAll(".reveal").forEach(e => e.classList.add("in"));
+      into.appendChild(w); borrowed.push([w, ph]);
+    }
+    function giveBack() { borrowed.forEach(([w, ph]) => { w.hidden = false; ph.replaceWith(w); }); borrowed = []; }
+
+    function showTab(id) {
+      dev.querySelectorAll(".screen-body > .wrap").forEach(w => w.hidden = w.dataset.part !== id);
+      dev.querySelectorAll(".vs-tabs button").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === id));
+      dev.querySelector(".screen-body").scrollTop = 0;
+      if (id === "terminal") setTimeout(() => $("#termIn").focus({ preventScroll: true }), 60);
+    }
+
+    function flip(reverse) {
+      if (reduceMotion) return Promise.resolve();
+      const s = srcEl.getBoundingClientRect(), f = dev.getBoundingClientRect();
+      const onScreen = s.width && s.bottom > 0 && s.top < innerHeight;
+      const lying = onScreen
+        ? `translate(${s.left + s.width / 2 - (f.left + f.width / 2)}px, ${s.top + s.height / 2 - (f.top + f.height / 2)}px) scale(${s.width / f.width}, ${s.height / f.height}) rotateX(55deg)`
+        : "translateY(60px) scale(.85) rotateX(35deg)";
+      const from = { transform: lying, opacity: 0 }, to = { transform: "none", opacity: 1 };
+      const frames = reverse ? [to, { opacity: 1, offset: .75 }, from] : [from, { opacity: 1, offset: .2 }, to];
+      return dev.animate(frames, { duration: reverse ? 420 : 720, easing: "cubic-bezier(.2,.8,.2,1)", fill: reverse ? "forwards" : "none" }).finished;
+    }
+
+    async function open(type, tab) {
+      if (current === type) { if (tab) showTab(tab); return; }
+      if (current) await close(true);
+      current = type; srcEl = $(SRC[type]); lastFocus = document.activeElement;
+      dev.className = "device dev-" + type;
+      dev.setAttribute("aria-label", LABEL[type]);
+      dev.innerHTML = TPL[type]();
+      const body = dev.querySelector(".screen-body");
+      PARTS[type].forEach(id => borrow(id, body));
+      if (type === "imac") {
+        dev.querySelector(".vs-tabs").addEventListener("click", e => { const b = e.target.closest("button"); if (b) showTab(b.dataset.tab); });
+        showTab(tab || "hakkimda");
+      }
+      stage.hidden = false;
+      document.documentElement.classList.add("locked");
+      requestAnimationFrame(() => stage.classList.add("on"));
+      closeBtn.focus({ preventScroll: true });
+      flip(false);
+    }
+
+    async function close(switching) {
+      if (!current) return;
+      stage.classList.remove("on");
+      await flip(true);
+      giveBack();
+      dev.getAnimations().forEach(a => a.cancel());
+      dev.innerHTML = ""; current = null;
+      if (switching) return;
+      stage.hidden = true;
+      document.documentElement.classList.remove("locked");
+      if (lastFocus) lastFocus.focus({ preventScroll: true });
+    }
+
+    closeBtn.addEventListener("click", () => close());
+    stage.addEventListener("click", e => { if (e.target === stage) close(); });
+    document.addEventListener("keydown", e => { if (e.key === "Escape" && current) close(); });
+    document.addEventListener("click", e => {
+      const el = e.target.closest("[data-open]"); if (!el) return;
+      e.preventDefault();
+      const [t, tab] = el.dataset.open.split(":");
+      open(t, tab);
+    });
+    return { open, close };
   })();
 
   // ---------- EXPERIENCE ----------

@@ -767,6 +767,33 @@
       html { scroll-behavior: auto; }
       .reveal { opacity: 1; transform: none; }
     }
+    /* ---------- TAM EKRAN ODA ---------- */
+    @media (min-width: 901px) {
+      html.webgl .hero { padding: 0; }
+      html.webgl .hero > .wrap { width: 100%; position: relative; }
+      html.webgl .room-frame:not(.no3d) { position: absolute; inset: 0; border: 0; border-radius: 0; box-shadow: none; }
+      html.webgl .room-frame.is-3d::before { content: ""; position: absolute; inset: 0; z-index: 2; pointer-events: none; transition: opacity .5s;
+        background: linear-gradient(90deg, rgba(8,7,20,.86) 0%, rgba(8,7,20,.6) 26%, rgba(8,7,20,0) 50%), linear-gradient(0deg, rgba(8,7,20,.55), rgba(8,7,20,0) 22%); }
+      html.webgl .room-frame.textless::before, html.webgl .room-frame.free::before, html.webgl .room-frame.zoomed::before, html.webgl .room-frame.reeling::before { opacity: 0; }
+      html.webgl .hero-top { position: absolute; z-index: 6; left: clamp(20px, 4vw, 72px); top: clamp(24px, 7vh, 80px); width: min(580px, 42vw);
+        display: block; margin: 0; pointer-events: none; transition: opacity .4s; }
+      html.webgl .hero-top a, html.webgl .hero-top button { pointer-events: auto; }
+      html.webgl .hero-side { margin-top: 20px; }
+      html.webgl .hero-side p { color: #c9c4e6; }
+      html.webgl .gh-tick { left: auto; right: 16px; }
+      html.webgl .reel-bar span { right: auto; left: 50%; transform: translateX(-50%); }
+      html.roam .hero-top { opacity: 0 !important; pointer-events: none; }
+      html.roam .hero-top * { pointer-events: none !important; }
+    }
+    @media (max-width: 900px) {
+      html.webgl .room-frame:not(.no3d) { border-radius: 0; border-left: 0; border-right: 0; margin-inline: -16px; }
+    }
+    .free-exit { position: absolute; z-index: 6; left: 50%; top: 16px; transform: translate(-50%, -10px); opacity: 0; pointer-events: none;
+      font: 13px var(--mono); color: #15132e; background: var(--cyan); border: 0; border-radius: 999px; padding: 8px 16px; cursor: pointer;
+      box-shadow: 0 8px 24px -8px rgba(94,234,212,.7); transition: opacity .3s, transform .3s; }
+    .free .free-exit { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
+    .free .tag3d, .free .scroll-hint, .free .tour-cap { opacity: 0 !important; transition: opacity .3s; }
+
     /* ---------- 2. DALGA ---------- */
     .stat .k { display: block; font: 11px var(--mono); letter-spacing: .14em; color: var(--muted); margin-bottom: 12px; }
     .reel-btn { border-style: dashed; }

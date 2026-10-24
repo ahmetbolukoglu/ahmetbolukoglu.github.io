@@ -802,6 +802,7 @@ async function init() {
   Devices.onOpen(type => { if (type === "archive") openDrawer(); });
   // telefon ve projeler: önce kamera cihaza gider (menüden açınca da), sonra arayüz açılır
   Devices.setPreOpen(async type => {
+    resetOffset();
     if (!frame.classList.contains("is-3d")) return;
     const fr = frame.getBoundingClientRect();
     if (fr.top < 64 || fr.bottom > innerHeight) jump(scrollY + fr.top - Math.max(64, (innerHeight - fr.height) / 2));
@@ -825,7 +826,9 @@ async function init() {
     }
     if (o.material.name === "W_Screen_Watch") screens.watch = { mesh: o, w: 0.035, h: 0.035, normal: new THREE.Vector3(0, 0, 1), fill: 0.62 };
   });
+  const resetOffset = () => { viewOff = 0; if (camera.view && camera.view.enabled) camera.clearViewOffset(); };
   Devices.setEmbedSource(async type => {
+    resetOffset();
     const sc = screens[type], screenMesh = sc && sc.mesh;
     if (!screenMesh || !frame.classList.contains("is-3d") || frame.clientWidth < 640) return null;
     document.documentElement.classList.add("roomzoom");  // giriş yazısı çekilir, oda büyür, ekran daha geniş açılır
@@ -937,15 +940,59 @@ async function init() {
     else if (n === "Neon") { sfx("click"); say(p, "🍵 çay · kod · tekrar"); }
   }
 
-  let mouse = { x: 0, y: 0 };
+  // serbest gezinme: sürükle = etrafına bak, WASD = yürü (Q/E alçal/yüksel); sayfayı kaydırınca tura döner
+  const free = { on: false, pos: new THREE.Vector3(), yaw: 0, pitch: 0, keys: new Set() };
+  const lookDir = () => new THREE.Vector3(Math.sin(free.yaw) * Math.cos(free.pitch), Math.sin(free.pitch), -Math.cos(free.yaw) * Math.cos(free.pitch));
+  const exitBtn = document.createElement("button");
+  exitBtn.type = "button"; exitBtn.className = "free-exit"; exitBtn.textContent = "↺ tura dön";
+  frame.appendChild(exitBtn);
+  function enterFree() {
+    if (free.on) return;
+    const d = camLook.clone().sub(camera.position).normalize();
+    free.yaw = Math.atan2(d.x, -d.z); free.pitch = Math.asin(THREE.MathUtils.clamp(d.y, -1, 1));
+    free.pos.copy(camera.position); free.on = true;
+    frame.classList.add("free"); document.documentElement.classList.add("roam");
+  }
+  function exitFree() {
+    if (!free.on) return;
+    free.on = false; free.keys.clear();
+    frame.classList.remove("free"); document.documentElement.classList.remove("roam");
+  }
+  exitBtn.addEventListener("click", () => { sfx("whooshOut"); exitFree(); });
+  let mouse = { x: 0, y: 0 }, drag = null, dragged = false;
+  canvas.addEventListener("pointerdown", e => { if (e.pointerType === "mouse" && e.button === 0) { drag = { x: e.clientX, y: e.clientY }; dragged = false; } });
+  addEventListener("pointerup", () => { drag = null; canvas.style.cursor = hover ? "pointer" : ""; });
   canvas.addEventListener("pointermove", e => {
     const r = canvas.getBoundingClientRect();
     mouse = { x: (e.clientX - r.left) / r.width - 0.5, y: (e.clientY - r.top) / r.height - 0.5 };
     tip.style.transform = `translate(${e.clientX - r.left + 16}px, ${e.clientY - r.top + 16}px)`;
+    if (drag && (e.buttons & 1) && !busy && stage.hidden && !reel) {
+      if (!dragged && Math.hypot(e.clientX - drag.x, e.clientY - drag.y) < 6) return;
+      dragged = true; enterFree(); setHover(null);
+      canvas.style.cursor = "grabbing";
+      free.yaw -= e.movementX * 0.0032;                                   // dünyayı tutup çevir
+      free.pitch = THREE.MathUtils.clamp(free.pitch + e.movementY * 0.0032, -1.25, 1.25);
+      return;
+    }
     if (e.pointerType === "mouse") setHover(pick(e));
   });
   canvas.addEventListener("pointerleave", () => { setHover(null); mouse = { x: 0, y: 0 }; });
-  canvas.addEventListener("click", e => act(pick(e)));
+  canvas.addEventListener("click", e => { if (dragged) { dragged = false; return; } act(pick(e)); });
+  const MOVE = { w: "w", a: "a", s: "s", d: "d", q: "q", e: "e", arrowup: "w", arrowdown: "s", arrowleft: "a", arrowright: "d" };
+  addEventListener("keydown", e => {
+    const k = MOVE[e.key.toLowerCase()];
+    if (!k || e.ctrlKey || e.metaKey || e.altKey || !visible || !stage.hidden || reel || busy) return;
+    if (e.target.closest?.("input, textarea, [contenteditable]")) return;
+    if (k !== e.key.toLowerCase() && !free.on) return;                   // oklar yalnız gezinirken (yoksa sayfa kayar)
+    e.preventDefault(); enterFree(); free.keys.add(k);
+  });
+  addEventListener("keyup", e => { const k = MOVE[e.key.toLowerCase()]; if (k) free.keys.delete(k); });
+  addEventListener("blur", () => free.keys.clear());
+  Devices.onOpen(() => exitFree());
+  if (matchMedia("(pointer: fine)").matches) {
+    const hint = frame.querySelector(".room-hint");
+    if (hint) hint.textContent = "🖱️ sürükle: etrafına bak · WASD: yürü · tıkla: keşfet";
+  }
 
   // ---------------------------------------------------------------- boyut, döngü
   function resize() {
@@ -969,7 +1016,7 @@ async function init() {
   // #tour uzun bir kap; içindeki giriş (sticky) sabit kalır, kaydırma ilerlemesi kamerayı duraktan durağa taşır
   const tourEl = document.getElementById("tour"), heroTop = document.querySelector(".hero-top");
   const capEl = document.getElementById("tourCap");
-  let tourS = 0, capIdx = -1, h0 = 0, mb0 = 0;
+  let tourS = 0, capIdx = -1, h0 = 0, mb0 = 0, lastP = 0, heroK = 0, viewOff = 0;
   const smooth = t => t * t * (3 - 2 * t);
   function measureHero() {
     heroTop.style.height = ""; heroTop.style.marginBottom = "";
@@ -981,6 +1028,9 @@ async function init() {
     const total = tourEl.offsetHeight - tourEl.firstElementChild.offsetHeight;
     const p = total > 10 && innerWidth > 900 ? THREE.MathUtils.clamp(-tourEl.getBoundingClientRect().top / total, 0, 1) : 0;
     const k = THREE.MathUtils.clamp(p / 0.07, 0, 1);
+    if (free.on && Math.abs(p - lastP) > 0.002) exitFree();
+    lastP = p; heroK = k;
+    frame.classList.toggle("textless", k > 0.6);
     if (force || heroTop.dataset.k !== k.toFixed(3)) {
       heroTop.dataset.k = k.toFixed(3);
       heroTop.style.height = k ? h0 * (1 - k) + "px" : "";
@@ -1043,7 +1093,15 @@ async function init() {
       p.material.opacity = Math.sin(t * Math.PI) * 0.6; p.scale.setScalar(0.03 + t * 0.05);
     });
     // kamera: tur durağı + fareyle hafif paralaks (yumuşak takip = kaydırmada atalet)
-    if (!busy && stage.hidden && !Object.keys(lifted).length) {
+    if (free.on && !busy && stage.hidden) {
+      const f = lookDir(), fl = new THREE.Vector3(f.x, 0, f.z).normalize(), rt = new THREE.Vector3(-fl.z, 0, fl.x), v = new THREE.Vector3(), K = free.keys;
+      if (K.has("w")) v.add(fl); if (K.has("s")) v.sub(fl); if (K.has("d")) v.add(rt); if (K.has("a")) v.sub(rt);
+      if (K.has("e")) v.y += 1; if (K.has("q")) v.y -= 1;
+      if (v.lengthSq()) free.pos.addScaledVector(v.normalize(), dt * 1.2);
+      free.pos.set(THREE.MathUtils.clamp(free.pos.x, -1.85, 1.85), THREE.MathUtils.clamp(free.pos.y, 0.35, 2.45), THREE.MathUtils.clamp(free.pos.z, -1.45, 2.2));  // oda sınırları
+      camera.position.lerp(free.pos, 0.25);
+      camLook.copy(camera.position).add(lookDir());
+    } else if (!busy && stage.hidden && !Object.keys(lifted).length) {
       const amp = tourS < 0.3 || tourS > stops.length - 1.3 ? 1 : 0.3;
       tmp.copy(base.pos).add(new THREE.Vector3(mouse.x * 0.18 * amp, -mouse.y * 0.1 * amp, 0));
       camera.position.lerp(tmp, 0.08);
@@ -1054,8 +1112,13 @@ async function init() {
       if (Math.abs(want - drawerAmt) > 0.002) setDrawer(drawerAmt + (want - drawerAmt) * 0.12);
     }
     camera.lookAt(camLook);
-    // etiketler
     const r = frame.getBoundingClientRect();
+    // geniş ekranda giriş yazısı soldayken görüntü sağa kayar
+    const offWant = innerWidth > 900 && heroK < 0.6 && !free.on && !reel && !frame.classList.contains("zoomed") ? r.width * 0.15 : 0;
+    viewOff += (offWant - viewOff) * 0.08;
+    if (Math.abs(viewOff) > 0.5) camera.setViewOffset(r.width, r.height, -viewOff, 0, r.width, r.height);
+    else if (camera.view && camera.view.enabled) camera.clearViewOffset();
+    // etiketler
     TAGS.forEach(t => {
       const v = t.at.clone().project(camera);
       t.el.style.transform = `translate(${(v.x + 1) / 2 * r.width}px, ${(1 - v.y) / 2 * r.height}px) translate(-50%, -100%)`;
@@ -1073,6 +1136,7 @@ async function init() {
     // giriş yazısı çekilmiş, oda ekranı dolduruyor (turun başı)
     const total = tourEl.offsetHeight - tourEl.firstElementChild.offsetHeight;
     jump(innerWidth > 900 && total > 10 ? tourEl.offsetTop + total * 0.07 + 2 : scrollY + frame.getBoundingClientRect().top - 72);
+    exitFree();
     const me = reel = { stop: false, music: false };
     busy = true; capIdx = -1;
     frame.classList.add("reeling");

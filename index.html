@@ -372,7 +372,6 @@
     .touring .tag3d, .touring .room-hint, .touring .scroll-hint, .zoomed .tag3d, .zoomed .room-hint, .zoomed .scroll-hint, .zoomed .tour-cap { opacity: 0 !important; transition: opacity .3s; }
 
     /* ---------- BOOT ---------- */
-    html.booting { overflow: hidden; }
     .boot {
       position: fixed; inset: 0; z-index: 300; display: grid; place-items: center; padding: 16px;
       background: radial-gradient(800px 500px at 50% 40%, #15123a, var(--bg));
@@ -393,6 +392,11 @@
     .boot-actions[hidden] { display: none; }
     .boot-actions .btn { flex: 1; justify-content: center; min-width: 180px; cursor: pointer; }
     .boot-hint { padding: 0 20px 16px; font: 11px var(--mono); color: var(--dim); }
+    @media (max-height: 560px) {  /* yatay telefon: açılış ekranı sığsın */
+      .boot { overflow-y: auto; place-items: start center; padding-block: 12px; }
+      .boot-log { min-height: 0; font-size: 11px; line-height: 1.55; padding: 10px 14px 4px; max-height: 42vh; overflow: hidden; }
+      .boot-bar2 { padding: 2px 14px 10px; } .boot-actions { padding: 0 14px 12px; gap: 8px; } .boot-actions .btn { padding: 9px 12px; min-width: 140px; } .boot-hint { display: none; }
+    }
 
     /* sound toggle */
     .snd { font: 13px var(--mono); color: var(--muted); background: none; border: 1px solid var(--line); border-radius: 8px; padding: 5px 9px; cursor: pointer; margin-right: 10px; }
@@ -404,8 +408,6 @@
     @keyframes eq { 50% { height: 10px; } }
 
     /* ---------- SCROLL TOUR ---------- */
-    html.webgl .tour { height: calc(100svh - 64px + 460vh); }
-    html.webgl .tour > .hero { position: sticky; top: 64px; }
     .tour-cap {
       position: absolute; left: clamp(16px, 3vw, 40px); bottom: clamp(16px, 4vh, 44px); z-index: 4; max-width: min(520px, 80%);
       pointer-events: none; opacity: 0; transform: translateY(16px); transition: opacity .45s, transform .45s;
@@ -428,22 +430,24 @@
     html.locked { overscroll-behavior: none; }
     .stage {
       position: fixed; inset: 0; z-index: 100;
-      display: grid; place-items: center; padding: 64px 16px 24px;
+      display: grid; place-items: center; grid-template-columns: minmax(0, 1fr); padding: 64px 16px 24px;
       perspective: 1800px;
       background: rgba(5,4,13,0); transition: background .4s, backdrop-filter .4s;
     }
     .stage[hidden] { display: none; }
     .stage.on { background: rgba(5,4,13,.38); }
     .stage-close {
-      position: fixed; top: 14px; right: 16px; z-index: 2;
+      position: fixed; top: 76px; right: 16px; z-index: 2;
       font: 500 13px var(--mono); color: var(--text); cursor: pointer;
       background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 9px 14px;
       opacity: 0; transition: opacity .3s .25s, border-color .2s;
     }
     .stage-close:hover { border-color: var(--cyan); }
+    /* cihaz açıkken üst menü karartmanın üstünde kalır: menüden doğrudan başka bölüme geçilir */
+    html.locked nav { z-index: 120; }
     .stage-close kbd { font: 11px var(--mono); color: var(--dim); border: 1px solid var(--line); border-radius: 4px; padding: 0 5px; margin-left: 6px; }
     .stage.on .stage-close { opacity: 1; }
-    .device { display: flex; flex-direction: column; max-height: calc(100vh - 88px); transform-origin: center; will-change: transform; }
+    .device { display: flex; flex-direction: column; max-width: 100%; min-width: 0; max-height: calc(100vh - 88px); transform-origin: center; will-change: transform; }
     .screen-body { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
     .screen-body::-webkit-scrollbar { width: 8px; } .screen-body::-webkit-scrollbar-thumb { background: var(--line); border-radius: 4px; }
     .screen-body > .wrap { width: auto; margin: 0; padding: 28px clamp(16px, 3vw, 32px); }
@@ -769,7 +773,7 @@
     }
     /* ---------- TAM EKRAN ODA ---------- */
     @media (min-width: 901px) {
-      html.webgl .hero { padding: 0; }
+      html.webgl .hero { padding: 0; min-height: 0; }
       html.webgl .hero > .wrap { width: 100%; position: relative; }
       html.webgl .room-frame:not(.no3d) { position: absolute; inset: 0; border: 0; border-radius: 0; box-shadow: none; }
       html.webgl .room-frame.is-3d::before { content: ""; position: absolute; inset: 0; z-index: 2; pointer-events: none; transition: opacity .5s;
@@ -785,6 +789,14 @@
       html.roam .hero-top { opacity: 0 !important; pointer-events: none; }
       html.roam .hero-top * { pointer-events: none !important; }
     }
+    @media (min-width: 901px) and (max-height: 720px) {  /* kısa dizüstü ekranı: giriş yazısı sığsın */
+      html.webgl .hero-top { top: 18px; }
+      html.webgl .hero .status { margin-bottom: 8px; padding: 4px 10px; }
+      html.webgl .role { margin-top: 8px; }
+      html.webgl .hero-side { margin-top: 10px; } html.webgl .hero-side p { font-size: 14px; margin-bottom: 12px; }
+      html.webgl .hero-top .btn { padding: 9px 13px; font-size: 13px; }
+    }
+    @media (min-width: 901px) and (max-height: 540px) { html.webgl .hero-side p { display: none; } }
     @media (max-width: 900px) {
       html.webgl .room-frame:not(.no3d) { border-radius: 0; border-left: 0; border-right: 0; margin-inline: -16px; }
     }
@@ -793,6 +805,56 @@
       box-shadow: 0 8px 24px -8px rgba(94,234,212,.7); transition: opacity .3s, transform .3s; }
     .free .free-exit { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
     .free .tag3d, .free .scroll-hint, .free .tour-cap { opacity: 0 !important; transition: opacity .3s; }
+
+    /* ---------- KÜÇÜK EKRANLAR: her genişlikte taşma olmasın ---------- */
+    @media (max-width: 600px) {
+      .os-uw .os-icons { left: 12px; right: 12px; top: 14px; grid-auto-flow: row; grid-template-rows: none; grid-template-columns: repeat(auto-fill, minmax(76px, 1fr)); }
+      .mp { padding: 12px 6px; } .mp-now { flex-direction: column; text-align: center; } .mp-now .w-ctrl { justify-content: center; }
+      .dc-msg { max-width: 94%; }
+      .os-dock { max-width: calc(100% - 16px); gap: 5px; padding: 6px 8px; bottom: 10px; overflow-x: auto; scrollbar-width: none; }
+      .os-dock .app i { width: 34px; height: 34px; border-radius: 10px; font-size: 17px; }
+      .os-dock .app i svg { width: 18px; height: 18px; }
+    }
+    @media (max-width: 420px) {
+      .logo { font-size: 13px; } .logo .cur { width: 6px; height: 13px; }
+      nav .wrap { gap: 8px; }
+      .ai-btn { margin-right: 6px; padding: 4px 8px; } .snd { margin-right: 6px; padding: 4px 7px; }
+      h1 { font-size: clamp(30px, 9.4vw, 40px); }
+      .cta .btn { flex: 1 1 auto; justify-content: center; }
+    }
+    @media (max-height: 560px) {  /* yatay telefon / kısa ekran: cihazlar ekrana sığsın */
+      .stage { padding: 54px 12px 8px; }
+      .imac-screen { height: calc(100dvh - 104px); border-width: 8px; border-bottom-width: 10px; }
+      .imac-chin { height: 22px; } .imac-stand { display: none; }
+      .dev-tablet, .dev-phone { height: calc(100dvh - 64px); }
+      .dev-tablet { padding: 10px; border-radius: 24px; }
+      .dev-watch:not(.embed) { width: min(300px, calc(100dvh - 72px)); height: min(300px, calc(100dvh - 72px)); }
+      .dc-chips { padding-bottom: 6px; } .dc-intro { display: none; }
+    }
+    @media (max-width: 360px) {
+      #navTime { display: none; }
+      .snd .bars { display: none; }
+    }
+
+    /* ---------- ODADA GEZİNME YARDIMI ---------- */
+    #room3d { touch-action: none; }
+    .roam-q { position: absolute; right: 16px; bottom: 16px; z-index: 6; width: 34px; height: 34px; border-radius: 50%; display: none;
+      font: 700 15px var(--mono); color: var(--text); background: rgba(11,10,26,.75); border: 1px solid var(--line); cursor: pointer; backdrop-filter: blur(6px); }
+    .is-3d .roam-q { display: block; }
+    .roam-q:hover, .roam-q[aria-expanded="true"] { color: #15132e; background: var(--cyan); border-color: var(--cyan); }
+    .zoomed .roam-q, .reeling .roam-q { opacity: 0; pointer-events: none; }
+    .roam-help { position: absolute; z-index: 7; left: 50%; top: 50%; width: min(420px, calc(100% - 24px)); max-height: calc(100% - 24px); overflow: auto;
+      transform: translate(-50%, -46%) scale(.96); opacity: 0; pointer-events: none; transition: opacity .35s, transform .35s;
+      background: rgba(15,13,36,.94); border: 1px solid var(--line); border-radius: 18px; padding: 20px; box-shadow: 0 30px 80px -20px rgba(0,0,0,.7); backdrop-filter: blur(12px); }
+    .roam-help.show { opacity: 1; transform: translate(-50%, -50%); pointer-events: auto; }
+    .roam-help > b { display: block; font-size: 18px; margin-bottom: 12px; }
+    .roam-help ul { list-style: none; margin: 0 0 16px; padding: 0; display: grid; gap: 10px; }
+    .roam-help li { display: grid; grid-template-columns: 28px auto 1fr; gap: 10px; align-items: center; font-size: 14px; }
+    .roam-help li span { font-size: 18px; text-align: center; }
+    .roam-help kbd { font: 12px var(--mono); color: var(--cyan); background: rgba(94,234,212,.08); border: 1px solid rgba(94,234,212,.3); border-radius: 6px; padding: 3px 8px; white-space: nowrap; }
+    .roam-help em { font-style: normal; color: var(--muted); }
+    .rh-acts { display: flex; flex-wrap: wrap; gap: 10px; } .rh-acts .btn { flex: 1 1 auto; justify-content: center; cursor: pointer; padding: 10px 14px; }
+    @media (max-width: 420px) { .roam-help { padding: 16px; } .roam-help li { grid-template-columns: 24px 1fr; } .roam-help li em { grid-column: 2; } }
 
     /* ---------- 2. DALGA ---------- */
     .stat .k { display: block; font: 11px var(--mono); letter-spacing: .14em; color: var(--muted); margin-bottom: 12px; }
@@ -866,19 +928,6 @@
 </head>
 <body>
 
-<div class="boot" id="boot" role="dialog" aria-modal="true" aria-label="Açılış">
-  <div class="boot-win">
-    <div class="win-bar"><i></i><i></i><i></i><span>PowerShell — C:\dev\ahmet</span></div>
-    <pre class="boot-log" id="bootLog" aria-live="polite"></pre>
-    <div class="boot-bar2"><span id="bootPct">0%</span><div><b id="bootFill"></b></div></div>
-    <div class="boot-actions" id="bootActions" hidden>
-      <button type="button" class="btn btn-primary" id="bootSound">🔊 Sesle gir</button>
-      <button type="button" class="btn btn-ghost" id="bootMute">🔇 Sessiz gir</button>
-    </div>
-    <div class="boot-hint">Enter: sesle gir · Esc: sessiz gir</div>
-  </div>
-</div>
-
 <nav>
   <div class="wrap">
     <a href="#top" class="logo"><span class="u">ahmet</span>@<span class="h">dev-room</span>:<span class="p">~</span>$<span class="cur"></span></a>
@@ -917,12 +966,12 @@
     </div>
 
     <!-- THE ROOM -->
-    <div class="room-frame" id="room">
+    <div class="room-frame" id="room" data-lenis-prevent>
       <div class="room-hint">✨ Bilgisayara, tablete veya telefona tıklayarak keşfedebilirsiniz</div>
       <div class="bubble" id="bubble"></div>
       <a class="gh-tick" id="ghTick" href="https://github.com/ahmetbolukoglu" target="_blank" rel="noopener" hidden><i></i><span></span></a>
       <div class="tour-cap" id="tourCap" aria-live="polite"></div>
-      <div class="scroll-hint">kaydır, odayı gez <i>↓</i></div>
+      <button type="button" class="roam-q" id="roamQ" aria-label="Odada nasıl gezinilir?" aria-expanded="false">?</button>
       <canvas id="room3d" aria-label="3D yazılımcı odası: bilgisayar, tablet ve telefona tıklayarak içeriği açabilirsiniz"></canvas>
       <div class="room-loader" id="roomLoader">🍵 çay demleniyor <b>0%</b></div>
       <svg viewBox="0 0 1600 1000" role="img" aria-label="Gece, İstanbul manzaralı bir yazılımcı odası: masa, iki monitör, lamba, çay bardağı, kitaplık ve neon tabela">
@@ -1462,14 +1511,9 @@
   const sfx = (name, ...a) => window.Sfx && Sfx.play(name, ...a);
 
   // ---------- BOOT: "dotnet run" açılışı + sesle/sessiz gir ----------
-  // js/room3d.js modeli yükledikçe Boot.progress, sahne hazır olunca Boot.ready çağırır
+  // js/room3d.js model yüklenince Boot.ready çağırır; açılış terminali bilgisayarın ekranında akar (Boot.LINES)
+  // ses varsayılan açık (tarayıcı ilk dokunuşta başlatır); üst menüden kapatılırsa tercih hatırlanır
   window.Boot = (function () {
-    const el = $("#boot"), log = $("#bootLog"), pct = $("#bootPct"), fill = $("#bootFill"), actions = $("#bootActions");
-    let ready = false, progress = 0, done = false;
-    const api = { entered: false, progress(p) { progress = Math.max(progress, p); }, ready() { ready = true; progress = 1; } };
-    let seen = false;
-    try { seen = sessionStorage.getItem("devroom-booted") === "1"; } catch {}
-    const fast = reduceMotion || seen;
     const LINES = [
       ["c", "PS C:\\dev\\ahmet> dotnet run --project DevRoom.csproj -c Release"],
       ["", "  Determining projects to restore..."],
@@ -1478,60 +1522,23 @@
       ["ok", "info: Redis[0]      Cache ısıtıldı (hit %98.7)"],
       ["ok", "info: Grpc[0]       6 servis ayakta"],
       ["ok", "info: EventBus[0]   Pub/Sub kanalları bağlandı"],
-      ["gate", "info: Blender[0]    room.glb yükleniyor"],
+      ["ok", "info: Blender[0]    room.glb yüklendi  ████████████████  ✓"],
       ["ok", "info: Tea[0]        Çay demlendi 🍵"],
       ["s", "Build succeeded.    0 Warning(s)    0 Error(s)"],
       ["i", "Now listening on: https://ahmetbolukoglu.github.io"],
     ];
-    const wait = ms => new Promise(r => setTimeout(r, fast ? Math.min(ms, 25) : ms));
-    function line(cls, txt) {
-      const s = document.createElement("span");
-      if (cls) s.className = cls;
-      s.textContent = txt + "\n"; log.appendChild(s); return s;
-    }
-    async function run() {
-      if (!el) return;
-      document.documentElement.classList.add("booting");
-      const start = performance.now();
-      for (const [cls, txt] of LINES) {
-        if (cls === "gate") {
-          const s = line("a", txt + "  " + "░".repeat(20));
-          while (!ready && performance.now() - start < 20000) {
-            const n = Math.round(progress * 20);
-            s.textContent = `${txt}  ${"█".repeat(n)}${"░".repeat(20 - n)}  ${Math.round(progress * 100)}%\n`;
-            pct.textContent = Math.round(progress * 100) + "%"; fill.style.width = progress * 100 + "%";
-            await new Promise(r => setTimeout(r, 80));
-          }
-          s.textContent = `${txt}  ${"█".repeat(20)}  ✓\n`; s.className = "ok";
-          pct.textContent = "100%"; fill.style.width = "100%";
-          continue;
-        }
-        line(cls === "c" ? "c" : cls, txt);
-        await wait(cls === "c" ? 420 : 140 + Math.random() * 120);
-      }
-      actions.hidden = false;
-      $("#bootSound").focus({ preventScroll: true });
-      try { sessionStorage.setItem("devroom-booted", "1"); } catch {}
-    }
-    function enter(sound) {
-      if (done || actions.hidden) return;
-      done = true;
-      Sfx.set(sound);
-      if (sound) Sfx.play("chime");
-      el.classList.add("out");
-      document.documentElement.classList.remove("booting");
-      api.entered = true;
-      dispatchEvent(new Event("devroom:enter"));
-      setTimeout(() => { el.hidden = true; }, reduceMotion ? 0 : 950);
-    }
-    $("#bootSound").addEventListener("click", () => enter(true));
-    $("#bootMute").addEventListener("click", () => enter(false));
-    addEventListener("keydown", e => {
-      if (done || actions.hidden) return;
-      if (e.key === "Enter") { e.preventDefault(); enter(true); }
-      else if (e.key === "Escape") { e.preventDefault(); enter(false); }
-    });
-    run();
+    const api = {
+      entered: false, LINES,
+      progress() {},
+      ready() {
+        if (api.entered) return;
+        api.entered = true;
+        let sound = true;
+        try { sound = localStorage.getItem("devroom-sound") !== "0"; } catch {}
+        Sfx.set(sound);
+        dispatchEvent(new Event("devroom:enter"));
+      },
+    };
     return api;
   })();
 

@@ -400,7 +400,9 @@ const CC = { k: "#ff7b72", t: "#79c0ff", s: "#a5d6ff", f: "#d2a8ff", c: "#8b949e
 
 function imacScreen() {
   let fi = 0, li = 0, ci = 0;
+  const st = { boot: null };  // açılış satırları (tex.boot)
   const tex = canvasTex(2048, 582, (g, W, h) => {
+    if (st.boot) return bootPane(g, W, h, st.boot);  // açılış: ortada terminal (kamera ekranın içinden bakar)
     const w = 1024;  // sol yarı: editör; sağ yarı: tarayıcıda site
     browserPane(g, 1024, 0, 1024, h);
     g.fillStyle = "#0d1117"; g.fillRect(0, 0, w, h);
@@ -423,6 +425,7 @@ function imacScreen() {
     if (Math.floor(performance.now() / 500) % 2) { g.fillStyle = "#5eead4"; g.fillRect(80, 96 + li * 46 - 22, 12, 28); }
   });
   tex.step = () => {
+    if (st.boot) return tex.redraw();
     const f = CODE[fi];
     if (li >= f.lines.length) { li = 0; ci = 0; fi = (fi + 1) % CODE.length; }
     else {
@@ -431,7 +434,22 @@ function imacScreen() {
     }
     tex.redraw();
   };
+  Object.defineProperty(tex, "boot", { get: () => st.boot, set: v => { st.boot = v; } });
   return tex;
+}
+
+// açılış terminali: ekranın ortasında (giriş kamerası ekranın orta kısmına bakar)
+const BOOT_C = { c: "#f1f5f9", ok: "#86efac", i: "#7dd3fc", s: "#5eead4", a: "#fbbf24", "": "#94a3b8" };
+function bootPane(g, W, h, lines) {
+  g.fillStyle = "#05060c"; g.fillRect(0, 0, W, h);
+  const x0 = 590, x1 = W - 590, y0 = 70;
+  g.fillStyle = "#0c0c18"; g.beginPath(); g.roundRect(x0, y0, x1 - x0, h - y0 - 50, 14); g.fill();
+  g.fillStyle = "#171630"; g.beginPath(); g.roundRect(x0, y0, x1 - x0, 40, [14, 14, 0, 0]); g.fill();
+  [["#ff5f57", 22], ["#febc2e", 46], ["#28c840", 70]].forEach(([c, dx]) => { g.fillStyle = c; g.beginPath(); g.arc(x0 + dx, y0 + 20, 7, 0, 7); g.fill(); });
+  g.fillStyle = "#8b949e"; g.font = "18px JetBrains Mono, monospace"; g.textAlign = "center"; g.fillText("ahmet@dev-room — dotnet run", (x0 + x1) / 2, y0 + 26);
+  g.textAlign = "left"; g.font = "19px JetBrains Mono, monospace";
+  lines.forEach(([cls, txt], i) => { g.fillStyle = BOOT_C[cls] ?? BOOT_C[""]; g.font = (cls === "s" ? "700 " : "") + "19px JetBrains Mono, monospace"; g.fillText(txt, x0 + 24, y0 + 74 + i * 30); });
+  if (Math.floor(performance.now() / 400) % 2) { g.fillStyle = "#5eead4"; g.fillRect(x0 + 24, y0 + 56 + lines.length * 30, 11, 22); }
 }
 
 function browserPane(g, x0, y0, w, h) {
@@ -940,11 +958,11 @@ async function init() {
     else if (n === "Neon") { sfx("click"); say(p, "🍵 çay · kod · tekrar"); }
   }
 
-  // serbest gezinme: sürükle = etrafına bak, WASD = yürü (Q/E alçal/yüksel); sayfayı kaydırınca tura döner
+  // odada gezinme: sürükle = etrafına bak, tekerlek / iki parmak = ileri-geri, WASD = yürü (Q/E alçal/yüksel)
   const free = { on: false, pos: new THREE.Vector3(), yaw: 0, pitch: 0, keys: new Set() };
   const lookDir = () => new THREE.Vector3(Math.sin(free.yaw) * Math.cos(free.pitch), Math.sin(free.pitch), -Math.cos(free.yaw) * Math.cos(free.pitch));
   const exitBtn = document.createElement("button");
-  exitBtn.type = "button"; exitBtn.className = "free-exit"; exitBtn.textContent = "↺ tura dön";
+  exitBtn.type = "button"; exitBtn.className = "free-exit"; exitBtn.textContent = "↺ başa dön";
   frame.appendChild(exitBtn);
   function enterFree() {
     if (free.on) return;
@@ -952,6 +970,7 @@ async function init() {
     free.yaw = Math.atan2(d.x, -d.z); free.pitch = Math.asin(THREE.MathUtils.clamp(d.y, -1, 1));
     free.pos.copy(camera.position); free.on = true;
     frame.classList.add("free"); document.documentElement.classList.add("roam");
+    hideHelp();
   }
   function exitFree() {
     if (!free.on) return;
@@ -959,40 +978,85 @@ async function init() {
     frame.classList.remove("free"); document.documentElement.classList.remove("roam");
   }
   exitBtn.addEventListener("click", () => { sfx("whooshOut"); exitFree(); });
-  let mouse = { x: 0, y: 0 }, drag = null, dragged = false;
-  canvas.addEventListener("pointerdown", e => { if (e.pointerType === "mouse" && e.button === 0) { drag = { x: e.clientX, y: e.clientY }; dragged = false; } });
-  addEventListener("pointerup", () => { drag = null; canvas.style.cursor = hover ? "pointer" : ""; });
+  const canRoam = () => !busy && stage.hidden && !reel;
+  let mouse = { x: 0, y: 0 }, dragged = false, pinch = 0;
+  const ptrs = new Map();                                              // basılı parmaklar / fare: id → {x, y, x0, y0}
+  canvas.addEventListener("pointerdown", e => {
+    if (e.pointerType === "mouse" && e.button !== 0) return;
+    ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY, x0: e.clientX, y0: e.clientY });
+    if (e.pointerType !== "mouse") canvas.setPointerCapture(e.pointerId);
+    if (ptrs.size === 1) dragged = false;
+    pinch = 0;
+  });
+  const release = e => { ptrs.delete(e.pointerId); pinch = 0; if (!ptrs.size) canvas.style.cursor = hover ? "pointer" : ""; };
+  addEventListener("pointerup", release); addEventListener("pointercancel", release);
   canvas.addEventListener("pointermove", e => {
     const r = canvas.getBoundingClientRect();
     mouse = { x: (e.clientX - r.left) / r.width - 0.5, y: (e.clientY - r.top) / r.height - 0.5 };
     tip.style.transform = `translate(${e.clientX - r.left + 16}px, ${e.clientY - r.top + 16}px)`;
-    if (drag && (e.buttons & 1) && !busy && stage.hidden && !reel) {
-      if (!dragged && Math.hypot(e.clientX - drag.x, e.clientY - drag.y) < 6) return;
+    const p = ptrs.get(e.pointerId);
+    if (p && canRoam()) {
+      const dx = e.clientX - p.x, dy = e.clientY - p.y;
+      p.x = e.clientX; p.y = e.clientY;
+      if (ptrs.size === 2) {                                           // iki parmak: açınca ileri, kıstırınca geri
+        const [a, b] = [...ptrs.values()], dist = Math.hypot(a.x - b.x, a.y - b.y);
+        if (pinch) { enterFree(); free.pos.addScaledVector(lookDir(), (dist - pinch) * 0.004); }
+        pinch = dist; dragged = true;
+        return;
+      }
+      if (!dragged && Math.hypot(e.clientX - p.x0, e.clientY - p.y0) < 6) return;
       dragged = true; enterFree(); setHover(null);
       canvas.style.cursor = "grabbing";
-      free.yaw -= e.movementX * 0.0032;                                   // dünyayı tutup çevir
-      free.pitch = THREE.MathUtils.clamp(free.pitch + e.movementY * 0.0032, -1.25, 1.25);
+      const k = e.pointerType === "mouse" ? 0.0032 : 0.0045;
+      free.yaw -= dx * k;                                              // dünyayı tutup çevir
+      free.pitch = THREE.MathUtils.clamp(free.pitch + dy * k, -1.25, 1.25);
       return;
     }
     if (e.pointerType === "mouse") setHover(pick(e));
   });
   canvas.addEventListener("pointerleave", () => { setHover(null); mouse = { x: 0, y: 0 }; });
   canvas.addEventListener("click", e => { if (dragged) { dragged = false; return; } act(pick(e)); });
+  canvas.addEventListener("wheel", e => {                              // tekerlek: baktığın yöne ilerle / geri çekil
+    if (!canRoam() || e.ctrlKey) return;
+    e.preventDefault(); enterFree();
+    free.pos.addScaledVector(lookDir(), -THREE.MathUtils.clamp(e.deltaY, -120, 120) * 0.0022);
+  }, { passive: false });
   const MOVE = { w: "w", a: "a", s: "s", d: "d", q: "q", e: "e", arrowup: "w", arrowdown: "s", arrowleft: "a", arrowright: "d" };
   addEventListener("keydown", e => {
     const k = MOVE[e.key.toLowerCase()];
-    if (!k || e.ctrlKey || e.metaKey || e.altKey || !visible || !stage.hidden || reel || busy) return;
+    if (!k || e.ctrlKey || e.metaKey || e.altKey || !visible || !canRoam()) return;
     if (e.target.closest?.("input, textarea, [contenteditable]")) return;
-    if (k !== e.key.toLowerCase() && !free.on) return;                   // oklar yalnız gezinirken (yoksa sayfa kayar)
     e.preventDefault(); enterFree(); free.keys.add(k);
   });
   addEventListener("keyup", e => { const k = MOVE[e.key.toLowerCase()]; if (k) free.keys.delete(k); });
   addEventListener("blur", () => free.keys.clear());
   Devices.onOpen(() => exitFree());
-  if (matchMedia("(pointer: fine)").matches) {
-    const hint = frame.querySelector(".room-hint");
-    if (hint) hint.textContent = "🖱️ sürükle: etrafına bak · WASD: yürü · tıkla: keşfet";
+
+  // nasıl gezinilir: ilk girişte kart, sonra köşedeki "?" ile tekrar açılır
+  const fine = matchMedia("(pointer: fine)").matches;
+  const hint = frame.querySelector(".room-hint");
+  if (hint) hint.textContent = fine ? "🖱️ sürükle: bak · tekerlek / WASD: yürü · tıkla: keşfet" : "👆 sürükle: bak · iki parmak: yaklaş · dokun: keşfet";
+  const help = document.createElement("div");
+  help.className = "roam-help"; help.setAttribute("role", "dialog"); help.setAttribute("aria-label", "Odada nasıl gezinilir");
+  const ROWS = fine
+    ? [["🖱️", "Sürükle", "etrafına bak"], ["🖲️", "Tekerlek", "ileri / geri git"], ["⌨️", "W A S D", "odada yürü (Q / E: alçal, yüksel)"], ["👆", "Tıkla", "bilgisayar, telefon, saat, çekmece… keşfet"]]
+    : [["👆", "Sürükle", "etrafına bak"], ["🤏", "İki parmak", "açınca yaklaş, kıstırınca uzaklaş"], ["✨", "Dokun", "bilgisayar, telefon, saat, çekmece… keşfet"]];
+  help.innerHTML = `<b>🧭 Odanın içinde gezinebilirsin</b>
+    <ul>${ROWS.map(([i, k, t]) => `<li><span>${i}</span><kbd>${k}</kbd><em>${t}</em></li>`).join("")}</ul>
+    <div class="rh-acts"><button type="button" class="btn btn-primary rh-ok">Anladım, gezeyim</button><button type="button" class="btn btn-ghost rh-reel">▶ Önce odayı izle</button></div>`;
+  frame.appendChild(help);
+  const qBtn = document.getElementById("roamQ");
+  function showHelp() { help.classList.add("show"); qBtn?.setAttribute("aria-expanded", "true"); }
+  function hideHelp() {
+    if (!help.classList.contains("show")) return;
+    help.classList.remove("show"); qBtn?.setAttribute("aria-expanded", "false");
+    try { localStorage.setItem("devroom-roam-help", "1"); } catch {}
   }
+  help.querySelector(".rh-ok").addEventListener("click", () => { sfx("tick"); hideHelp(); });
+  help.querySelector(".rh-reel").addEventListener("click", () => { hideHelp(); showreel(); });
+  qBtn?.addEventListener("click", () => { sfx("tick"); help.classList.contains("show") ? hideHelp() : showHelp(); });
+  addEventListener("keydown", e => { if (e.key === "Escape") hideHelp(); });
+  const firstHelp = () => { let seen = false; try { seen = localStorage.getItem("devroom-roam-help") === "1"; } catch {} if (!seen) setTimeout(showHelp, reduceMotion ? 300 : 2800); };
 
   // ---------------------------------------------------------------- boyut, döngü
   function resize() {
@@ -1183,7 +1247,20 @@ async function init() {
   busy = true;
   requestAnimationFrame(frameLoop);
   // açılış: "Sesle/Sessiz gir" seçilince kamera ekranın içinden odaya geri çekilir
-  const intro = async () => { await flyTo(base.pos, base.look, reduceMotion ? 0 : 2400); busy = false; setTimeout(ferry, 15000); ferryLoop(); };
+  // açılış: kamera ekranın içindeyken "dotnet run" satırları akar, sonra odaya geri çekilir
+  async function bootScreen() {
+    const T = screenTex.W_Screen_iMac, lines = (window.Boot && window.Boot.LINES) || [];
+    T.boot = [];
+    for (const ln of lines) {
+      T.boot.push(ln); T.redraw();
+      sfx("key", 0.5);
+      await new Promise(r => setTimeout(r, reduceMotion ? 0 : ln[0] === "c" ? 420 : 120 + Math.random() * 90));
+    }
+    sfx("chime");
+    await new Promise(r => setTimeout(r, reduceMotion ? 0 : 650));
+    T.boot = null; T.redraw();
+  }
+  const intro = async () => { await bootScreen(); firstHelp(); await flyTo(base.pos, base.look, reduceMotion ? 0 : 2400); busy = false; setTimeout(ferry, 15000); ferryLoop(); };
   if (boot.entered) intro(); else addEventListener("devroom:enter", intro, { once: true });
   boot.ready();
 }

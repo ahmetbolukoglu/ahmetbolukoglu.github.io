@@ -213,11 +213,19 @@ window.Sfx = (function () {
     set(v) {
       on = !!v;
       try { localStorage.setItem("devroom-sound", on ? "1" : "0"); } catch {}
-      if (on) { init(); if (!ctx) { on = false; return; } ctx.resume(); } else if (ctx) stopMusic();
+      if (on) {
+        init(); if (!ctx) { on = false; return; }
+        ctx.resume();
+        if (ctx.state !== "running") {  // tarayıcı sesi ilk kullanıcı etkileşimine kadar bekletir
+          const EV = ["pointerdown", "keydown", "touchstart"];
+          const unlock = () => { ctx.resume(); EV.forEach(t => removeEventListener(t, unlock, true)); };
+          EV.forEach(t => addEventListener(t, unlock, true));
+        }
+      } else if (ctx) stopMusic();
       listeners.forEach(fn => fn(on));
     },
     onChange(fn) { listeners.push(fn); },
-    play(name, ...a) { if (on && ctx && S[name]) S[name](...a); },
+    play(name, ...a) { if (on && ctx && ctx.state === "running" && S[name]) S[name](...a); },
     preferred() { try { return localStorage.getItem("devroom-sound") === "1"; } catch { return false; } },
     music: {
       get playing() { return music.playing; },

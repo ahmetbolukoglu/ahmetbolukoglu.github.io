@@ -58,6 +58,7 @@ const MATS = {
   W_MonBack: { color: "#2a2c31", roughness: 0.45 },
   W_Cat: { color: "#8f949b", roughness: 0.95 }, W_CatDark: { color: "#5c6067", roughness: 0.95 },
   W_Printer: { color: "#1c1d21", roughness: 0.5 }, W_PrinterLCD: { color: "#60a5fa", emissive: "#60a5fa", emissiveIntensity: 1.2 },
+  W_Poster: { color: "#ffffff", roughness: 0.6, emissive: "#ffffff", emissiveIntensity: 0.32 },  // karanlıkta da okunsun
   W_LampWarm: { color: "#ffd9a0", emissive: "#ffd9a0", emissiveIntensity: 3 }, W_CatWhite: { color: "#f5efe6", roughness: 0.95 },
 };
 // raftaki kitaplar: her biri bir yetenek alanı (tıklanınca masaüstünde o kategori açılır)
@@ -561,15 +562,12 @@ function watchScreen() {
 
 // Mafia Gun posteri: kara film havası, kırmızı ışık, fötr şapkalı silüet ve makineli tüfek
 function posterTexture() {
-  const art = new Image();  // oyunun giriş ekranı (theyvoice.com basın kiti); yüklenene kadar çizim yer tutar
-  const tex = canvasTex(600, 830, (g, w, h) => {
-    if (art.complete && art.naturalWidth) {
-      g.drawImage(art, 0, 40, 430, 594, 0, 0, w, h);
-      const fade = g.createLinearGradient(0, h - 120, 0, h); fade.addColorStop(0, "rgba(0,0,0,0)"); fade.addColorStop(1, "rgba(0,0,0,.85)");
-      g.fillStyle = fade; g.fillRect(0, h - 120, w, 120);
-      g.fillStyle = "#facc15"; g.font = "700 26px JetBrains Mono, monospace"; g.textAlign = "center"; g.fillText("BETA · mafiagun.com", w / 2, h - 30);
-      return;
-    }
+  const art = new Image();  // Ahmet'in verdiği poster (1200×1660, tam çözünürlük); yüklenene kadar çizim yer tutar
+  const tex = canvasTex(1200, 1660, (g, W, H) => {
+    g.setTransform(1, 0, 0, 1, 0, 0);
+    if (art.complete && art.naturalWidth) { g.drawImage(art, 0, 0, W, H); return; }
+    g.setTransform(2, 0, 0, 2, 0, 0);
+    const w = 600, h = 830;
     const bg = g.createLinearGradient(0, 0, 0, h); bg.addColorStop(0, "#1a0708"); bg.addColorStop(1, "#050203");
     g.fillStyle = bg; g.fillRect(0, 0, w, h);
     const sp = g.createRadialGradient(w / 2, 300, 20, w / 2, 300, 360); sp.addColorStop(0, "rgba(220,38,38,.55)"); sp.addColorStop(1, "rgba(220,38,38,0)");
@@ -608,7 +606,8 @@ function posterTexture() {
     g.strokeStyle = "rgba(255,255,255,.25)"; g.lineWidth = 2; [[90, 140], [520, 610], [470, 120]].forEach(([x, y]) => { g.beginPath(); g.arc(x, y, 13, 0, 7); g.stroke(); });
   });
   art.onload = () => tex.redraw();
-  art.src = "assets/projects/mafia-gun/01-giris.jpg";
+  art.src = "assets/projects/mafia-gun/poster.webp";
+  tex.anisotropy = 16;  // eğik bakınca da net
   return tex;
 }
 
@@ -698,7 +697,7 @@ async function init() {
   // performans: retina ekranda kenar yumuşatma yerine yüksek çözünürlük; çözünürlük kare süresine göre kendini ayarlar
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: devicePixelRatio < 1.5, powerPreference: "high-performance" });
   const PR_MAX = Math.min(devicePixelRatio, 1.75), PR_MIN = 0.6;
-  let pr = Math.min(PR_MAX, 1.25);
+  let pr = PR_MAX;  // net başlar; yavaşsa kendiliğinden düşer
   renderer.setPixelRatio(pr);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -785,6 +784,7 @@ async function init() {
       if (map && !patterns[map]) patterns[map] = PATTERNS[map]();
       m = new THREE.MeshStandardMaterial({ ...rest, map: printTex[name] || (map ? patterns[map] : null) });
       if (rest.emissive) m.emissive = new THREE.Color(rest.emissive);
+      if (name === "W_Poster") m.emissiveMap = m.map;
       maskShader(m);
       if (name === "W_RGB" || name === "W_KeyGlow" || name === "W_FanBlade") part.name.startsWith("Fan_") ? rainbow(m, RING[part.name[4]], "ring" + part.name[4]) : rainbow(m, WAVE, "wave");
       (partMats[part.name] ||= []).push(m);

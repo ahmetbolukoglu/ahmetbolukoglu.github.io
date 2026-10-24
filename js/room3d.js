@@ -83,7 +83,7 @@ const STOPS = [
   { pos: [-0.95, 0.45, 1.7], look: [-1.4, 5.0, 1.75], n: "01", h: "Üsküdar'dan Boğaz'a", p: "Kız Kulesi'ne bakan bir oda. 10 yılı aşkın süredir kod burada demleniyor." },
   { pos: [0.12, 0.05, 1.12], look: [0.12, 1.3, 1.07], n: "02", h: "49 inç masaüstü", p: ".NET Core, C#, mikroservisler. Ekrana tıkla: README, yetenekler ve terminal." },
   { pos: [-0.42, 0.5, 1.02], look: [-0.35, 1.0, 0.8], n: "03", h: "Çay · kod · tekrar", p: "Performans, ölçeklenebilirlik ve sürdürülebilir kod. Bir de bol çay ve lastik ördek." },
-  { pos: [0.835, 0.02, 1.08], look: [0.835, 0.72, 0.6], n: "04", h: "Projeler", p: "Çekmecede yeni projeler hazırlanıyor. Tıkla, dosyalara göz at: hepsi coming soon.", drawer: true },
+  { pos: [0.835, 0.02, 1.08], look: [0.835, 0.72, 0.6], n: "04", h: "Projeler", p: "Mafia Gun, TheyVoice ve yolda olanlar. Çekmeceye tıkla, proje dosyalarına göz at.", drawer: true },
   { pos: [0.6, 0.35, 1.25], look: [0.92, 1.2, 1.0], n: "05", h: "Kasa ve RGB", p: "TUF GT502, RTX 4090 Suprim, 360 sıvı soğutma ve 10 RGB fan. Derleme hızlı, ışıklar daha hızlı." },
   { pos: [0.78, 0.15, 1.62], look: [1.45, 1.5, 1.58], n: "06", h: "Kitaplık", p: "Yapay zekâ, MCP, Redis, gRPC… Yetenekler rafta dizili." },
   { pos: [-0.45, -0.6, 1.3], look: [-1.95, 0.15, 1.25], n: "07", h: "Oyun molası", p: "65 inç TV ve PS5. Kod bitince bir maç." },
@@ -403,7 +403,10 @@ const CC = { k: "#ff7b72", t: "#79c0ff", s: "#a5d6ff", f: "#d2a8ff", c: "#8b949e
 function imacScreen() {
   let fi = 0, li = 0, ci = 0;
   const st = { boot: null };  // açılış satırları (tex.boot)
-  const tex = canvasTex(2048, 582, (g, W, h) => {
+  // performans: doku 1536 px (her harfte GPU'ya daha az veri gider); çizim 2048 ölçeğinde yapılır
+  const tex = canvasTex(1536, 437, (g) => {
+    g.setTransform(0.75, 0, 0, 0.75, 0, 0);
+    const W = 2048, h = 582;
     if (st.boot) return bootPane(g, W, h, st.boot);  // açılış: ortada terminal (kamera ekranın içinden bakar)
     const w = 1024;  // sol yarı: editör; sağ yarı: tarayıcıda site
     browserPane(g, 1024, 0, 1024, h);
@@ -558,7 +561,15 @@ function watchScreen() {
 
 // Mafia Gun posteri: kara film havası, kırmızı ışık, fötr şapkalı silüet ve makineli tüfek
 function posterTexture() {
-  return canvasTex(600, 830, (g, w, h) => {
+  const art = new Image();  // oyunun giriş ekranı (theyvoice.com basın kiti); yüklenene kadar çizim yer tutar
+  const tex = canvasTex(600, 830, (g, w, h) => {
+    if (art.complete && art.naturalWidth) {
+      g.drawImage(art, 0, 40, 430, 594, 0, 0, w, h);
+      const fade = g.createLinearGradient(0, h - 120, 0, h); fade.addColorStop(0, "rgba(0,0,0,0)"); fade.addColorStop(1, "rgba(0,0,0,.85)");
+      g.fillStyle = fade; g.fillRect(0, h - 120, w, 120);
+      g.fillStyle = "#facc15"; g.font = "700 26px JetBrains Mono, monospace"; g.textAlign = "center"; g.fillText("BETA · mafiagun.com", w / 2, h - 30);
+      return;
+    }
     const bg = g.createLinearGradient(0, 0, 0, h); bg.addColorStop(0, "#1a0708"); bg.addColorStop(1, "#050203");
     g.fillStyle = bg; g.fillRect(0, 0, w, h);
     const sp = g.createRadialGradient(w / 2, 300, 20, w / 2, 300, 360); sp.addColorStop(0, "rgba(220,38,38,.55)"); sp.addColorStop(1, "rgba(220,38,38,0)");
@@ -596,6 +607,9 @@ function posterTexture() {
     g.fillStyle = "#000"; [[90, 140], [520, 610], [470, 120]].forEach(([x, y]) => { g.beginPath(); g.arc(x, y, 9, 0, 7); g.fill(); });  // kurşun delikleri
     g.strokeStyle = "rgba(255,255,255,.25)"; g.lineWidth = 2; [[90, 140], [520, 610], [470, 120]].forEach(([x, y]) => { g.beginPath(); g.arc(x, y, 13, 0, 7); g.stroke(); });
   });
+  art.onload = () => tex.redraw();
+  art.src = "assets/projects/mafia-gun/01-giris.jpg";
+  return tex;
 }
 
 // galeri çerçeveleri: şimdilik boş, coming soon
@@ -681,8 +695,11 @@ function neonTexture() {
 
 async function init() {
   if (!canvas || !webglOK()) { frame?.classList.add("no3d"); boot.ready(); return; }
-  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: "high-performance" });
-  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  // performans: retina ekranda kenar yumuşatma yerine yüksek çözünürlük; çözünürlük kare süresine göre kendini ayarlar
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: devicePixelRatio < 1.5, powerPreference: "high-performance" });
+  const PR_MAX = Math.min(devicePixelRatio, 1.75), PR_MIN = 0.6;
+  let pr = Math.min(PR_MAX, 1.25);
+  renderer.setPixelRatio(pr);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.15;
@@ -956,7 +973,7 @@ async function init() {
       skyState.ferry = t >= 1 ? null : -320 + t * 2700;
       sky.redraw(skyState);
       if (t >= 1) clearInterval(id);
-    }, 90);
+    }, 140);
   }
   const ferryLoop = () => setTimeout(() => { if (!document.hidden) ferry(); ferryLoop(); }, 70000 + Math.random() * 50000);
   function duckHop() {
@@ -1017,7 +1034,7 @@ async function init() {
       say(p, day ? "☀️ Üsküdar'dan Boğaz manzarası" : "🌠 Kız Kulesi manzarası, bir dilek tut");
     } else if (n === "Cert") { sfx("paper"); say(p, "📜 MCPD — 100 puan (2013)"); }
     else if (n === "PC") { sfx("whooshIn"); rgbBoost = 1; say(p, "🖥️ TUF GT502 · RTX 4090 Suprim · 360 sıvı soğutma + 7 fan ⚡"); }
-    else if (n === "Poster") { sfx("paper"); say(p, "🎯 Mafia Gun: yeni oyunum, çok yakında!"); }
+    else if (n === "Poster") { sfx("paper"); say(p, "🎯 Mafia Gun: yeni oyunum, beta'da! Tarayıcıda oyna"); setTimeout(() => Devices.open("archive"), 900); }
     else if (n === "Gallery") { sfx("paper"); say(p, "🖼️ Coming soon: eski oyunlarım ve uygulamalarım burada sergilenecek"); }
     else if (n === "Printer") { sfx("drawer"); say(p, "🖨️ CV yazdırılıyor…"); setTimeout(() => Devices.open("tablet", "cv"), 900); }
     else if (n === "Mouse") { sfx("click"); say(p, "🖱️ MX Master 3: yan tekerlek, sonsuz kaydırma"); }
@@ -1195,19 +1212,34 @@ async function init() {
     frame.classList.toggle("touring", tourS > 0.3 && tourS < stops.length - 1.3);
   }
 
+  // kare süresi ölçülür: yavaşsa çözünürlük düşer (donma olmasın), hızlıysa yavaşça geri çıkar
+  let perfT = 0, perfN = 0, perfSum = 0, fastFor = 0;
+  function adapt(dt) {
+    if (!dt || dt > 0.2) return;
+    perfSum += dt; perfN++; perfT += dt;
+    if (perfT < 1) return;
+    const avg = perfSum / perfN; perfT = perfSum = perfN = 0;
+    let next = pr;
+    if (avg > 0.024 && pr > PR_MIN) { next = Math.max(PR_MIN, pr - 0.2); fastFor = 0; }
+    else if (avg < 0.0145 && pr < PR_MAX) { if (++fastFor >= 3) { next = Math.min(PR_MAX, pr + 0.1); fastFor = 0; } }
+    else fastFor = 0;
+    if (next !== pr) { pr = next; renderer.setPixelRatio(pr); resize(); }
+  }
+
   function frameLoop(now) {
     requestAnimationFrame(frameLoop);
     if (!visible || document.hidden || !stage.hidden) return;
     const dt = Math.min(0.05, (now - last) / 1000); last = now;
+    adapt(dt);
     // saat
     const d = new Date(), s = d.getSeconds() + d.getMilliseconds() / 1000, m = d.getMinutes() + s / 60, hr = (d.getHours() % 12) + m / 60;
     if (parts.ClockSec) { parts.ClockSec.rotation.z = -s / 60 * Math.PI * 2; parts.ClockMin.rotation.z = -m / 60 * Math.PI * 2; parts.ClockHour.rotation.z = -hr / 12 * Math.PI * 2; }
     // ekranlar
-    if (!reduceMotion && now - lastType > 45) { screenTex.W_Screen_iMac.step(); lastType = now; if (Math.random() < 0.3) sfx("key", 0.3); }
+    if (!reduceMotion && now - lastType > 80) { screenTex.W_Screen_iMac.step(); lastType = now; if (Math.random() < 0.3) sfx("key", 0.3); }
     tour();
     if (now % 30000 < 20) screenTex.W_Screen_Phone.redraw();
     if (now - lastWatch > 1000) { screenTex.W_Screen_Watch.redraw(); lastWatch = now; }
-    if (!reduceMotion && now - lastTV > 33) { screenTex.W_Screen_TV.redraw(now); lastTV = now; }
+    if (!reduceMotion && now - lastTV > 90) { screenTex.W_Screen_TV.redraw(now); lastTV = now; }
     if (parts.Cat) {
       catPoke *= 0.94;
       const b = Math.sin(now / 900) * (reduceMotion ? 0 : 1), k = Math.sin(now / 60) * catPoke;

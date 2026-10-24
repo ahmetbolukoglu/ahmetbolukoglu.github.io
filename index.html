@@ -9,6 +9,9 @@
   <meta property="og:description" content="10+ yıllık backend tecrübesi, .NET Core, mikroservisler ve yapay zekâ destekli geliştirme.">
   <meta name="theme-color" content="#0b0a1a">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%230b0a1a'/><text x='50' y='66' font-size='46' text-anchor='middle' fill='%235eead4' font-family='monospace' font-weight='700'>&lt;/&gt;</text></svg>">
+  <!-- performans: 3D model ve three.js sayfa ayrıştırılırken inmeye başlar -->
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="preload" href="models/room.glb" as="fetch" crossorigin>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -18,6 +21,8 @@
       "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"
     } }
   </script>
+  <!-- import map'ten sonra: three.js modülleri erkenden insin -->
+  <link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js" crossorigin>
   <script>
     // WebGL varsa SVG oda hiç görünmesin (3D yüklenene kadar yer tutucu); 3D gelmezse SVG'ye dönülür
     (function () {
@@ -706,7 +711,7 @@
     .fold b { display: block; font: 700 22px/1.1 var(--sans); margin: 4px 0 8px; }
     .fold small { font-size: 11px; opacity: .75; }
     .fold .chips .chip { color: #3b2a14; background: rgba(194,65,12,.1); border-color: rgba(194,65,12,.3); font-size: 10px; }
-    .ar-detail { position: absolute; inset: 0; z-index: 5; display: grid; place-items: center; padding: 20px; overflow-y: auto; background: rgba(15,9,5,.9); perspective: 1400px; }
+    .ar-detail { position: absolute; inset: 0; z-index: 5; display: grid; grid-template-columns: minmax(0, 1fr); place-items: safe center; padding: 20px; overflow-y: auto; background: rgba(15,9,5,.9); perspective: 1400px; }
     .ar-detail[hidden] { display: none; }
     .ar-paper {
       position: relative; width: min(780px, 100%); padding: clamp(22px, 4vw, 44px); border-radius: 6px; color: #2b2118; font-family: var(--mono);
@@ -722,6 +727,17 @@
     .ar-paper .chips .chip { color: #3b2a14; background: rgba(194,65,12,.08); border-color: rgba(194,65,12,.3); }
     .ar-stamp { position: absolute; right: clamp(16px, 4vw, 40px); top: clamp(16px, 4vw, 36px); padding: 6px 12px; border: 3px solid #c2410c; border-radius: 6px; color: #c2410c; font: 700 13px var(--mono); letter-spacing: .12em; transform: rotate(9deg); opacity: .85; animation: stamp .35s .35s both cubic-bezier(.3,1.6,.5,1); }
     @keyframes stamp { from { transform: rotate(9deg) scale(2.2); opacity: 0; } }
+    .ar-live { padding: 3px 8px; border-radius: 6px; background: rgba(94,234,212,.15); color: var(--cyan); }
+    .ar-stamp.live { border-color: #15803d; color: #15803d; }
+    .fold-img { display: block; width: 100%; aspect-ratio: 1200 / 630; object-fit: cover; border-radius: 6px; margin-bottom: 10px; background: #0b0a10; }
+    .fold-img.logo { object-fit: contain; padding: 14px; }
+    .ar-cover { display: block; width: 100%; aspect-ratio: 1200 / 630; object-fit: cover; border-radius: 8px; margin: 0 0 18px; box-shadow: 0 10px 30px rgba(0,0,0,.25); background: #0b0a10; }
+    .ar-cover.logo { object-fit: contain; padding: 30px; aspect-ratio: 3 / 1; }
+    .ar-shots { display: flex; gap: 10px; overflow-x: auto; margin: 18px 0 4px; padding-bottom: 6px; overscroll-behavior: contain; }
+    .ar-shots img { flex: none; height: 220px; aspect-ratio: 430 / 932; object-fit: cover; border-radius: 10px; box-shadow: 0 8px 20px rgba(0,0,0,.25); }
+    .ar-links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+    .ar-links a { font: 600 13px var(--mono); padding: 10px 16px; border-radius: 8px; background: #2b2118; color: #f8f1e1; text-decoration: none; }
+    .ar-links a:first-child { background: #c2410c; }
     .ar-nav { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
     .ar-nav button { font: 13px var(--mono); padding: 9px 14px; border-radius: 8px; border: 1px solid rgba(43,33,24,.25); background: rgba(255,255,255,.5); color: #2b2118; cursor: pointer; }
     .ar-nav button:hover { background: #2b2118; color: #f8f1e1; }
@@ -1500,6 +1516,21 @@
     { cat: "fun", title: "Liderlik & Ürün", icon: "🧭", c: "#fb923c", desc: "Kodun ötesinde",
       items: ["Takım Liderliği", "Proje Yönetimi", "Ürün Geliştirme", "Ürün Yönetimi", "Scrum", "İngilizce (Teknik)"] },
   ];
+  // projeler: yayımladıklarım theyvoice.com'da; en yenisi en üstte. Kalan dosyalar şimdilik coming soon
+  const MG = "assets/projects/mafia-gun/";
+  const PROJECTS = [
+    { name: "Mafia Gun", status: "BETA · v0.1.1", type: "Oyun · gerçek zamanlı 1v1 kart ve kule savaşı", release: "24 Ekim 2026", platforms: "Web · Android · iOS",
+      desc: "Mafya temalı, gerçek zamanlı 1v1 kart ve kule savaşı. 8 kartlık desteni kur, Nakit'ini doğru anda harca, birliklerini köprülerden geçirip rakibin kulelerini yık. Aile kur, haftalık Aile Savaşı'nda İstanbul'un semtlerini ele geçir; Rulet, Şanslı Kasa ve Sezon Bileti ödülleri. Tarayıcıda oynanır, indirme gerekmez.",
+      tech: ["Çevrimiçi 1v1", "Sunucu doğrulamalı maçlar", "3D modellenmiş karakterler", "Tarayıcıda oynanır (PWA)", "Google ile giriş", "Aile & sıralama"],
+      cover: MG + "cover.jpg", shots: ["01-giris", "03-savas", "06-sehir", "05-deste", "18-aile-savasi", "04-lobi"].map(s => MG + s + ".jpg"),
+      links: [["▶ Web'de oyna", "https://mafiagun.com/"], ["TheyVoice sayfası", "https://theyvoice.com/games/mafia-gun"]] },
+    { name: "TheyVoice", status: "Yayında", type: "Bağımsız oyun & uygulama stüdyosu · web sitesi", release: "2026", platforms: "Web",
+      desc: "Oyunlarımı ve uygulamalarımı yayımladığım stüdyo sitesi: oyun sayfaları, haberler, yama notları ve basın kiti. Her güncelleme topluluktan gelen geri bildirimle şekilleniyor.",
+      tech: ["Next.js", "Haberler & yama notları", "Basın kiti", "TR / EN"],
+      cover: "assets/projects/theyvoice/logo.svg", logo: true, shots: [],
+      links: [["theyvoice.com", "https://theyvoice.com/"]] },
+    ...Array.from({ length: 6 }, (_, i) => ({ name: "Proje " + String(i + 3).padStart(2, "0"), soon: true })),
+  ];
   const SERVICES = [
     { icon: "⚙️", t: "Backend & API geliştirme", d: "Kurumsal ölçekte, test edilebilir ve sürdürülebilir .NET Core servisleri.", tech: [".NET Core", "C#", "Web API", "FastEndpoints"] },
     { icon: "🧩", t: "Mikroservis mimarisi", d: "Servis sınırları, gRPC/RPC iletişimi, Event Bus (Pub/Sub) akışları.", tech: ["gRPC", "Event Bus", "PostgreSQL", "MSSQL"] },
@@ -1710,7 +1741,6 @@
     const LABEL = { imac: "Masaüstü", tablet: "CV", phone: "İletişim", archive: "Projeler", watch: "Akıllı saat" };
     const PARTS = { imac: [], tablet: [], phone: [], archive: [], watch: [] };  // ana ekranlı cihazlar bölümleri uygulama açılınca alır
     // projeler: hepsi hazırlanıyor (coming soon); ad, tür ve teknoloji geldikçe buraya yazılır
-    const PROJECTS = Array.from({ length: 8 }, (_, i) => ({ name: "Proje " + String(i + 1).padStart(2, "0"), type: "Yakında", tech: [] }));
     // uygulamalar: sayfa bölümleri cihazın içine taşınır ya da uygulamaya özel ekran çizilir
     const profile = s => `
       <div class="ph-profile">
@@ -1898,12 +1928,12 @@
         </div>`,
       archive: () => `
         <div class="ar-drawer">
-          <div class="ar-head"><span>~/çekmece/<b>projeler</b></span><span>${PROJECTS.length} proje · coming soon</span></div>
+          <div class="ar-head"><span>~/çekmece/<b>projeler</b></span><span lang="en">${PROJECTS.filter(p => !p.soon).length} yayında · ${PROJECTS.filter(p => p.soon).length} coming soon</span></div>
           <div class="ar-list">${PROJECTS.map((p, i) => `
             <button type="button" class="ar-row" data-i="${i}">
               <span class="ar-n">${String(i + 1).padStart(2, "0")}</span>
-              <span class="ar-name">${esc(p.name.toLocaleUpperCase("tr-TR"))}</span>
-              <span class="ar-meta"><span class="ar-soon">coming soon</span></span>
+              <span class="ar-name">${esc(p.name.toUpperCase())}</span>
+              <span class="ar-meta">${p.soon ? '<span class="ar-soon" lang="en">coming soon</span>' : `<span class="ar-live">${esc(p.status)}</span>`}</span>
               <span class="ar-arrow">↗</span>
             </button>`).join("")}
           </div>
@@ -1916,7 +1946,9 @@
     function setupArchive() {
       const box = dev.querySelector(".ar-drawer"), pv = dev.querySelector(".ar-preview"), det = dev.querySelector(".ar-detail");
       let shown = -1;
-      const card = p => `<div class="fold" data-tab="${esc(p.name.toLocaleUpperCase("tr-TR"))}"><small>durum</small><b>Coming soon 🚧</b><small>Detaylar hazırlanıyor</small></div>`;
+      const card = p => p.soon
+        ? `<div class="fold" data-tab="${esc(p.name.toUpperCase())}"><small>durum</small><b>Coming soon 🚧</b><small>Detaylar hazırlanıyor</small></div>`
+        : `<div class="fold" data-tab="${esc(p.name.toUpperCase())}"><img class="fold-img${p.logo ? " logo" : ""}" src="${p.cover}" alt=""><small>${esc(p.status)}</small><b>${esc(p.name)}</b><small>${esc(p.type)}</small></div>`;
       box.addEventListener("pointermove", e => {
         const r = box.getBoundingClientRect(), row = e.target.closest(".ar-row");
         pv.style.left = Math.min(r.width - 150, Math.max(150, e.clientX - r.left + 170)) + "px";
@@ -1931,23 +1963,40 @@
         sfx("paper");
         pv.classList.remove("show");
         det.hidden = false;
-        det.innerHTML = `
+        const nav = `
+            <div class="ar-nav">
+              <button type="button" data-go="back">← çekmeceye dön</button>
+              <button type="button" data-go="${(i - 1 + n) % n}">‹ önceki</button>
+              <button type="button" data-go="${(i + 1) % n}">sonraki ›</button>
+            </div>`;
+        det.innerHTML = p.soon ? `
           <article class="ar-paper">
             <div class="ar-stamp">COMING SOON</div>
             <div class="no">PROJE #${String(i + 1).padStart(2, "0")} / ${String(n).padStart(2, "0")}</div>
-            <h3>${esc(p.name.toLocaleUpperCase("tr-TR"))}</h3>
+            <h3>${esc(p.name.toUpperCase())}</h3>
             <dl class="ar-fields">
               <div><dt>Durum</dt><dd>Hazırlanıyor 🚧</dd></div>
               <div><dt>Tür</dt><dd>—</dd></div>
               <div><dt>Teknolojiler</dt><dd>—</dd></div>
               <div><dt>Yayın</dt><dd>Yakında</dd></div>
             </dl>
-            <p>Bu proje dosyası henüz boş. Detaylar, ekran görüntüleri ve bağlantılar çok yakında burada olacak.</p>
-            <div class="ar-nav">
-              <button type="button" data-go="back">← çekmeceye dön</button>
-              <button type="button" data-go="${(i - 1 + n) % n}">‹ önceki</button>
-              <button type="button" data-go="${(i + 1) % n}">sonraki ›</button>
-            </div>
+            <p>Bu proje dosyası henüz boş. Detaylar, ekran görüntüleri ve bağlantılar çok yakında burada olacak.</p>${nav}
+          </article>` : `
+          <article class="ar-paper">
+            <div class="ar-stamp live">${esc(p.status.split(" · ")[0])}</div>
+            <div class="no">PROJE #${String(i + 1).padStart(2, "0")} / ${String(n).padStart(2, "0")}</div>
+            <h3>${esc(p.name.toUpperCase())}</h3>
+            <img class="ar-cover${p.logo ? " logo" : ""}" src="${p.cover}" alt="${esc(p.name)} kapak görseli" loading="lazy">
+            <dl class="ar-fields">
+              <div><dt>Durum</dt><dd>${esc(p.status)}</dd></div>
+              <div><dt>Tür</dt><dd>${esc(p.type)}</dd></div>
+              <div><dt>Platform</dt><dd>${esc(p.platforms)}</dd></div>
+              <div><dt>Yayın</dt><dd>${esc(p.release)}</dd></div>
+            </dl>
+            <p>${esc(p.desc)}</p>
+            <div class="chips">${p.tech.map(t => `<span class="chip">${esc(t)}</span>`).join("")}</div>
+            ${p.shots.length ? `<div class="ar-shots">${p.shots.map(s => `<img src="${s}" alt="${esc(p.name)} ekran görüntüsü" loading="lazy">`).join("")}</div>` : ""}
+            <div class="ar-links">${p.links.map(([l, u]) => `<a href="${u}" target="_blank" rel="noopener">${esc(l)} ↗</a>`).join("")}</div>${nav}
           </article>`;
         det.querySelector("[data-go='back']").focus({ preventScroll: true });
       }
@@ -2161,7 +2210,7 @@
       egitim: () => `🎓 Bilgisayar Programcılığı — İstanbul Üniversitesi MYO · Fatih Üniversitesi (2012–2014)\n🎓 Bilgisayar Programcılığı — Haydarpaşa Endüstri Meslek Lisesi (2008–2012)\n📜 Microsoft Certified Professional Developer — 100 puan (2013)`,
       iletisim: () => `📧 <a href="mailto:${EMAIL}">${EMAIL}</a>`,
       sosyal: () => SOCIALS.map(s => `→ ${s.name}: <a href="${s.url}" target="_blank" rel="noopener">${s.url.replace(/^https?:\/\/(www\.)?/, "")}</a>`).join("\n"),
-      projeler: () => { setTimeout(() => Devices.open("archive"), 300); return `🗂️ Çekmece açılıyor… <span class="c">${PROJECTS.length}</span> proje, hepsi <span class="a">coming soon</span>`; },
+      projeler: () => { setTimeout(() => Devices.open("archive"), 300); return `🗂️ Çekmece açılıyor… <span class="c">Mafia Gun</span> (beta), <span class="c">TheyVoice</span> ve yakında gelecek <span class="a">${PROJECTS.filter(p => p.soon).length}</span> proje`; },
       cay: () => `<span class="a">     ( (\n      ) )\n   ........\n   |      |]\n   \\      /\n    \`----'</span>\nÇay demlendi 🍵 Afiyet olsun!`,
       "sudo ise-al": () => `<span class="p">[sudo] parola gerekmez.</span>\n✔ Harika seçim! Hemen bir mail at: <a href="mailto:${EMAIL}">${EMAIL}</a>`,
       sudo: () => `<span class="p">sudo:</span> ne yapmak istersin? Belki <span class="c">sudo ise-al</span>?`,
@@ -2327,8 +2376,8 @@
         return A(`Evet, <b>yeni projelere açık</b>. Dış kaynak danışmanlık, freelance ya da tam zamanlı rolleri konuşabilir. Kısa bir mail yeter: ${EMAIL}`, [{ label: "✉️ mail at", href: "mailto:" + EMAIL }, open("🛠️ hizmetler", "imac:hizmet")]);
       if (has(q, "hizmet", "ne yapabil", "yardim", "neler yap", "destek ver"))
         return A(SERVICES.map((v, i) => `[${String(i + 1).padStart(2, "0")}] ${v.icon} ${v.t}`).join("\n"), [open("🛠️ hizmetler.md", "imac:hizmet")]);
-      if (has(q, "proje", "portfolyo", "portfoy", "neler yaptin", "is ornek"))
-        return A("Projeler çekmecede hazırlanıyor: hepsi şimdilik <b>coming soon</b> 🚧. İş deneyimindeki projeleri (EnerjiSA güneş santrali, QPay, Ovinot e-SMM…) sorabilirsin.", [open("🗂️ çekmeceyi aç", "archive")]);
+      if (has(q, "proje", "portfolyo", "portfoy", "neler yaptin", "is ornek", "oyun", "mafia", "theyvoice", "studyo"))
+        return A("En yeni projesi <b>Mafia Gun</b> 🎯: mafya temalı, gerçek zamanlı 1v1 kart ve kule savaşı (beta, tarayıcıda oynanır). Oyunlarını ve uygulamalarını <b>TheyVoice</b> stüdyosunda yayımlıyor. Diğer proje dosyaları yakında.", [{ label: "▶ Mafia Gun", href: "https://mafiagun.com/" }, open("🗂️ çekmeceyi aç", "archive")]);
       if (has(q, "egitim", "okul", "universite", "mezun", "lise", "sertifika", "mcpd", "diploma"))
         return A("🎓 Bilgisayar Programcılığı · İstanbul Üniversitesi MYO / Fatih Üniversitesi (2012–2014)\n🎓 Haydarpaşa Endüstri Meslek Lisesi (2008–2012)\n📜 Microsoft Certified Professional Developer: 100 puan (2013)");
       if (has(q, "hobi", "bos zaman", "hali saha", "futbol", "dizi", "film", "oyun", "ps5", "playstation"))

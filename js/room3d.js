@@ -562,7 +562,7 @@ function watchScreen() {
 
 // Mafia Gun posteri: kara film havası, kırmızı ışık, fötr şapkalı silüet ve makineli tüfek
 function posterTexture() {
-  const art = new Image();  // Ahmet'in verdiği poster (1200×1660, tam çözünürlük); yüklenene kadar çizim yer tutar
+  const art = new Image();  // oyunun resmi posteri (mafiagun.com/press, 1200×1660); yüklenene kadar çizim yer tutar
   const tex = canvasTex(1200, 1660, (g, W, H) => {
     g.setTransform(1, 0, 0, 1, 0, 0);
     if (art.complete && art.naturalWidth) { g.drawImage(art, 0, 0, W, H); return; }
@@ -606,7 +606,7 @@ function posterTexture() {
     g.strokeStyle = "rgba(255,255,255,.25)"; g.lineWidth = 2; [[90, 140], [520, 610], [470, 120]].forEach(([x, y]) => { g.beginPath(); g.arc(x, y, 13, 0, 7); g.stroke(); });
   });
   art.onload = () => tex.redraw();
-  art.src = "assets/projects/mafia-gun/poster.webp";
+  art.src = "assets/projects/mafia-gun/poster.jpg";
   tex.anisotropy = 16;  // eğik bakınca da net
   return tex;
 }
@@ -1034,7 +1034,7 @@ async function init() {
       say(p, day ? "☀️ Üsküdar'dan Boğaz manzarası" : "🌠 Kız Kulesi manzarası, bir dilek tut");
     } else if (n === "Cert") { sfx("paper"); say(p, "📜 MCPD — 100 puan (2013)"); }
     else if (n === "PC") { sfx("whooshIn"); rgbBoost = 1; say(p, "🖥️ TUF GT502 · RTX 4090 Suprim · 360 sıvı soğutma + 7 fan ⚡"); }
-    else if (n === "Poster") { sfx("paper"); say(p, "🎯 Mafia Gun: yeni oyunum, beta'da! Tarayıcıda oyna"); setTimeout(() => Devices.open("archive"), 900); }
+    else if (n === "Poster") { sfx("paper"); say(p, "🎯 Mafia Gun: yeni oyunum, şimdi oyna! mafiagun.com"); setTimeout(() => Devices.open("archive"), 900); }
     else if (n === "Gallery") { sfx("paper"); say(p, "🖼️ Coming soon: eski oyunlarım ve uygulamalarım burada sergilenecek"); }
     else if (n === "Printer") { sfx("drawer"); say(p, "🖨️ CV yazdırılıyor…"); setTimeout(() => Devices.open("tablet", "cv"), 900); }
     else if (n === "Mouse") { sfx("click"); say(p, "🖱️ MX Master 3: yan tekerlek, sonsuz kaydırma"); }

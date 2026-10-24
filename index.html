@@ -1519,9 +1519,9 @@
   // projeler: yayımladıklarım theyvoice.com'da; en yenisi en üstte. Kalan dosyalar şimdilik coming soon
   const MG = "assets/projects/mafia-gun/";
   const PROJECTS = [
-    { name: "Mafia Gun", status: "BETA · v0.1.1", type: "Oyun · gerçek zamanlı 1v1 kart ve kule savaşı", release: "24 Ekim 2026", platforms: "Web · Android · iOS",
-      desc: "Mafya temalı, gerçek zamanlı 1v1 kart ve kule savaşı. 8 kartlık desteni kur, Nakit'ini doğru anda harca, birliklerini köprülerden geçirip rakibin kulelerini yık. Aile kur, haftalık Aile Savaşı'nda İstanbul'un semtlerini ele geçir; Rulet, Şanslı Kasa ve Sezon Bileti ödülleri. Tarayıcıda oynanır, indirme gerekmez.",
-      tech: ["Çevrimiçi 1v1", "Sunucu doğrulamalı maçlar", "3D modellenmiş karakterler", "Tarayıcıda oynanır (PWA)", "Google ile giriş", "Aile & sıralama"],
+    { name: "Mafia Gun", status: "Yayında · v0.1.1", type: "Oyun · gerçek zamanlı 1v1 kart ve bina savaşı", release: "24 Ekim 2026", platforms: "Web · Android · iOS",
+      desc: "Mafya temalı, gerçek zamanlı 1v1 kart ve bina savaşı. 8 kartlık desteni kur, Nakit'ini doğru anda harca, birliklerini köprülerden geçirip rakibin Kapo Binaları'nı yık; Baron Binası'nı düşüren maçı kazanır. Aile kur, haftalık Aile Savaşı'nda İstanbul'un semtlerini ele geçir; Rulet, Şanslı Kasa ve Sezon Bileti ödülleri. Tarayıcıda oynanır, indirme gerekmez; ilerlemeni TheyVoice ID ile kaydet.",
+      tech: ["Çevrimiçi 1v1", "Sunucu doğrulamalı maçlar", "3D modellenmiş karakterler", "Tarayıcıda oynanır (PWA)", "TheyVoice ID", "Aile & sıralama"],
       cover: MG + "cover.jpg", shots: ["01-giris", "03-savas", "06-sehir", "05-deste", "18-aile-savasi", "04-lobi"].map(s => MG + s + ".jpg"),
       links: [["▶ Web'de oyna", "https://mafiagun.com/"], ["TheyVoice sayfası", "https://theyvoice.com/games/mafia-gun"]] },
     { name: "TheyVoice", status: "Yayında", type: "Bağımsız oyun & uygulama stüdyosu · web sitesi", release: "2026", platforms: "Web",
@@ -2210,7 +2210,7 @@
       egitim: () => `🎓 Bilgisayar Programcılığı — İstanbul Üniversitesi MYO · Fatih Üniversitesi (2012–2014)\n🎓 Bilgisayar Programcılığı — Haydarpaşa Endüstri Meslek Lisesi (2008–2012)\n📜 Microsoft Certified Professional Developer — 100 puan (2013)`,
       iletisim: () => `📧 <a href="mailto:${EMAIL}">${EMAIL}</a>`,
       sosyal: () => SOCIALS.map(s => `→ ${s.name}: <a href="${s.url}" target="_blank" rel="noopener">${s.url.replace(/^https?:\/\/(www\.)?/, "")}</a>`).join("\n"),
-      projeler: () => { setTimeout(() => Devices.open("archive"), 300); return `🗂️ Çekmece açılıyor… <span class="c">Mafia Gun</span> (beta), <span class="c">TheyVoice</span> ve yakında gelecek <span class="a">${PROJECTS.filter(p => p.soon).length}</span> proje`; },
+      projeler: () => { setTimeout(() => Devices.open("archive"), 300); return `🗂️ Çekmece açılıyor… <span class="c">Mafia Gun</span> (şimdi oyna: mafiagun.com), <span class="c">TheyVoice</span> ve yakında gelecek <span class="a">${PROJECTS.filter(p => p.soon).length}</span> proje`; },
       cay: () => `<span class="a">     ( (\n      ) )\n   ........\n   |      |]\n   \\      /\n    \`----'</span>\nÇay demlendi 🍵 Afiyet olsun!`,
       "sudo ise-al": () => `<span class="p">[sudo] parola gerekmez.</span>\n✔ Harika seçim! Hemen bir mail at: <a href="mailto:${EMAIL}">${EMAIL}</a>`,
       sudo: () => `<span class="p">sudo:</span> ne yapmak istersin? Belki <span class="c">sudo ise-al</span>?`,
@@ -2377,7 +2377,7 @@
       if (has(q, "hizmet", "ne yapabil", "yardim", "neler yap", "destek ver"))
         return A(SERVICES.map((v, i) => `[${String(i + 1).padStart(2, "0")}] ${v.icon} ${v.t}`).join("\n"), [open("🛠️ hizmetler.md", "imac:hizmet")]);
       if (has(q, "proje", "portfolyo", "portfoy", "neler yaptin", "is ornek", "oyun", "mafia", "theyvoice", "studyo"))
-        return A("En yeni projesi <b>Mafia Gun</b> 🎯: mafya temalı, gerçek zamanlı 1v1 kart ve kule savaşı (beta, tarayıcıda oynanır). Oyunlarını ve uygulamalarını <b>TheyVoice</b> stüdyosunda yayımlıyor. Diğer proje dosyaları yakında.", [{ label: "▶ Mafia Gun", href: "https://mafiagun.com/" }, open("🗂️ çekmeceyi aç", "archive")]);
+        return A("En yeni projesi <b>Mafia Gun</b> 🎯: mafya temalı, gerçek zamanlı 1v1 kart ve bina savaşı. Yayında, tarayıcıda oynanır: mafiagun.com. Oyunlarını ve uygulamalarını <b>TheyVoice</b> stüdyosunda yayımlıyor. Diğer proje dosyaları yakında.", [{ label: "▶ Mafia Gun", href: "https://mafiagun.com/" }, open("🗂️ çekmeceyi aç", "archive")]);
       if (has(q, "egitim", "okul", "universite", "mezun", "lise", "sertifika", "mcpd", "diploma"))
         return A("🎓 Bilgisayar Programcılığı · İstanbul Üniversitesi MYO / Fatih Üniversitesi (2012–2014)\n🎓 Haydarpaşa Endüstri Meslek Lisesi (2008–2012)\n📜 Microsoft Certified Professional Developer: 100 puan (2013)");
       if (has(q, "hobi", "bos zaman", "hali saha", "futbol", "dizi", "film", "oyun", "ps5", "playstation"))

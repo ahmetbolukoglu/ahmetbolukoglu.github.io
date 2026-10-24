@@ -836,6 +836,14 @@
       .snd .bars { display: none; }
     }
 
+    /* ---------- KAYDIRMA YOK: tek ekran, kaydırma çubuğu görünmez ---------- */
+    html { scrollbar-width: none; } html::-webkit-scrollbar { display: none; }
+    @media (min-width: 901px) {
+      html.webgl, html.webgl body { overflow: hidden; height: 100%; }
+      html.webgl footer { position: fixed; left: 50%; bottom: 12px; transform: translateX(-50%); z-index: 5; padding: 0; font-size: 11px; opacity: .6; pointer-events: none; white-space: nowrap; }
+      html.webgl footer .wrap { width: auto; }
+    }
+
     /* ---------- ODADA GEZİNME YARDIMI ---------- */
     #room3d { touch-action: none; }
     .roam-q { position: absolute; right: 16px; bottom: 16px; z-index: 6; width: 34px; height: 34px; border-radius: 50%; display: none;

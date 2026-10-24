@@ -56,7 +56,9 @@ const MATS = {
   W_DSLight: { color: "#3b82f6", emissive: "#3b82f6", emissiveIntensity: 3 }, W_LEDAmber: { color: "#f59e0b", emissive: "#f59e0b", emissiveIntensity: 2.5 },
   W_Steel: { color: "#1c1d21", roughness: 0.3, metalness: 0.85 }, W_Cushion: { color: "#121216", roughness: 1 }, W_Elastic: { color: "#22232a", roughness: 0.9 },
   W_MonBack: { color: "#2a2c31", roughness: 0.45 },
-  W_Cat: { color: "#d9822b", roughness: 0.95 }, W_CatDark: { color: "#8a4a14", roughness: 0.95 }, W_CatWhite: { color: "#f5efe6", roughness: 0.95 },
+  W_Cat: { color: "#8f949b", roughness: 0.95 }, W_CatDark: { color: "#5c6067", roughness: 0.95 },
+  W_Printer: { color: "#1c1d21", roughness: 0.5 }, W_PrinterLCD: { color: "#60a5fa", emissive: "#60a5fa", emissiveIntensity: 1.2 },
+  W_LampWarm: { color: "#ffd9a0", emissive: "#ffd9a0", emissiveIntensity: 3 }, W_CatWhite: { color: "#f5efe6", roughness: 0.95 },
 };
 // raftaki kitaplar: her biri bir yetenek alanı (tıklanınca masaüstünde o kategori açılır)
 const BOOKS = {
@@ -88,11 +90,11 @@ const STOPS = [
   { pos: [0.15, -1.5, 1.42], look: [0.18, 1.3, 1.22] },
 ];
 const SCREENS = ["W_Screen_iMac", "W_Screen_Left", "W_Screen_TV", "W_Screen_Phone", "W_Screen_Watch", "W_Cert"];
-const CLICK = ["iMac", "Monitor2", "Phone", "Shelf", "Tea", "Duck", "Ball", "Window", "Cert", "Clock", "Neon", "Drawer", "Keyboard", "PC", "TV", "PS5", "Controllers", "Headphones", "Bottle", "Modem", "Watch", "Chair", "Cat", "Mouse"];
+const CLICK = ["iMac", "Monitor2", "Phone", "Shelf", "Tea", "Duck", "Ball", "Window", "Cert", "Clock", "Neon", "Drawer", "Keyboard", "PC", "TV", "PS5", "Controllers", "Headphones", "Bottle", "Modem", "Watch", "Chair", "Cat", "Mouse", "Poster", "Gallery", "Printer"];
 // imlecin yanında görünen adlar
 const NAMES = { iMac: "49\" masaüstü", Monitor2: "CV · 27\"", Phone: "İletişim · S22", Shelf: "Kitaplık", Tea: "Çay", Duck: "🦆 Ördeğe sor", Ball: "Top", Window: "Boğaz manzarası",
   Cert: "Sertifika", Clock: "Saat", Neon: "Neon", Drawer: "Projeler", Keyboard: "Apex 7 · terminal", PC: "TUF GT502 · RTX 4090", TV: "65\" TV", PS5: "PS5", Controllers: "DualSense ×2",
-  Headphones: "Arctis 7+ · müzik", Bottle: "Su", Modem: "Modem", Watch: "Akıllı saat", Chair: "Koltuk", Cat: "😺 Tekir", Mouse: "MX Master 3" };
+  Headphones: "Arctis 7+ · müzik", Bottle: "Su", Modem: "Modem", Watch: "Akıllı saat", Chair: "Koltuk", Cat: "😺 Alpay", Mouse: "MX Master 3", Poster: "🎯 Mafia Gun", Gallery: "🖼️ yakında", Printer: "🖨️ HP LaserJet · CV yazdır" };
 
 function webglOK() {
   try { const c = document.createElement("canvas"); return !!(c.getContext("webgl2") || c.getContext("webgl")); }
@@ -554,6 +556,70 @@ function watchScreen() {
   return tex;
 }
 
+// Mafia Gun posteri: kara film havası, kırmızı ışık, fötr şapkalı silüet ve makineli tüfek
+function posterTexture() {
+  return canvasTex(600, 830, (g, w, h) => {
+    const bg = g.createLinearGradient(0, 0, 0, h); bg.addColorStop(0, "#1a0708"); bg.addColorStop(1, "#050203");
+    g.fillStyle = bg; g.fillRect(0, 0, w, h);
+    const sp = g.createRadialGradient(w / 2, 300, 20, w / 2, 300, 360); sp.addColorStop(0, "rgba(220,38,38,.55)"); sp.addColorStop(1, "rgba(220,38,38,0)");
+    g.fillStyle = sp; g.fillRect(0, 0, w, h);
+    g.strokeStyle = "rgba(255,255,255,.07)"; g.lineWidth = 1.5;                                 // yağmur
+    for (let i = 0; i < 120; i++) { const x = (i * 97) % w, y = (i * 211) % h; g.beginPath(); g.moveTo(x, y); g.lineTo(x - 6, y + 26); g.stroke(); }
+    g.fillStyle = "#0b0405";                                                                    // şehir silüeti
+    for (let i = 0; i < 14; i++) { const x = i * 46, bh = 90 + (i * 53) % 110; g.fillRect(x, h - 250 - bh, 40, bh + 250); }
+    g.fillStyle = "rgba(251,191,36,.7)";
+    for (let i = 0; i < 40; i++) g.fillRect((i * 67) % w, h - 260 - (i * 29) % 160, 5, 7);
+    // silüet: fötr şapka, palto omuzları
+    g.fillStyle = "#000";
+    g.beginPath(); g.ellipse(w / 2, 238, 120, 22, 0, 0, 7); g.fill();                         // şapka siperi
+    g.beginPath(); g.moveTo(w / 2 - 72, 236); g.quadraticCurveTo(w / 2 - 78, 150, w / 2, 148); g.quadraticCurveTo(w / 2 + 78, 150, w / 2 + 72, 236); g.fill();
+    g.beginPath(); g.ellipse(w / 2, 300, 58, 72, 0, 0, 7); g.fill();                           // baş
+    g.beginPath(); g.moveTo(w / 2 - 60, 340); g.lineTo(w / 2 - 210, 430); g.lineTo(w / 2 - 230, h - 200); g.lineTo(w / 2 + 230, h - 200); g.lineTo(w / 2 + 210, 430); g.lineTo(w / 2 + 60, 340); g.fill();
+    g.strokeStyle = "rgba(239,68,68,.85)"; g.lineWidth = 4;                                    // kırmızı kenar ışığı
+    g.beginPath(); g.moveTo(w / 2 + 72, 236); g.quadraticCurveTo(w / 2 + 78, 150, w / 2, 148); g.stroke();
+    g.beginPath(); g.moveTo(w / 2 + 60, 340); g.lineTo(w / 2 + 210, 430); g.lineTo(w / 2 + 230, h - 200); g.stroke();
+    g.fillStyle = "#b91c1c"; g.fillRect(w / 2 - 120, 222, 240, 10);                           // şapka bandı
+    // makineli tüfek (çapraz)
+    g.save(); g.translate(w / 2, 520); g.rotate(-0.22);
+    g.fillStyle = "#1c1917"; g.fillRect(-230, -14, 300, 28); g.fillRect(70, -8, 150, 16);
+    g.beginPath(); g.arc(-60, 30, 46, 0, 7); g.fill();                                          // tambur şarjör
+    g.fillStyle = "#3f2a1d"; g.fillRect(-300, -12, 80, 30); g.fillRect(-20, 14, 26, 60);
+    g.fillStyle = "rgba(239,68,68,.6)"; g.fillRect(-230, -14, 300, 3);
+    g.restore();
+    // başlık
+    g.textAlign = "center";
+    g.font = "800 112px Impact, Haettenschweiler, 'Arial Narrow', sans-serif";
+    g.fillStyle = "#7f1d1d"; g.fillText("MAFIA", w / 2 + 5, h - 108); g.fillText("GUN", w / 2 + 5, h - 12);
+    g.fillStyle = "#fef2f2"; g.fillText("MAFIA", w / 2, h - 113); g.fillText("GUN", w / 2, h - 17);
+    g.fillStyle = "#fca5a5"; g.font = "600 22px JetBrains Mono, monospace"; g.fillText("YENİ OYUNUM · ÇOK YAKINDA", w / 2, 60);
+    g.fillStyle = "rgba(255,255,255,.45)"; g.font = "16px JetBrains Mono, monospace"; g.fillText("ahmet bölükoğlu games", w / 2, 92);
+    g.fillStyle = "#000"; [[90, 140], [520, 610], [470, 120]].forEach(([x, y]) => { g.beginPath(); g.arc(x, y, 9, 0, 7); g.fill(); });  // kurşun delikleri
+    g.strokeStyle = "rgba(255,255,255,.25)"; g.lineWidth = 2; [[90, 140], [520, 610], [470, 120]].forEach(([x, y]) => { g.beginPath(); g.arc(x, y, 13, 0, 7); g.stroke(); });
+  });
+}
+
+// galeri çerçeveleri: şimdilik boş, coming soon
+function frameSoonTexture() {
+  return canvasTex(400, 400, (g, w, h) => {
+    g.fillStyle = "#14122b"; g.fillRect(0, 0, w, h);
+    g.strokeStyle = "rgba(167,139,250,.12)"; g.lineWidth = 14;
+    for (let i = -h; i < w; i += 40) { g.beginPath(); g.moveTo(i, h); g.lineTo(i + h, 0); g.stroke(); }
+    g.strokeStyle = "rgba(255,255,255,.18)"; g.lineWidth = 3; g.setLineDash([12, 10]); g.strokeRect(24, 24, w - 48, h - 48); g.setLineDash([]);
+    g.textAlign = "center"; g.fillStyle = "#e9e5ff"; g.font = "700 46px Space Grotesk, sans-serif";
+    g.fillText("COMING", w / 2, h / 2 - 6); g.fillText("SOON", w / 2, h / 2 + 46);
+    g.fillStyle = "#a78bfa"; g.font = "18px JetBrains Mono, monospace"; g.fillText("oyunlar & uygulamalar", w / 2, h / 2 + 88);
+    g.font = "44px sans-serif"; g.fillText("🎮", w / 2, h / 2 - 70);
+  });
+}
+
+// yazıcıdan çıkan sayfa: mavi ve turuncu bloklar (rapor)
+function printOutTexture() {
+  return canvasTex(256, 64, (g, w, h) => {
+    g.fillStyle = "#f8fafc"; g.fillRect(0, 0, w, h);
+    ["#2563eb", "#f97316", "#2563eb", "#f97316", "#2563eb", "#f97316"].forEach((c, i) => { g.fillStyle = c; g.fillRect(10 + i * 41, 10, 32, 44); });
+  });
+}
+
 function soonTexture() {  // çekmecedeki A4: COMING SOON
   return canvasTex(420, 594, (g, w, h) => {
     g.fillStyle = "#fbfaf6"; g.fillRect(0, 0, w, h);
@@ -638,6 +704,11 @@ async function init() {
   const monLight = new THREE.PointLight("#5eead4", 0.9, 0, 2); monLight.position.copy(B(0.12, 1.0, 1.15)); scene.add(monLight);
   const ledLight = new THREE.PointLight("#5eead4", 0.7, 0, 2); ledLight.position.copy(B(0.0, 0.88, 0.55)); scene.add(ledLight);
   const neonLight = new THREE.PointLight("#f472b6", 0.8, 0, 2); neonLight.position.copy(B(0.12, 1.4, 2.1)); scene.add(neonLight);
+  for (const [y, ty] of [[-0.68, -0.75], [0.36, 0.3]]) {             // sağ duvar galerisi: resim lambaları tabloları aydınlatır
+    const sl = new THREE.SpotLight("#ffd29a", 3.2, 0, 0.95, 0.75, 2);
+    sl.position.copy(B(1.8, y, 2.0)); sl.target.position.copy(B(2.0, ty, 1.3));
+    scene.add(sl, sl.target);
+  }
 
   // dış manzara (Asya yakası, Boğaz, Kız Kulesi)
   const sky = skyTexture();
@@ -680,6 +751,7 @@ async function init() {
   const printTex = { W_Note_1: noteTexture(["TODO:", "Redis TTL", "kontrol ✓"], "#fde047"), W_Note_2: noteTexture(["Çay al", "🍵 x2"], "#f9a8d4") };
   for (const [id, b] of Object.entries(BOOKS)) printTex["W_Spine_" + id] = spineTexture(b);
   printTex.W_Soon = soonTexture();
+  printTex.W_Poster = posterTexture(); printTex.W_FrameSoon = frameSoonTexture(); printTex.W_PrintOut = printOutTexture();
   const patterns = {};
   const partMats = {};
 
@@ -729,7 +801,7 @@ async function init() {
   const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
   let hover = null, busy = false, teaCount = 1, qi = 0, rgbBoost = 0;
   let catCount = 0, catPoke = 0;
-  const CAT = ["😺 Mırr… kod yazarken uyuyakaldım", "😼 Klavyenin üstüne yatmadım, söz", "😸 Deploy bitince uyandır", "🐟 Mama saati geçti ama…"];
+  const CAT = ["😺 Alpay: Mırr… kod yazarken uyuyakaldım", "😼 Alpay klavyenin üstüne yatmadı, söz", "😸 Alpay: deploy bitince uyandır", "🐟 Alpay'ın mama saati geçti ama…"];
   const QUACK = ["🦆 Quack! Bug'ı bana anlat…", "🦆 Satır satır anlat, bulacağız.", "🦆 Null mı geliyor yoksa?", "🦆 Cache'i temizledin mi?"];
 
   function pick(ev) {
@@ -945,6 +1017,9 @@ async function init() {
       say(p, day ? "☀️ Üsküdar'dan Boğaz manzarası" : "🌠 Kız Kulesi manzarası, bir dilek tut");
     } else if (n === "Cert") { sfx("paper"); say(p, "📜 MCPD — 100 puan (2013)"); }
     else if (n === "PC") { sfx("whooshIn"); rgbBoost = 1; say(p, "🖥️ TUF GT502 · RTX 4090 Suprim · 360 sıvı soğutma + 7 fan ⚡"); }
+    else if (n === "Poster") { sfx("paper"); say(p, "🎯 Mafia Gun: yeni oyunum, çok yakında!"); }
+    else if (n === "Gallery") { sfx("paper"); say(p, "🖼️ Coming soon: eski oyunlarım ve uygulamalarım burada sergilenecek"); }
+    else if (n === "Printer") { sfx("drawer"); say(p, "🖨️ CV yazdırılıyor…"); setTimeout(() => Devices.open("tablet", "cv"), 900); }
     else if (n === "Mouse") { sfx("click"); say(p, "🖱️ MX Master 3: yan tekerlek, sonsuz kaydırma"); }
     else if (n === "TV") { sfx("click"); say(p, "📺 65 inç · PS5 hazır: akşam bir maç? 🎮"); }
     else if (n === "PS5") { sfx("thump"); say(p, "🎮 Kod molası: bir maç?"); }

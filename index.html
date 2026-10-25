@@ -727,6 +727,7 @@
     .ar-paper .chips .chip { color: #3b2a14; background: rgba(194,65,12,.08); border-color: rgba(194,65,12,.3); }
     .ar-stamp { position: absolute; right: clamp(16px, 4vw, 40px); top: clamp(16px, 4vw, 36px); padding: 6px 12px; border: 3px solid #c2410c; border-radius: 6px; color: #c2410c; font: 700 13px var(--mono); letter-spacing: .12em; transform: rotate(9deg); opacity: .85; animation: stamp .35s .35s both cubic-bezier(.3,1.6,.5,1); }
     @keyframes stamp { from { transform: rotate(9deg) scale(2.2); opacity: 0; } }
+    .ar-ico { width: 1em; height: 1em; border-radius: 22%; vertical-align: -0.12em; margin-right: .3em; object-fit: cover; }
     .ar-live { padding: 3px 8px; border-radius: 6px; background: rgba(94,234,212,.15); color: var(--cyan); }
     .ar-stamp.live { border-color: #15803d; color: #15803d; }
     .fold-img { display: block; width: 100%; aspect-ratio: 1200 / 630; object-fit: cover; border-radius: 6px; margin-bottom: 10px; background: #0b0a10; }
@@ -1519,15 +1520,15 @@
   // projeler: yayımladıklarım theyvoice.com'da; en yenisi en üstte. Kalan dosyalar şimdilik coming soon
   const MG = "assets/projects/mafia-gun/";
   const PROJECTS = [
-    { name: "Mafia Gun", status: "Yayında · v0.1.1", type: "Oyun · gerçek zamanlı 1v1 kart ve bina savaşı", release: "24 Ekim 2026", platforms: "Web · Android · iOS",
-      desc: "Mafya temalı, gerçek zamanlı 1v1 kart ve bina savaşı. 8 kartlık desteni kur, Nakit'ini doğru anda harca, birliklerini köprülerden geçirip rakibin Kapo Binaları'nı yık; Baron Binası'nı düşüren maçı kazanır. Aile kur, haftalık Aile Savaşı'nda İstanbul'un semtlerini ele geçir; Rulet, Şanslı Kasa ve Sezon Bileti ödülleri. Tarayıcıda oynanır, indirme gerekmez; ilerlemeni TheyVoice ID ile kaydet.",
-      tech: ["Çevrimiçi 1v1", "Sunucu doğrulamalı maçlar", "3D modellenmiş karakterler", "Tarayıcıda oynanır (PWA)", "TheyVoice ID", "Aile & sıralama"],
-      cover: MG + "cover.jpg", shots: ["01-giris", "03-savas", "06-sehir", "05-deste", "18-aile-savasi", "04-lobi"].map(s => MG + s + ".jpg"),
+    { name: "Mafia Gun", status: "Yayında · v0.1.2", type: "Oyun · gerçek zamanlı 1v1 kart ve bina savaşı", release: "24 Ekim 2026", platforms: "Web · Android · iOS",
+      desc: "Mafya temalı, gerçek zamanlı 1v1 kart ve bina savaşı. 8 kartlık desteni kur, Nakit'ini doğru anda harca, birliklerini köprülerden geçirip rakibin Kapo Binaları'nı yık; Baron Binası'nı düşüren maçı kazanır. Aile kur, haftalık Aile Savaşı'nda İstanbul'un semtlerini ele geçir; Rulet, Şanslı Kasa ve Sezon Bileti ödülleri. Tarayıcıda oynanır, indirme gerekmez; v0.1.2 ile TheyVoice ID geldi: tek hesapla bütün TheyVoice oyunlarında oyna, Oyuncu ID'siyle arkadaş ekle, cihazdaki hesaplar arasında tek dokunuşla geç.",
+      tech: ["Çevrimiçi 1v1", "Sunucu doğrulamalı maçlar", "3D modellenmiş karakterler", "Tarayıcıda oynanır (PWA)", "TheyVoice ID", "Arkadaşlar", "Aile & sıralama"],
+      cover: MG + "cover.jpg", icon: MG + "icon.png", shots: ["01-giris", "03-savas", "06-sehir", "05-deste", "18-aile-savasi", "23-tvid-hesap", "04-lobi"].map(s => MG + s + ".jpg"),
       links: [["▶ Web'de oyna", "https://mafiagun.com/"], ["TheyVoice sayfası", "https://theyvoice.com/games/mafia-gun"]] },
     { name: "TheyVoice", status: "Yayında", type: "Bağımsız oyun & uygulama stüdyosu · web sitesi", release: "2026", platforms: "Web",
-      desc: "Oyunlarımı ve uygulamalarımı yayımladığım stüdyo sitesi: oyun sayfaları, haberler, yama notları ve basın kiti. Her güncelleme topluluktan gelen geri bildirimle şekilleniyor.",
-      tech: ["Next.js", "Haberler & yama notları", "Basın kiti", "TR / EN"],
-      cover: "assets/projects/theyvoice/logo.svg", logo: true, shots: [],
+      desc: "Oyuncuların sesini dinleyerek oyun ve uygulama üreten bağımsız stüdyom. Sitede oyun sayfaları, haberler, yama notları ve basın kiti var; TheyVoice ID ile tek hesapla bütün TheyVoice oyunları oynanıyor. Her güncelleme topluluktan gelen geri bildirimle şekilleniyor.",
+      tech: ["Next.js", "TheyVoice ID", "Haberler & yama notları", "Basın kiti", "TR / EN"],
+      cover: "assets/projects/theyvoice/logo.png", icon: "assets/projects/theyvoice/mark.png", logo: true, shots: [],
       links: [["theyvoice.com", "https://theyvoice.com/"]] },
     ...Array.from({ length: 6 }, (_, i) => ({ name: "Proje " + String(i + 3).padStart(2, "0"), soon: true })),
   ];
@@ -1932,7 +1933,7 @@
           <div class="ar-list">${PROJECTS.map((p, i) => `
             <button type="button" class="ar-row" data-i="${i}">
               <span class="ar-n">${String(i + 1).padStart(2, "0")}</span>
-              <span class="ar-name">${esc(p.name.toUpperCase())}</span>
+              <span class="ar-name">${p.icon ? `<img class="ar-ico" src="${p.icon}" alt="">` : ""}${esc(p.name.toUpperCase())}</span>
               <span class="ar-meta">${p.soon ? '<span class="ar-soon" lang="en">coming soon</span>' : `<span class="ar-live">${esc(p.status)}</span>`}</span>
               <span class="ar-arrow">↗</span>
             </button>`).join("")}

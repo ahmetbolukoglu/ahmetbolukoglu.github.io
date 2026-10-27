@@ -104,12 +104,19 @@ window.RoomContent = (function () {
       const pr = projects.find(p => p.id === tv.project) || projects.find(p => !p.soon && p.shots.length);
       if (pr) slides = pr.shots.map(image => ({ image, caption: pr.name }));
     }
+    // çekmece başlıkları: labels[x] > items[x].title (eski ayar) > site varsayılanı (projeler / coming soon)
+    function drawersOf(d) {
+      const items = d.items && typeof d.items === "object" ? d.items : {}, labels = {};
+      for (const [k, it] of Object.entries(items)) if (/^Drawer/.test(k) && it && str(it.title)) labels[k] = str(it.title).slice(0, 40);
+      for (const [k, v] of Object.entries(d.labels && typeof d.labels === "object" ? d.labels : {})) if (/^Drawer/.test(k) && str(v)) labels[k] = str(v).slice(0, 40);
+      return { projects: str(d.projects, "Drawer"), items, labels };
+    }
     return {
       status: str(room.status, "yeni projelere açık"), neon: str(room.neon, "çay · kod · tekrar"),
       projects,
       featured: { center: tile(f.center), left: tile(f.left), right: tile(f.right) },
       gallery: Array.from({ length: 9 }, (_, i) => tile(arr(room.gallery)[i])),
-      drawers: { projects: str(room.drawers && room.drawers.projects, "Drawer"), items: (room.drawers && room.drawers.items) || {} },
+      drawers: drawersOf(room.drawers || {}),
       screens: room.screens || {},
       customApps: arr(room.customApps).filter(a => a && /^[a-z0-9_-]{1,30}$/.test(a.key)).map(a => ({
         key: a.key, label: str(a.label, a.key), icon: str(a.icon, "📄"), color: /^#[0-9a-f]{6}$/i.test(a.color) ? a.color : "#7c3aed",

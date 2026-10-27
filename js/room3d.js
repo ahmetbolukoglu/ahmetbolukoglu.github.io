@@ -903,7 +903,8 @@ async function init() {
   if (patterns.ball) { const t = patterns.ball; t.wrapS = THREE.RepeatWrapping; t.anisotropy = 8; t.needsUpdate = true; }
 
   // ---------------------------------------------------------------- oda içeriği (theyvoice.com paneli)
-  let content = null, projectsDrawer = "Drawer", drawerItems = {};
+  let content = null, projectsDrawer = "Drawer", drawerItems = {}, drawerLabels = {};
+  const drawerLabel = n => drawerLabels[n] || (n === projectsDrawer ? "projeler" : "");
   const featuredOf = n => content ? content.featured[{ Poster: "center", Poster_L: "left", Poster_R: "right" }[n]] : null;
   const tileLabel = t => !t || t.soon ? "🖼️ yakında" : "🖼️ " + (t.title || "tablo");
   function applyContent(d) {
@@ -916,9 +917,14 @@ async function init() {
     d.tv.slides.forEach((sl, i) => loadImg(sl.image).then(im => { if (tvState.slides[i] === sl) tvState.imgs[i] = im; }));
     if (!reduceMotion) screenTex.W_Screen_TV.redraw(performance.now());
     projectsDrawer = parts[d.drawers.projects] ? d.drawers.projects : "Drawer";
-    drawerItems = d.drawers.items || {};
-    const tag = TAGS.find(t => t.cls === "a");
-    if (tag && parts[projectsDrawer]) tag.at = new THREE.Box3().setFromObject(parts[projectsDrawer]).getCenter(new THREE.Vector3()).add(new THREE.Vector3(0, 0.12, 0.1));
+    drawerItems = d.drawers.items || {}; drawerLabels = d.drawers.labels || {};
+    // çekmece etiketleri: projeler çekmecesi hep, diğerleri panelde başlık verildiyse
+    drawerTags.forEach(t => t.el.remove()); drawerTags.length = 0;
+    for (const n of Object.keys(parts).filter(k => /^Drawer(_[LR]\d)?$/.test(k))) {
+      const text = drawerLabel(n); if (!text) continue;
+      const el = document.createElement("div"); el.className = "tag3d a"; el.textContent = (n === projectsDrawer ? "🗂️ " : "📁 ") + text; frame.appendChild(el);
+      drawerTags.push({ el, at: new THREE.Box3().setFromObject(parts[n]).getCenter(new THREE.Vector3()).add(new THREE.Vector3(0, 0.12, 0.1)) });
+    }
   }
 
   // neon yazısı
@@ -939,9 +945,9 @@ async function init() {
     { text: "🖥️ masaüstü", at: B(0.12, 1.3, 1.31), cls: "c" },
     { text: "📄 cv.pdf", at: B(-0.84, 1.13, 1.25), cls: "v" },
     { text: "📱 iletişim", at: B(0.98, 1.0, 0.97), cls: "p" },
-    { text: "🗂️ projeler", at: B(0.835, 0.88, 0.6), cls: "a" },
   ].map(t => { const el = document.createElement("div"); el.className = "tag3d " + t.cls; el.textContent = t.text; frame.appendChild(el); return { ...t, el }; });
 
+  const drawerTags = [];
   window.RoomContent && RoomContent.on(applyContent);
 
   // ---------------------------------------------------------------- etkileşim
@@ -975,7 +981,7 @@ async function init() {
     if (hover) (partMats[hover.name] || []).forEach(m => { m.userData.e0 ??= m.emissive.getHex(); if (!m.userData.e0) m.emissive.set("#2a2550"); });
     canvas.style.cursor = hover ? "pointer" : "";
     const label = hover && (hover.name.startsWith("Fig_") ? "🎴 " + (FIGS.find(f => "Fig_" + f.id === hover.name) || {}).name : hover.name.startsWith("Book_") ? "Kitap" : hover.name.startsWith("Poster") ? tileLabel(featuredOf(hover.name))
-      : hover.name === "Gallery" ? "🖼️ galeri" : hover.name === projectsDrawer ? "🗂️ Projeler" : hover.name.startsWith("Drawer") ? "Çekmece" : NAMES[hover.name]);
+      : hover.name === "Gallery" ? "🖼️ galeri" : hover.name === projectsDrawer ? "🗂️ " + drawerLabel(hover.name) : hover.name.startsWith("Drawer") ? (drawerLabel(hover.name) ? "📁 " + drawerLabel(hover.name) : "Çekmece") : NAMES[hover.name]);
     dispatchEvent(new CustomEvent("room:hover", { detail: label || "" }));
     const b = hover && hover.name.startsWith("Book_") && BOOKS[hover.name.slice(5)];
     const fig = hover && hover.name.startsWith("Fig_") && FIGS.find(f => "Fig_" + f.id === hover.name);
@@ -1139,16 +1145,16 @@ async function init() {
       const item = itemOf(n);
       if (n === "Drawer") {
         const a1 = drawerAmt > 0.5 ? 0 : 1; sfx("drawer"); drawerHold = !!a1;
-        if (a1 && !item) say(p, "📄 Coming soon: bu çekmece yakında dolacak");
+        if (a1 && !item) say(p, "📄 " + (drawerLabel(n) ? drawerLabel(n) + " · " : "") + "Coming soon: bu çekmece yakında dolacak");
         const a0 = drawerAmt; await tween(600, t => setDrawer(a0 + (a1 - a0) * t));
-        if (a1 && item) Devices.openItem(item);
+        if (a1 && item) Devices.openItem({ ...item, title: item.title || drawerLabel(n) });
         return;
       }
       const d = extraDrawers.find(x => x.o === p), a1 = d.amt > 0.5 ? 0 : 1;
       sfx("drawer");
-      if (a1 && !item) say(p, "📄 Coming soon: bu çekmece yakında dolacak");
+      if (a1 && !item) say(p, "📄 " + (drawerLabel(n) ? drawerLabel(n) + " · " : "") + "Coming soon: bu çekmece yakında dolacak");
       await slideExtra(d, a1);
-      if (a1 && item) { heldExtra = d; Devices.openItem(item); }
+      if (a1 && item) { heldExtra = d; Devices.openItem({ ...item, title: item.title || drawerLabel(n) }); }
       return;
     }
     if (n.startsWith("Fig_")) {  // figür: zıplar, adını ve yeteneğini söyler
@@ -1464,7 +1470,7 @@ async function init() {
     if (Math.abs(viewOff) > 0.5) camera.setViewOffset(r.width, r.height, -viewOff, 0, r.width, r.height);
     else if (camera.view && camera.view.enabled) camera.clearViewOffset();
     // etiketler
-    TAGS.forEach(t => {
+    [...TAGS, ...drawerTags].forEach(t => {
       const v = t.at.clone().project(camera);
       t.el.style.transform = `translate(${(v.x + 1) / 2 * r.width}px, ${(1 - v.y) / 2 * r.height}px) translate(-50%, -100%)`;
     });

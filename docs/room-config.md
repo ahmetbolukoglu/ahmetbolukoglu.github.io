@@ -69,7 +69,8 @@ sayfa yenilenmeden yerine oturur.
     "items": {
       "Drawer_L0": { "soon": true },
       "Drawer_L1": { "title": "Sertifikalar", "text": "…", "image": "https://…", "link": "https://…" }
-    }
+    },
+    "labels": { "Drawer": "Benim projelerim", "Drawer_L1": "Sertifikalar" }
   },
 
   "screens": {
@@ -100,6 +101,7 @@ sayfa yenilenmeden yerine oturur.
 | `featured` | Monitörün üstündeki 3 tablo: `center` büyük, `left` / `right` biraz küçük. `image` (dikey poster önerilir: 3:4 ya da 1200×1660), `title`, tıklayınca `project` (çekmecede o dosya açılır) ya da `link`. `{ "soon": true }` coming soon yazar. |
 | `gallery` | Sağ duvardaki 9 çerçeve (sırayla, en çok 9). Aynı biçim. Eksikler coming soon. |
 | `drawers.projects` | Projelerin hangi çekmecede olduğu: `Drawer` (sağ üst), `Drawer_R0`, `Drawer_R1`, `Drawer_L0`, `Drawer_L1`, `Drawer_L2`. |
+| `drawers.labels` | Çekmecenin önünde görünen başlık: `{ "<çekmece>": "başlık" }` (en çok 40 karakter). Projeler çekmecesi dahil her çekmeceye verilebilir; etiket odada çekmecenin üstünde, üzerine gelince ve açılınca görünür. Boşsa varsayılan: projeler çekmecesi "projeler", diğerleri etiketsiz (coming soon). Eski ayarlarda yalnız `items[x].title` varsa o başlık sayılır. |
 | `drawers.items` | Diğer çekmecelerin içeriği: `{ "soon": true }` ya da `title` / `text` / `image` / `link`. Yazılmayan çekmece coming soon. |
 | `screens.<cihaz>.mode` | `os`: işletim sistemi ana ekranı (uygulamalar); `showcase`: tam ekran sergi (`slides` + `title`). |
 | `screens.<cihaz>.apps` | Ana ekrandaki uygulamalar ve sırası. Hazır anahtarlar: `hakkimda`, `yetenekler`, `terminal`, `cv`, `archive` (projeler), `iletisim`, `mail`, `github`, `linkedin`, `hizmet`, `ordek`, `player`; saat: `bildirim`, `nabiz`, `adim`, `hava`, `takvim`, `muzik`. Ayrıca `customApps` anahtarları. |

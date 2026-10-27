@@ -56,7 +56,7 @@ window.RoomContent = (function () {
     const tag = r.release ? " · " + r.release : "";
     return {
       name: str(r.name), status: (r.release ? "Güncel" : "Son güncelleme " + trDate(r.pushed_at)) + tag,
-      desc: str(r.description), release: trDate(r.created_at), tech: [r.language, ...arr(r.topics)].filter(Boolean),
+      desc: str(r.description), release: trDate(r.created_at), tech: [],  // dil ve konu etiketleri gösterilmez: projenin altyapısı açık edilmez
       links: [["GitHub", safeLink(r.html_url)], ...(safeLink(r.homepage) ? [["Siteyi aç", r.homepage]] : [])].filter(l => l[1]),
       isNew: recent(r.pushed_at), version: str(r.release),
     };

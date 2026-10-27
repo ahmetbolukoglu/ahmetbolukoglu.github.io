@@ -96,15 +96,17 @@ for (const k of ["W_Poster_C", "W_Poster_L", "W_Poster_R", ...Array.from({ lengt
 // sağ duvar çerçevelerinin ölçüleri (make_room.py GALLERY ile aynı sıra): doku oranı çerçeveye uysun
 const GAL_SIZE = [[0.4, 0.5], [0.5, 0.36], [0.34, 0.46], [0.44, 0.34], [0.3, 0.3], [0.36, 0.46], [0.5, 0.34], [0.3, 0.4], [0.38, 0.3]];
 // Mafia Gun karakter figürleri: odanın boş yerlerine serpiştirilir (models/figures.glb, make_figures.py)
+// figür modellerinin önü (glb ekseni): lookAt +Z'yi hedefe çevirir
+const FIG_FRONT = 0;
 const FIGS = [
-  { id: "madam_v", name: "Madam V", info: "Kraliçenin Çağrısı: her 7 saniyede 3 sustalı çocuk çağırır", at: [-1.32, 1.5, 1.306], h: 0.17, yaw: 10 },
-  { id: "the_butcher", name: "Kasap", info: "Kan Kokusu: canı yarının altındaki hedeflere %50 fazla vurur", at: [0.9, 1.3, 1.212], h: 0.15, yaw: -15 },
-  { id: "stiletto_boys", name: "Sustalı Çocuklar", info: "İlk Bıçak: ilk vuruşu 2 kat hasar verir", at: [-1.0, 0.98, 0.75], h: 0.13, yaw: 20 },
-  { id: "pistol_sisters", name: "Tabancalı Kardeşler", info: "Çift Atış: her 3. atışı 2 kat hasar verir", at: [-1.74, -0.3, 0.4], h: 0.17, yaw: -60 },
-  { id: "yakuza_enforcer", name: "Yakuza Kılıcı", info: "Öfke: canı yarıya inince %40 daha hızlı vurur", at: [-1.74, 0.2, 0.4], h: 0.17, yaw: -70 },
-  { id: "the_heavy", name: "Ağır Abi", info: "Demir Yumruk: binaya ilk vuruşu 2 kat hasar verir", at: [1.7, -0.95, 0], h: 0.55, yaw: 35 },
-  { id: "sharpshooter", name: "Keskin Nişancı", info: "Nişan Al: aynı hedefe her vuruşta %15 daha sert", at: [1.12, 0.82, 0], h: 0.32, yaw: 25 },
-  { id: "grenadier", name: "Bombacı", info: "Son Hediye: ölünce son bombasını bırakır", at: [-1.5, -0.6, 0], h: 0.3, yaw: -30 },
+  { id: "madam_v", name: "Madam V", info: "Kraliçenin Çağrısı: her 7 saniyede 3 sustalı çocuk çağırır", at: [-1.32, 1.5, 1.306], h: 0.17 },
+  { id: "the_butcher", name: "Kasap", info: "Kan Kokusu: canı yarının altındaki hedeflere %50 fazla vurur", at: [0.9, 1.3, 1.212], h: 0.15 },
+  { id: "stiletto_boys", name: "Sustalı Çocuklar", info: "İlk Bıçak: ilk vuruşu 2 kat hasar verir", at: [-1.0, 0.98, 0.75], h: 0.13 },
+  { id: "pistol_sisters", name: "Tabancalı Kardeşler", info: "Çift Atış: her 3. atışı 2 kat hasar verir", at: [-1.74, -0.3, 0.4], h: 0.17 },
+  { id: "yakuza_enforcer", name: "Yakuza Kılıcı", info: "Öfke: canı yarıya inince %40 daha hızlı vurur", at: [-1.74, 0.2, 0.4], h: 0.17 },
+  { id: "the_heavy", name: "Ağır Abi", info: "Demir Yumruk: binaya ilk vuruşu 2 kat hasar verir", at: [1.7, -0.95, 0], h: 0.55 },
+  { id: "sharpshooter", name: "Keskin Nişancı", info: "Nişan Al: aynı hedefe her vuruşta %15 daha sert", at: [1.12, 0.82, 0], h: 0.32 },
+  { id: "grenadier", name: "Bombacı", info: "Son Hediye: ölünce son bombasını bırakır", at: [-1.5, -0.6, 0], h: 0.3 },
 ];
 const SCREENS = ["W_Screen_iMac", "W_Screen_Left", "W_Screen_TV", "W_Screen_Phone", "W_Screen_Watch", "W_Cert"];
 const CLICK = ["iMac", "Monitor2", "Phone", "Shelf", "Tea", "Duck", "Ball", "Window", "Cert", "Clock", "Neon", "Drawer", "Keyboard", "PC", "TV", "PS5", "Controllers", "Headphones", "Bottle", "Modem", "Watch", "Chair", "Cat", "Mouse", "Poster", "Poster_L", "Poster_R", "Gallery", "Printer"];
@@ -811,9 +813,11 @@ async function init() {
   const monLight = new THREE.PointLight("#5eead4", 0.9, 0, 2); monLight.position.copy(B(0.12, 1.0, 1.15)); scene.add(monLight);
   const ledLight = new THREE.PointLight("#5eead4", 0.7, 0, 2); ledLight.position.copy(B(0.0, 0.88, 0.55)); scene.add(ledLight);
   const neonLight = new THREE.PointLight("#f472b6", 0.8, 0, 2); neonLight.position.copy(B(0.12, 1.4, 2.1)); scene.add(neonLight);
-  for (const [y, ty] of [[-0.68, -0.75], [0.36, 0.3]]) {             // sağ duvar galerisi: resim lambaları tabloları aydınlatır
-    const sl = new THREE.SpotLight("#ffd29a", 3.2, 0, 0.95, 0.75, 2);
-    sl.position.copy(B(1.8, y, 2.0)); sl.target.position.copy(B(2.0, ty, 1.3));
+  // sağ duvar galerisi: her resim lambası kendi tablosuna iner, ışık alt sıradaki tabloya kadar yayılır
+  // (make_room.py GALLERY üst sırası: y, z, en, boy; lamba çubuğu duvardan 0.12 m dışarıda, tablonun 8 cm üstünde)
+  for (const [y, z, w, h] of [[-0.95, 1.62, 0.4, 0.5], [-0.4, 1.66, 0.5, 0.36], [0.12, 1.6, 0.34, 0.46], [0.6, 1.66, 0.44, 0.34]]) {
+    const sl = new THREE.SpotLight("#ffd29a", 2.2, 2.4, 0.6, 0.9, 2);
+    sl.position.copy(B(1.8, y, z + h / 2 + 0.1)); sl.target.position.copy(B(2.0, y, z - h * 0.6));  // biraz dışarıdan: tablonun tamamını eşit yıkar
     scene.add(sl, sl.target);
   }
 
@@ -1561,7 +1565,9 @@ async function init() {
           m.material.emissive = new THREE.Color(0x000000);
           (partMats[o.name] ||= []).push(m.material);
         });
-        o.position.copy(B(...f.at)); o.scale.setScalar(f.h); o.rotation.set(0, THREE.MathUtils.degToRad(f.yaw), 0);
+        // yüz daima odanın ana bakış noktasına döner (yalnız dikey eksende; figür dik durur)
+        o.position.copy(B(...f.at)); o.scale.setScalar(f.h);
+        o.lookAt(HOME.pos.x, o.position.y, HOME.pos.z); o.rotateY(FIG_FRONT);
         o.name = "Fig_" + f.id; root.add(o); parts[o.name] = o;
       }
     } catch (e) { console.warn("Figürler yüklenemedi:", e); }

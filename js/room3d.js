@@ -509,6 +509,17 @@ const TECH_ROW = [".NET Core", "C#", "Redis", "gRPC", "Event Bus", "PostgreSQL",
 // TV oynanış akışı: görseller yavaşça yakınlaşıp kayar, birbirine geçer; CANLI rozeti, alt yazı ve zaman çubuğu
 // video değil, her kare kodla çizilir (dikey ekran görüntüleri ortada telefon gibi, arkada bulanık zemin)
 const SLIDE = 6500;
+// performans: her görselin küçük bulanık kopyası bir kez hazırlanır; tarama çizgileri tek desen
+const BLUR = new WeakMap();
+function blurOf(im) {
+  if (!BLUR.has(im)) { const c = document.createElement("canvas"); c.width = 48; c.height = 27; drawCover(c.getContext("2d"), im, 0, 0, 48, 27); BLUR.set(im, c); }
+  return BLUR.get(im);
+}
+let SCAN = null;
+function scanPattern(g) {
+  if (!SCAN) { const c = document.createElement("canvas"); c.width = 1; c.height = 4; const x = c.getContext("2d"); x.fillStyle = "rgba(0,0,0,.08)"; x.fillRect(0, 0, 1, 1); SCAN = g.createPattern(c, "repeat"); }
+  return SCAN;
+}
 function gameplay(g, w, h, now, st) {
   const n = st.slides.length, k = Math.floor(now / SLIDE), i = k % n, p = (now % SLIDE) / SLIDE;
   const layer = (idx, kp, alpha) => {
@@ -516,9 +527,10 @@ function gameplay(g, w, h, now, st) {
     g.globalAlpha = alpha;
     const portrait = im.naturalHeight > im.naturalWidth * 1.1, dir = idx % 2 ? -1 : 1;
     if (portrait) {
-      g.save(); if ("filter" in g) g.filter = "blur(18px) brightness(.45)";
-      drawCover(g, im, -40, -40, w + 80, h + 80, 1.1 + kp * 0.05, dir * 30 * kp);
-      g.restore();
+      const bg = blurOf(im);
+      g.imageSmoothingQuality = "low";
+      g.drawImage(bg, -40 + dir * 30 * kp, -40, w + 80, h + 80);
+      g.fillStyle = "rgba(0,0,0,.55)"; g.fillRect(0, 0, w, h);
       const ph = h * 0.9, pw = ph * im.naturalWidth / im.naturalHeight, x = (w - pw) / 2 + dir * 18 * (kp - 0.5), y = (h - ph) / 2;
       g.save(); g.beginPath(); g.roundRect(x, y, pw, ph, 22); g.clip();
       drawCover(g, im, x, y, pw, ph, 1.02 + kp * 0.08, 0, -12 * kp);
@@ -531,7 +543,7 @@ function gameplay(g, w, h, now, st) {
   layer(i, p, 1);
   if (p > 0.88 && n > 1) layer((i + 1) % n, (p - 0.88) / 0.12 * 0.05, (p - 0.88) / 0.12);
   // tarama çizgileri ve kenar kararması
-  g.fillStyle = "rgba(0,0,0,.08)"; for (let y = 0; y < h; y += 4) g.fillRect(0, y, w, 1);
+  g.fillStyle = scanPattern(g); g.fillRect(0, 0, w, h);
   const vg = g.createRadialGradient(w / 2, h / 2, h * 0.35, w / 2, h / 2, h * 0.9); vg.addColorStop(0, "rgba(0,0,0,0)"); vg.addColorStop(1, "rgba(0,0,0,.55)");
   g.fillStyle = vg; g.fillRect(0, 0, w, h);
   // üst bilgi: CANLI + başlık, sağda kalite
@@ -813,9 +825,9 @@ async function init() {
   for (const [id, b] of Object.entries(BOOKS)) printTex["W_Spine_" + id] = spineTexture(b);
   printTex.W_Soon = soonTexture();
   printTex.W_PrintOut = printOutTexture();
-  printTex.W_Poster_C = tileTexture(1200, 1660);
-  printTex.W_Poster_L = tileTexture(900, 1250); printTex.W_Poster_R = tileTexture(900, 1250);
-  GAL_SIZE.forEach(([gw, gh], i) => { printTex["W_Gal_" + i] = tileTexture(Math.round(gw * 1600), Math.round(gh * 1600)); });
+  printTex.W_Poster_C = tileTexture(1024, 1416);
+  printTex.W_Poster_L = tileTexture(720, 1001); printTex.W_Poster_R = tileTexture(720, 1001);
+  GAL_SIZE.forEach(([gw, gh], i) => { printTex["W_Gal_" + i] = tileTexture(Math.round(gw * 1100), Math.round(gh * 1100)); });
   const patterns = {};
   const partMats = {};
 
@@ -1322,6 +1334,10 @@ async function init() {
     if (next !== pr) { pr = next; renderer.setPixelRatio(pr); resize(); }
   }
 
+  // görüş alanı (bir önceki karenin kamerasıyla): ekran dokuları görünmüyorsa güncellenmez
+  const frus = new THREE.Frustum(), projView = new THREE.Matrix4(), boxes = {};
+  const inView = n => { if (!parts[n]) return false; boxes[n] ||= new THREE.Box3().setFromObject(parts[n]); return frus.intersectsBox(boxes[n]); };
+
   function frameLoop(now) {
     requestAnimationFrame(frameLoop);
     if (!visible || document.hidden || !stage.hidden) return;
@@ -1331,11 +1347,11 @@ async function init() {
     const d = new Date(), s = d.getSeconds() + d.getMilliseconds() / 1000, m = d.getMinutes() + s / 60, hr = (d.getHours() % 12) + m / 60;
     if (parts.ClockSec) { parts.ClockSec.rotation.z = -s / 60 * Math.PI * 2; parts.ClockMin.rotation.z = -m / 60 * Math.PI * 2; parts.ClockHour.rotation.z = -hr / 12 * Math.PI * 2; }
     // ekranlar
-    if (!reduceMotion && now - lastType > 80) { screenTex.W_Screen_iMac.step(); lastType = now; if (Math.random() < 0.3) sfx("key", 0.3); }
+    if (!reduceMotion && now - lastType > 80 && inView("iMac")) { screenTex.W_Screen_iMac.step(); lastType = now; if (Math.random() < 0.3) sfx("key", 0.3); }
     tour();
     if (now % 30000 < 20) screenTex.W_Screen_Phone.redraw();
     if (now - lastWatch > 1000) { screenTex.W_Screen_Watch.redraw(); lastWatch = now; }
-    if (!reduceMotion && now - lastTV > (tvState.mode === "gameplay" ? 66 : 90)) { screenTex.W_Screen_TV.redraw(now); lastTV = now; }
+    if (!reduceMotion && now - lastTV > (tvState.mode === "gameplay" ? 66 : 90) && inView("TV")) { screenTex.W_Screen_TV.redraw(now); lastTV = now; }
     if (parts.Cat) {
       catPoke *= 0.94;
       const b = Math.sin(now / 900) * (reduceMotion ? 0 : 1), k = Math.sin(now / 60) * catPoke;
@@ -1391,6 +1407,7 @@ async function init() {
       t.el.style.transform = `translate(${(v.x + 1) / 2 * r.width}px, ${(1 - v.y) / 2 * r.height}px) translate(-50%, -100%)`;
     });
     renderer.render(scene, camera);
+    projView.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse); frus.setFromProjectionMatrix(projView);
   }
 
   // ---------------------------------------------------------------- showreel: odayı izle

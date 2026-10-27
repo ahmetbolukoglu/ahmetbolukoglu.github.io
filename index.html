@@ -83,8 +83,7 @@
     /* ---------- NAV ---------- */
     nav {
       position: sticky; top: 0; z-index: 50;
-      backdrop-filter: blur(14px);
-      background: rgba(11,10,26,.72);
+      background: rgba(11,10,26,.92);
       border-bottom: 1px solid var(--line);
     }
     nav .wrap { display: flex; align-items: center; justify-content: space-between; height: 64px; gap: 16px; }
@@ -153,7 +152,7 @@
       position: absolute; left: 16px; top: 16px;
       font-family: var(--mono); font-size: 12px; color: var(--text);
       background: rgba(11,10,26,.7); border: 1px solid var(--line);
-      padding: 6px 10px; border-radius: 8px; backdrop-filter: blur(6px);
+      padding: 6px 10px; border-radius: 8px;
       pointer-events: none; max-width: calc(100% - 32px); z-index: 3;
     }
     .bubble {
@@ -732,12 +731,12 @@
     .cms-page { padding: 22px; max-width: 760px; margin: 0 auto; display: grid; gap: 14px; }
     .cms-page img { width: 100%; border-radius: 12px; }
     .cms-page h3 { font: 700 26px var(--sans); margin: 0; } .cms-page p { color: var(--muted); white-space: pre-line; margin: 0; }
-    .show { position: relative; height: 100%; min-height: 320px; background: #000; overflow: hidden; }
-    .show img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; opacity: 0; transition: opacity .9s; }
-    .show img.on { opacity: 1; animation: showKB 7s ease-out both; }
+    .sc-show { position: relative; height: 100%; min-height: 320px; background: #000; overflow: hidden; }
+    .sc-show img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; opacity: 0; transition: opacity .9s; }
+    .sc-show img.on { opacity: 1; animation: showKB 7s ease-out both; }
     @keyframes showKB { from { transform: scale(1.08); } to { transform: scale(1); } }
-    .show figcaption { position: absolute; left: 0; right: 0; bottom: 0; padding: 18px 22px; font: 600 18px var(--sans); background: linear-gradient(transparent, rgba(0,0,0,.8)); }
-    .screen-body:has(> .show) { overflow: hidden; display: flex; flex-direction: column; } .screen-body > .show { flex: 1; }
+    .sc-show figcaption { position: absolute; left: 0; right: 0; bottom: 0; padding: 18px 22px; font: 600 18px var(--sans); background: linear-gradient(transparent, rgba(0,0,0,.8)); }
+    .screen-body:has(> .sc-show) { overflow: hidden; display: flex; flex-direction: column; } .screen-body > .sc-show { flex: 1; }
     .ar-ico { width: 1em; height: 1em; border-radius: 22%; vertical-align: -0.12em; margin-right: .3em; object-fit: cover; }
     .ar-live { padding: 3px 8px; border-radius: 6px; background: rgba(94,234,212,.15); color: var(--cyan); }
     .ar-stamp.live { border-color: #15803d; color: #15803d; }
@@ -875,13 +874,13 @@
     /* ---------- ODADA GEZİNME YARDIMI ---------- */
     #room3d { touch-action: none; }
     .roam-q { position: absolute; right: 16px; bottom: 16px; z-index: 6; width: 34px; height: 34px; border-radius: 50%; display: none;
-      font: 700 15px var(--mono); color: var(--text); background: rgba(11,10,26,.75); border: 1px solid var(--line); cursor: pointer; backdrop-filter: blur(6px); }
+      font: 700 15px var(--mono); color: var(--text); background: rgba(11,10,26,.75); border: 1px solid var(--line); cursor: pointer; }
     .is-3d .roam-q { display: block; }
     .roam-q:hover, .roam-q[aria-expanded="true"] { color: #15132e; background: var(--cyan); border-color: var(--cyan); }
     .zoomed .roam-q, .reeling .roam-q { opacity: 0; pointer-events: none; }
     .roam-help { position: absolute; z-index: 7; left: 50%; top: 50%; width: min(420px, calc(100% - 24px)); max-height: calc(100% - 24px); overflow: auto;
       transform: translate(-50%, -46%) scale(.96); opacity: 0; pointer-events: none; transition: opacity .35s, transform .35s;
-      background: rgba(15,13,36,.94); border: 1px solid var(--line); border-radius: 18px; padding: 20px; box-shadow: 0 30px 80px -20px rgba(0,0,0,.7); backdrop-filter: blur(12px); }
+      background: rgba(15,13,36,.94); border: 1px solid var(--line); border-radius: 18px; padding: 20px; box-shadow: 0 30px 80px -20px rgba(0,0,0,.7); }
     .roam-help.show { opacity: 1; transform: translate(-50%, -50%); pointer-events: auto; }
     .roam-help > b { display: block; font-size: 18px; margin-bottom: 12px; }
     .roam-help ul { list-style: none; margin: 0 0 16px; padding: 0; display: grid; gap: 10px; }
@@ -900,7 +899,7 @@
     @media (max-width: 720px) { .ai-btn span { display: none; } }
 
     .gh-tick { position: absolute; left: 16px; top: 16px; z-index: 3; display: flex; align-items: center; gap: 8px; max-width: min(460px, calc(100% - 32px));
-      font: 12px var(--mono); color: var(--text); background: rgba(11,10,26,.7); border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; backdrop-filter: blur(6px); text-decoration: none; }
+      font: 12px var(--mono); color: var(--text); background: rgba(11,10,26,.7); border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; text-decoration: none; }
     .gh-tick i { flex: none; width: 7px; height: 7px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 8px #22c55e; animation: ghp 1.6s ease-in-out infinite; }
     .gh-tick span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; transition: opacity .3s; }
     @keyframes ghp { 50% { opacity: .35; } }
@@ -1886,9 +1885,9 @@
         if (!sc || sc.mode !== "showcase") continue;
         const slides = (Array.isArray(sc.slides) ? sc.slides : []).filter(s => s && /^(https:\/\/|assets\/|content\/)/.test(s.image || ""));
         OS_APPS["show-" + kind] = { label: sc.title || "Sergi", file: sc.title || "sergi", icon: "🖼️", b: "#0f172a",
-          html: () => `<figure class="show">${slides.map((s, i) => `<img src="${s.image}" alt="" class="${i ? "" : "on"}">`).join("")}<figcaption>${esc((slides[0] && slides[0].caption) || sc.title || "")}</figcaption></figure>`,
+          html: () => `<figure class="sc-show">${slides.map((s, i) => `<img src="${s.image}" alt="" class="${i ? "" : "on"}">`).join("")}<figcaption>${esc((slides[0] && slides[0].caption) || sc.title || "")}</figcaption></figure>`,
           setup: () => {
-            const box = dev.querySelector(".show"); if (!box || slides.length < 2) return;
+            const box = dev.querySelector(".sc-show"); if (!box || slides.length < 2) return;
             let i = 0; const imgs = box.querySelectorAll("img"), cap = box.querySelector("figcaption");
             const t = setInterval(() => { if (!box.isConnected) return clearInterval(t); imgs[i].classList.remove("on"); i = (i + 1) % imgs.length; imgs[i].classList.add("on"); cap.textContent = slides[i].caption || sc.title || ""; }, 5000);
           } };

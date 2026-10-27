@@ -1,0 +1,53 @@
+{
+  "version": 1,
+  "status": "yeni projelere açık",
+  "neon": "çay · kod · tekrar",
+  "projects": [
+    { "ref": "theyvoice:mafia-gun",
+      "name": "Mafia Gun", "status": "Yayında · v0.1.2", "type": "Oyun · gerçek zamanlı 1v1 kart ve bina savaşı", "release": "24 Ekim 2026", "platforms": "Web · Android · iOS",
+      "desc": "Mafya temalı, gerçek zamanlı 1v1 kart ve bina savaşı. 8 kartlık desteni kur, Nakit'ini doğru anda harca, birliklerini köprülerden geçirip rakibin Kapo Binaları'nı yık; Baron Binası'nı düşüren maçı kazanır. Aile kur, haftalık Aile Savaşı'nda İstanbul'un semtlerini ele geçir; Rulet, Şanslı Kasa ve Sezon Bileti ödülleri. Tarayıcıda oynanır, indirme gerekmez. v0.1.2 ile TheyVoice ID geldi: tek hesapla bütün TheyVoice oyunlarında oyna, Oyuncu ID'siyle arkadaş ekle, cihazdaki hesaplar arasında tek dokunuşla geç.",
+      "tech": ["Çevrimiçi 1v1", "Sunucu doğrulamalı maçlar", "3D modellenmiş karakterler", "Tarayıcıda oynanır (PWA)", "TheyVoice ID", "Arkadaşlar", "Aile & sıralama"],
+      "cover": "assets/projects/mafia-gun/cover.jpg", "icon": "assets/projects/mafia-gun/icon.png",
+      "shots": ["assets/projects/mafia-gun/01-giris.jpg", "assets/projects/mafia-gun/03-savas.jpg", "assets/projects/mafia-gun/06-sehir.jpg", "assets/projects/mafia-gun/05-deste.jpg", "assets/projects/mafia-gun/18-aile-savasi.jpg", "assets/projects/mafia-gun/23-tvid-hesap.jpg", "assets/projects/mafia-gun/04-lobi.jpg"],
+      "links": [["▶ Web'de oyna", "https://mafiagun.com/"], ["TheyVoice sayfası", "https://theyvoice.com/games/mafia-gun"]] },
+    { "name": "TheyVoice", "status": "Yayında", "type": "Bağımsız oyun & uygulama stüdyosu · web sitesi", "release": "2026", "platforms": "Web",
+      "desc": "Oyuncuların sesini dinleyerek oyun ve uygulama üreten bağımsız stüdyom. Sitede oyun sayfaları, haberler, yama notları ve basın kiti var; TheyVoice ID ile tek hesapla bütün TheyVoice oyunları oynanıyor. Her güncelleme topluluktan gelen geri bildirimle şekilleniyor.",
+      "tech": ["Next.js", "TheyVoice ID", "Haberler & yama notları", "Basın kiti", "TR / EN"],
+      "cover": "assets/projects/theyvoice/logo.png", "icon": "assets/projects/theyvoice/mark.png", "logo": true,
+      "links": [["theyvoice.com", "https://theyvoice.com/"]] },
+    { "ref": "github:ahmetbolukoglu/ahmetbolukoglu.github.io", "name": "Dev Room", "type": "Portfolyo · Three.js + Blender ile 3D oda", "platforms": "Web",
+      "desc": "Şu an içinde gezindiğin oda: Blender'da Python ile modellenip Three.js ile tarayıcıda çalışıyor. Cihazlar gerçek arayüzler açıyor; içerik theyvoice.com panelinden canlı yönetiliyor.",
+      "tech": ["Three.js", "Blender Python", "Web Audio", "WebGL"], "cover": "assets/projects/theyvoice/mark.png", "logo": true,
+      "links": [["Kaynak kod", "https://github.com/ahmetbolukoglu/ahmetbolukoglu.github.io"]] },
+    { "soon": true, "name": "Proje 04" },
+    { "soon": true, "name": "Proje 05" },
+    { "soon": true, "name": "Proje 06" },
+    { "soon": true, "name": "Proje 07" },
+    { "soon": true, "name": "Proje 08" }
+  ],
+  "featured": {
+    "center": { "image": "assets/projects/mafia-gun/poster.jpg", "title": "Mafia Gun", "project": "theyvoice:mafia-gun" },
+    "left": { "image": "assets/projects/mafia-gun/01-giris.jpg", "title": "Mafia Gun · giriş", "project": "theyvoice:mafia-gun" },
+    "right": { "soon": true }
+  },
+  "gallery": [],
+  "drawers": { "projects": "Drawer", "items": {} },
+  "screens": {
+    "imac": { "mode": "os", "apps": ["hakkimda", "ordek", "yetenekler", "hizmet", "player", "terminal", "cv", "archive", "iletisim"] },
+    "tablet": { "mode": "os", "apps": ["cv", "hakkimda", "hizmet", "archive", "iletisim", "mail"] },
+    "phone": { "mode": "os", "apps": ["mail", "github", "linkedin", "cv", "terminal", "hakkimda", "yetenekler", "hizmet", "ordek", "player", "archive"] },
+    "watch": { "mode": "os", "apps": ["bildirim", "nabiz", "adim", "hava", "takvim", "muzik"] }
+  },
+  "customApps": [],
+  "tv": {
+    "mode": "gameplay",
+    "title": "Mafia Gun · oynanış",
+    "slides": [
+      { "image": "assets/projects/mafia-gun/03-savas.jpg", "caption": "Desteni kur, Baron Binası'nı düşür" },
+      { "image": "assets/projects/mafia-gun/06-sehir.jpg", "caption": "Şehir: İstanbul'un semtlerini ele geçir" },
+      { "image": "assets/projects/mafia-gun/05-deste.jpg", "caption": "8 kartlık deste, doğru anda Nakit" },
+      { "image": "assets/projects/mafia-gun/18-aile-savasi.jpg", "caption": "Haftalık Aile Savaşı" },
+      { "image": "assets/projects/mafia-gun/04-lobi.jpg", "caption": "Kupa Yolu ve arenalar" }
+    ]
+  }
+}

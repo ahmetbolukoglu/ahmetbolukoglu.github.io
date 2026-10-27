@@ -58,7 +58,7 @@ const MATS = {
   W_MonBack: { color: "#2a2c31", roughness: 0.45 },
   W_Cat: { color: "#8f949b", roughness: 0.95 }, W_CatDark: { color: "#5c6067", roughness: 0.95 },
   W_Printer: { color: "#1c1d21", roughness: 0.5 }, W_PrinterLCD: { color: "#60a5fa", emissive: "#60a5fa", emissiveIntensity: 1.2 },
-  W_Poster: { color: "#ffffff", roughness: 0.6, emissive: "#ffffff", emissiveIntensity: 0.32 },  // karanlıkta da okunsun
+
   W_LampWarm: { color: "#ffd9a0", emissive: "#ffd9a0", emissiveIntensity: 3 }, W_CatWhite: { color: "#f5efe6", roughness: 0.95 },
 };
 // raftaki kitaplar: her biri bir yetenek alanı (tıklanınca masaüstünde o kategori açılır)
@@ -90,8 +90,13 @@ const STOPS = [
   { pos: [-0.45, -0.6, 1.3], look: [-1.95, 0.15, 1.25], n: "07", h: "Oyun molası", p: "65 inç TV ve PS5. Kod bitince bir maç." },
   { pos: [0.15, -1.5, 1.42], look: [0.18, 1.3, 1.22] },
 ];
+// panelden gelen görseller: 3 tablo ve 9 galeri çerçevesi (hafif kendi ışığıyla karanlıkta da okunur)
+for (const k of ["W_Poster_C", "W_Poster_L", "W_Poster_R", ...Array.from({ length: 9 }, (_, i) => "W_Gal_" + i)])
+  MATS[k] = { color: "#ffffff", roughness: 0.6, emissive: "#ffffff", emissiveIntensity: 0.3 };
+// sağ duvar çerçevelerinin ölçüleri (make_room.py GALLERY ile aynı sıra): doku oranı çerçeveye uysun
+const GAL_SIZE = [[0.4, 0.5], [0.5, 0.36], [0.34, 0.46], [0.44, 0.34], [0.3, 0.3], [0.36, 0.46], [0.5, 0.34], [0.3, 0.4], [0.38, 0.3]];
 const SCREENS = ["W_Screen_iMac", "W_Screen_Left", "W_Screen_TV", "W_Screen_Phone", "W_Screen_Watch", "W_Cert"];
-const CLICK = ["iMac", "Monitor2", "Phone", "Shelf", "Tea", "Duck", "Ball", "Window", "Cert", "Clock", "Neon", "Drawer", "Keyboard", "PC", "TV", "PS5", "Controllers", "Headphones", "Bottle", "Modem", "Watch", "Chair", "Cat", "Mouse", "Poster", "Gallery", "Printer"];
+const CLICK = ["iMac", "Monitor2", "Phone", "Shelf", "Tea", "Duck", "Ball", "Window", "Cert", "Clock", "Neon", "Drawer", "Keyboard", "PC", "TV", "PS5", "Controllers", "Headphones", "Bottle", "Modem", "Watch", "Chair", "Cat", "Mouse", "Poster", "Poster_L", "Poster_R", "Gallery", "Printer"];
 // imlecin yanında görünen adlar
 const NAMES = { iMac: "49\" masaüstü", Monitor2: "CV · 27\"", Phone: "İletişim · S22", Shelf: "Kitaplık", Tea: "Çay", Duck: "🦆 Ördeğe sor", Ball: "Top", Window: "Boğaz manzarası",
   Cert: "Sertifika", Clock: "Saat", Neon: "Neon", Drawer: "Projeler", Keyboard: "Apex 7 · terminal", PC: "TUF GT502 · RTX 4090", TV: "65\" TV", PS5: "PS5", Controllers: "DualSense ×2",
@@ -501,7 +506,61 @@ function leftScreen() {  // 27" monitör: masaüstü duvar kâğıdı + cv.pdf p
 // 65" TV: çalıştığım yerler kayan yazı olarak geçer (alt satır ters yönde teknolojiler)
 const COMPANIES = ["EnerjiSA", "Agrio Finans", "Ovinot", "INTERTECH", "Timbo ICT", "Akbank", "Mavi Bilişim", "Medipol", "Arı Bilgi", "İETT"];
 const TECH_ROW = [".NET Core", "C#", "Redis", "gRPC", "Event Bus", "PostgreSQL", "MSSQL", "Blazor", "React", "MCP", "Azure DevOps", "k6"];
-function tvScreen() {
+// TV oynanış akışı: görseller yavaşça yakınlaşıp kayar, birbirine geçer; CANLI rozeti, alt yazı ve zaman çubuğu
+// video değil, her kare kodla çizilir (dikey ekran görüntüleri ortada telefon gibi, arkada bulanık zemin)
+const SLIDE = 6500;
+function gameplay(g, w, h, now, st) {
+  const n = st.slides.length, k = Math.floor(now / SLIDE), i = k % n, p = (now % SLIDE) / SLIDE;
+  const layer = (idx, kp, alpha) => {
+    const im = st.imgs[idx]; if (!im) return;
+    g.globalAlpha = alpha;
+    const portrait = im.naturalHeight > im.naturalWidth * 1.1, dir = idx % 2 ? -1 : 1;
+    if (portrait) {
+      g.save(); if ("filter" in g) g.filter = "blur(18px) brightness(.45)";
+      drawCover(g, im, -40, -40, w + 80, h + 80, 1.1 + kp * 0.05, dir * 30 * kp);
+      g.restore();
+      const ph = h * 0.9, pw = ph * im.naturalWidth / im.naturalHeight, x = (w - pw) / 2 + dir * 18 * (kp - 0.5), y = (h - ph) / 2;
+      g.save(); g.beginPath(); g.roundRect(x, y, pw, ph, 22); g.clip();
+      drawCover(g, im, x, y, pw, ph, 1.02 + kp * 0.08, 0, -12 * kp);
+      g.restore();
+      g.strokeStyle = "rgba(255,255,255,.15)"; g.lineWidth = 3; g.beginPath(); g.roundRect(x, y, pw, ph, 22); g.stroke();
+    } else drawCover(g, im, 0, 0, w, h, 1.04 + kp * 0.12, dir * 50 * (kp - 0.5), 25 * (kp - 0.5));
+    g.globalAlpha = 1;
+  };
+  g.fillStyle = "#05040a"; g.fillRect(0, 0, w, h);
+  layer(i, p, 1);
+  if (p > 0.88 && n > 1) layer((i + 1) % n, (p - 0.88) / 0.12 * 0.05, (p - 0.88) / 0.12);
+  // tarama çizgileri ve kenar kararması
+  g.fillStyle = "rgba(0,0,0,.08)"; for (let y = 0; y < h; y += 4) g.fillRect(0, y, w, 1);
+  const vg = g.createRadialGradient(w / 2, h / 2, h * 0.35, w / 2, h / 2, h * 0.9); vg.addColorStop(0, "rgba(0,0,0,0)"); vg.addColorStop(1, "rgba(0,0,0,.55)");
+  g.fillStyle = vg; g.fillRect(0, 0, w, h);
+  // üst bilgi: CANLI + başlık, sağda kalite
+  g.textAlign = "left"; g.font = "700 22px JetBrains Mono, monospace";
+  g.fillStyle = "rgba(0,0,0,.55)"; g.beginPath(); g.roundRect(28, 26, 120, 36, 8); g.fill();
+  g.fillStyle = Math.floor(now / 600) % 2 ? "#ef4444" : "#7f1d1d"; g.beginPath(); g.arc(48, 44, 7, 0, 7); g.fill();
+  g.fillStyle = "#fff"; g.fillText("CANLI", 62, 52);
+  g.font = "600 22px Space Grotesk, sans-serif"; g.fillStyle = "rgba(255,255,255,.9)"; g.fillText(st.title || "", 164, 52);
+  g.textAlign = "right"; g.font = "600 18px JetBrains Mono, monospace"; g.fillStyle = "rgba(255,255,255,.7)"; g.fillText("1080p60", w - 30, 52);
+  // alt yazı (kayarak girer)
+  const cap = st.slides[i].caption;
+  if (cap) {
+    const inn = Math.min(1, p / 0.08), out = p > 0.86 ? 1 - (p - 0.86) / 0.14 : 1, x = 30 - (1 - inn) * 60;
+    g.globalAlpha = Math.min(inn, out);
+    g.font = "700 30px Space Grotesk, sans-serif"; g.textAlign = "left";
+    const tw = g.measureText(cap).width;
+    g.fillStyle = "rgba(10,9,20,.78)"; g.beginPath(); g.roundRect(x, h - 118, tw + 44, 54, 10); g.fill();
+    g.fillStyle = "#f472b6"; g.fillRect(x, h - 118, 6, 54);
+    g.fillStyle = "#fff"; g.fillText(cap, x + 24, h - 81);
+    g.globalAlpha = 1;
+  }
+  // zaman çubuğu
+  const total = n * SLIDE, tt = now % total;
+  g.fillStyle = "rgba(255,255,255,.18)"; g.fillRect(30, h - 34, w - 160, 5);
+  g.fillStyle = "#5eead4"; g.fillRect(30, h - 34, (w - 160) * tt / total, 5);
+  const sec = Math.floor(tt / 1000), mm = String(Math.floor(sec / 60)).padStart(2, "0"), ss = String(sec % 60).padStart(2, "0");
+  g.textAlign = "right"; g.font = "16px JetBrains Mono, monospace"; g.fillStyle = "rgba(255,255,255,.75)"; g.fillText(`${mm}:${ss}`, w - 30, h - 26);
+}
+function tvScreen(st) {
   const row = (g, items, font, gap, y, x0, color) => {
     g.font = font; g.fillStyle = color;
     const widths = items.map(t => g.measureText(t).width + gap), total = widths.reduce((a, b) => a + b, 0);
@@ -509,6 +568,7 @@ function tvScreen() {
     while (x < 1024) { items.forEach((t, i) => { g.fillText(t, x, y); g.fillStyle = "#f472b6"; g.fillText("✦", x + widths[i] - gap / 2 - 10, y); g.fillStyle = color; x += widths[i]; }); }
   };
   return canvasTex(1024, 576, (g, w, h, now = 0) => {
+    if (st.mode === "gameplay" && st.slides.length && st.imgs.some(Boolean)) return gameplay(g, w, h, now, st);
     const bg = g.createLinearGradient(0, 0, w, h); bg.addColorStop(0, "#0b1a4a"); bg.addColorStop(1, "#2e1065");
     g.fillStyle = bg; g.fillRect(0, 0, w, h);
     g.strokeStyle = "rgba(147,197,253,.18)"; g.lineWidth = 2;
@@ -560,69 +620,51 @@ function watchScreen() {
   return tex;
 }
 
-// Mafia Gun posteri: kara film havası, kırmızı ışık, fötr şapkalı silüet ve makineli tüfek
-function posterTexture() {
-  const art = new Image();  // oyunun resmi posteri (mafiagun.com/press, 1200×1660); yüklenene kadar çizim yer tutar
-  const tex = canvasTex(1200, 1660, (g, W, H) => {
-    g.setTransform(1, 0, 0, 1, 0, 0);
-    if (art.complete && art.naturalWidth) { g.drawImage(art, 0, 0, W, H); return; }
-    g.setTransform(2, 0, 0, 2, 0, 0);
-    const w = 600, h = 830;
-    const bg = g.createLinearGradient(0, 0, 0, h); bg.addColorStop(0, "#1a0708"); bg.addColorStop(1, "#050203");
-    g.fillStyle = bg; g.fillRect(0, 0, w, h);
-    const sp = g.createRadialGradient(w / 2, 300, 20, w / 2, 300, 360); sp.addColorStop(0, "rgba(220,38,38,.55)"); sp.addColorStop(1, "rgba(220,38,38,0)");
-    g.fillStyle = sp; g.fillRect(0, 0, w, h);
-    g.strokeStyle = "rgba(255,255,255,.07)"; g.lineWidth = 1.5;                                 // yağmur
-    for (let i = 0; i < 120; i++) { const x = (i * 97) % w, y = (i * 211) % h; g.beginPath(); g.moveTo(x, y); g.lineTo(x - 6, y + 26); g.stroke(); }
-    g.fillStyle = "#0b0405";                                                                    // şehir silüeti
-    for (let i = 0; i < 14; i++) { const x = i * 46, bh = 90 + (i * 53) % 110; g.fillRect(x, h - 250 - bh, 40, bh + 250); }
-    g.fillStyle = "rgba(251,191,36,.7)";
-    for (let i = 0; i < 40; i++) g.fillRect((i * 67) % w, h - 260 - (i * 29) % 160, 5, 7);
-    // silüet: fötr şapka, palto omuzları
-    g.fillStyle = "#000";
-    g.beginPath(); g.ellipse(w / 2, 238, 120, 22, 0, 0, 7); g.fill();                         // şapka siperi
-    g.beginPath(); g.moveTo(w / 2 - 72, 236); g.quadraticCurveTo(w / 2 - 78, 150, w / 2, 148); g.quadraticCurveTo(w / 2 + 78, 150, w / 2 + 72, 236); g.fill();
-    g.beginPath(); g.ellipse(w / 2, 300, 58, 72, 0, 0, 7); g.fill();                           // baş
-    g.beginPath(); g.moveTo(w / 2 - 60, 340); g.lineTo(w / 2 - 210, 430); g.lineTo(w / 2 - 230, h - 200); g.lineTo(w / 2 + 230, h - 200); g.lineTo(w / 2 + 210, 430); g.lineTo(w / 2 + 60, 340); g.fill();
-    g.strokeStyle = "rgba(239,68,68,.85)"; g.lineWidth = 4;                                    // kırmızı kenar ışığı
-    g.beginPath(); g.moveTo(w / 2 + 72, 236); g.quadraticCurveTo(w / 2 + 78, 150, w / 2, 148); g.stroke();
-    g.beginPath(); g.moveTo(w / 2 + 60, 340); g.lineTo(w / 2 + 210, 430); g.lineTo(w / 2 + 230, h - 200); g.stroke();
-    g.fillStyle = "#b91c1c"; g.fillRect(w / 2 - 120, 222, 240, 10);                           // şapka bandı
-    // makineli tüfek (çapraz)
-    g.save(); g.translate(w / 2, 520); g.rotate(-0.22);
-    g.fillStyle = "#1c1917"; g.fillRect(-230, -14, 300, 28); g.fillRect(70, -8, 150, 16);
-    g.beginPath(); g.arc(-60, 30, 46, 0, 7); g.fill();                                          // tambur şarjör
-    g.fillStyle = "#3f2a1d"; g.fillRect(-300, -12, 80, 30); g.fillRect(-20, 14, 26, 60);
-    g.fillStyle = "rgba(239,68,68,.6)"; g.fillRect(-230, -14, 300, 3);
-    g.restore();
-    // başlık
-    g.textAlign = "center";
-    g.font = "800 112px Impact, Haettenschweiler, 'Arial Narrow', sans-serif";
-    g.fillStyle = "#7f1d1d"; g.fillText("MAFIA", w / 2 + 5, h - 108); g.fillText("GUN", w / 2 + 5, h - 12);
-    g.fillStyle = "#fef2f2"; g.fillText("MAFIA", w / 2, h - 113); g.fillText("GUN", w / 2, h - 17);
-    g.fillStyle = "#fca5a5"; g.font = "600 22px JetBrains Mono, monospace"; g.fillText("YENİ OYUNUM · ÇOK YAKINDA", w / 2, 60);
-    g.fillStyle = "rgba(255,255,255,.45)"; g.font = "16px JetBrains Mono, monospace"; g.fillText("ahmet bölükoğlu games", w / 2, 92);
-    g.fillStyle = "#000"; [[90, 140], [520, 610], [470, 120]].forEach(([x, y]) => { g.beginPath(); g.arc(x, y, 9, 0, 7); g.fill(); });  // kurşun delikleri
-    g.strokeStyle = "rgba(255,255,255,.25)"; g.lineWidth = 2; [[90, 140], [520, 610], [470, 120]].forEach(([x, y]) => { g.beginPath(); g.arc(x, y, 13, 0, 7); g.stroke(); });
-  });
-  art.onload = () => tex.redraw();
-  art.src = "assets/projects/mafia-gun/poster.jpg";
-  tex.anisotropy = 16;  // eğik bakınca da net
-  return tex;
+// panel görselleri: aynı adres bir kez yüklenir; https görseller CORS ile (WebGL dokusu olabilsin)
+const IMG = new Map();
+function loadImg(url) {
+  if (!IMG.has(url)) IMG.set(url, new Promise(res => {
+    const im = new Image();
+    if (/^https:/.test(url)) im.crossOrigin = "anonymous";
+    im.onload = () => res(im); im.onerror = () => res(null);
+    im.src = url;
+  }));
+  return IMG.get(url);
 }
-
-// galeri çerçeveleri: şimdilik boş, coming soon
-function frameSoonTexture() {
-  return canvasTex(400, 400, (g, w, h) => {
-    g.fillStyle = "#14122b"; g.fillRect(0, 0, w, h);
-    g.strokeStyle = "rgba(167,139,250,.12)"; g.lineWidth = 14;
-    for (let i = -h; i < w; i += 40) { g.beginPath(); g.moveTo(i, h); g.lineTo(i + h, 0); g.stroke(); }
-    g.strokeStyle = "rgba(255,255,255,.18)"; g.lineWidth = 3; g.setLineDash([12, 10]); g.strokeRect(24, 24, w - 48, h - 48); g.setLineDash([]);
-    g.textAlign = "center"; g.fillStyle = "#e9e5ff"; g.font = "700 46px Space Grotesk, sans-serif";
-    g.fillText("COMING", w / 2, h / 2 - 6); g.fillText("SOON", w / 2, h / 2 + 46);
-    g.fillStyle = "#a78bfa"; g.font = "18px JetBrains Mono, monospace"; g.fillText("oyunlar & uygulamalar", w / 2, h / 2 + 88);
-    g.font = "44px sans-serif"; g.fillText("🎮", w / 2, h / 2 - 70);
+function drawCover(g, im, x, y, w, h, s = 1, ox = 0, oy = 0) {
+  const r = Math.max(w / im.naturalWidth, h / im.naturalHeight) * s, dw = im.naturalWidth * r, dh = im.naturalHeight * r;
+  g.drawImage(im, x + (w - dw) / 2 + ox, y + (h - dh) / 2 + oy, dw, dh);
+}
+// boş çerçeve: coming soon (ya da görsel yüklenemezse başlık)
+function soonCard(g, w, h, label) {
+  g.fillStyle = "#14122b"; g.fillRect(0, 0, w, h);
+  g.strokeStyle = "rgba(167,139,250,.12)"; g.lineWidth = w * 0.035;
+  for (let i = -h; i < w; i += w * 0.1) { g.beginPath(); g.moveTo(i, h); g.lineTo(i + h, 0); g.stroke(); }
+  const m = Math.min(w, h) * 0.06;
+  g.strokeStyle = "rgba(255,255,255,.18)"; g.lineWidth = Math.max(2, m * 0.12); g.setLineDash([m * 0.5, m * 0.4]); g.strokeRect(m, m, w - 2 * m, h - 2 * m); g.setLineDash([]);
+  const u = Math.min(w, h) / 400;
+  g.textAlign = "center"; g.fillStyle = "#e9e5ff";
+  if (label) {
+    g.font = `700 ${34 * u}px Space Grotesk, sans-serif`; g.fillText(label.slice(0, 22), w / 2, h / 2 + 12 * u);
+    return;
+  }
+  g.font = `700 ${46 * u}px Space Grotesk, sans-serif`; g.fillText("COMING", w / 2, h / 2 - 6 * u); g.fillText("SOON", w / 2, h / 2 + 46 * u);
+  g.fillStyle = "#a78bfa"; g.font = `${18 * u}px JetBrains Mono, monospace`; g.fillText("oyunlar & uygulamalar", w / 2, h / 2 + 88 * u);
+  g.font = `${44 * u}px sans-serif`; g.fillText("🎮", w / 2, h / 2 - 70 * u);
+}
+// panelden yönetilen tablo: tex.set({ image, title } | { soon: true })
+function tileTexture(w, h) {
+  let tile = null, im = null, token = 0;
+  const tex = canvasTex(w, h, g => {
+    if (im) { g.fillStyle = "#000"; g.fillRect(0, 0, w, h); drawCover(g, im, 0, 0, w, h); return; }
+    soonCard(g, w, h, tile && !tile.soon ? tile.title : "");
   });
+  tex.anisotropy = 16;  // eğik bakınca da net
+  tex.set = async t => {
+    tile = t; im = null; tex.redraw();
+    if (t && !t.soon && t.image) { const my = ++token, got = await loadImg(t.image); if (my === token && got) { im = got; tex.redraw(); } }
+  };
+  return tex;
 }
 
 // yazıcıdan çıkan sayfa: mavi ve turuncu bloklar (rapor)
@@ -679,14 +721,16 @@ function certScreen() {
   });
 }
 
-function neonTexture() {
+function neonTexture(st) {
   return canvasTex(1024, 280, (g, w, h, dim) => {
     g.clearRect(0, 0, w, h);
     g.font = "700 92px JetBrains Mono, monospace"; g.textAlign = "center"; g.textBaseline = "middle";
     g.shadowColor = "#f472b6"; g.shadowBlur = dim ? 8 : 40;
     g.strokeStyle = dim ? "rgba(244,114,182,.35)" : "#f472b6"; g.lineWidth = 10; g.strokeRect(24, 24, w - 48, h - 48);
     g.fillStyle = dim ? "rgba(255,209,234,.35)" : "#ffd1ea";
-    for (let i = 0; i < 2; i++) g.fillText("çay · kod · tekrar", w / 2, h / 2 + 4);
+    let t = st.text; g.font = "700 92px JetBrains Mono, monospace";
+    for (let size = 92; g.measureText(t).width > w - 90 && size > 40; size -= 4) g.font = `700 ${size}px JetBrains Mono, monospace`;
+    for (let i = 0; i < 2; i++) g.fillText(t, w / 2, h / 2 + 4);
   });
 }
 
@@ -762,12 +806,16 @@ async function init() {
   const extraDrawers = Object.keys(parts).filter(k => k.startsWith("Drawer_")).map(k => ({ o: parts[k], z: parts[k].position.z, amt: 0 }));
   extraDrawers.forEach(d => { d.o.position.z = d.z - 0.33; });
 
-  const screenTex = { W_Screen_iMac: imacScreen(), W_Screen_Left: leftScreen(), W_Screen_TV: tvScreen(), W_Screen_Phone: phoneScreen(), W_Screen_Watch: watchScreen(), W_Cert: certScreen() };
+  const tvState = { mode: "marquee", title: "", slides: [], imgs: [] }, neonState = { text: "çay · kod · tekrar" };
+  const screenTex = { W_Screen_iMac: imacScreen(), W_Screen_Left: leftScreen(), W_Screen_TV: tvScreen(tvState), W_Screen_Phone: phoneScreen(), W_Screen_Watch: watchScreen(), W_Cert: certScreen() };
   // ışık alan baskılı yüzeyler: kitap sırtları ve not kâğıtları
   const printTex = { W_Note_1: noteTexture(["TODO:", "Redis TTL", "kontrol ✓"], "#fde047"), W_Note_2: noteTexture(["Çay al", "🍵 x2"], "#f9a8d4") };
   for (const [id, b] of Object.entries(BOOKS)) printTex["W_Spine_" + id] = spineTexture(b);
   printTex.W_Soon = soonTexture();
-  printTex.W_Poster = posterTexture(); printTex.W_FrameSoon = frameSoonTexture(); printTex.W_PrintOut = printOutTexture();
+  printTex.W_PrintOut = printOutTexture();
+  printTex.W_Poster_C = tileTexture(1200, 1660);
+  printTex.W_Poster_L = tileTexture(900, 1250); printTex.W_Poster_R = tileTexture(900, 1250);
+  GAL_SIZE.forEach(([gw, gh], i) => { printTex["W_Gal_" + i] = tileTexture(Math.round(gw * 1600), Math.round(gh * 1600)); });
   const patterns = {};
   const partMats = {};
 
@@ -784,7 +832,7 @@ async function init() {
       if (map && !patterns[map]) patterns[map] = PATTERNS[map]();
       m = new THREE.MeshStandardMaterial({ ...rest, map: printTex[name] || (map ? patterns[map] : null) });
       if (rest.emissive) m.emissive = new THREE.Color(rest.emissive);
-      if (name === "W_Poster") m.emissiveMap = m.map;
+      if (name.startsWith("W_Poster_") || name.startsWith("W_Gal_")) m.emissiveMap = m.map;
       maskShader(m);
       if (name === "W_RGB" || name === "W_KeyGlow" || name === "W_FanBlade") part.name.startsWith("Fan_") ? rainbow(m, RING[part.name[4]], "ring" + part.name[4]) : rainbow(m, WAVE, "wave");
       (partMats[part.name] ||= []).push(m);
@@ -793,8 +841,27 @@ async function init() {
     o.material = m;
   });
 
+  // ---------------------------------------------------------------- oda içeriği (theyvoice.com paneli)
+  let content = null, projectsDrawer = "Drawer", drawerItems = {};
+  const featuredOf = n => content ? content.featured[{ Poster: "center", Poster_L: "left", Poster_R: "right" }[n]] : null;
+  const tileLabel = t => !t || t.soon ? "🖼️ yakında" : "🖼️ " + (t.title || "tablo");
+  function applyContent(d) {
+    content = d;
+    printTex.W_Poster_C.set(d.featured.center); printTex.W_Poster_L.set(d.featured.left); printTex.W_Poster_R.set(d.featured.right);
+    d.gallery.forEach((t, i) => printTex["W_Gal_" + i].set(t));
+    if (neonState.text !== d.neon) { neonState.text = d.neon; neonTex.redraw(); }
+    tvState.mode = d.tv.mode; tvState.title = d.tv.title; tvState.slides = d.tv.slides;
+    tvState.imgs = d.tv.slides.map(() => null);
+    d.tv.slides.forEach((sl, i) => loadImg(sl.image).then(im => { if (tvState.slides[i] === sl) tvState.imgs[i] = im; }));
+    if (!reduceMotion) screenTex.W_Screen_TV.redraw(performance.now());
+    projectsDrawer = parts[d.drawers.projects] ? d.drawers.projects : "Drawer";
+    drawerItems = d.drawers.items || {};
+    const tag = TAGS.find(t => t.cls === "a");
+    if (tag && parts[projectsDrawer]) tag.at = new THREE.Box3().setFromObject(parts[projectsDrawer]).getCenter(new THREE.Vector3()).add(new THREE.Vector3(0, 0.12, 0.1));
+  }
+
   // neon yazısı
-  const neonTex = neonTexture(); neonTex.flipY = true; neonTex.needsUpdate = true;
+  const neonTex = neonTexture(neonState); neonTex.flipY = true; neonTex.needsUpdate = true;
   const neon = new THREE.Mesh(new THREE.PlaneGeometry(1.0, 0.27), new THREE.MeshBasicMaterial({ map: neonTex, transparent: true, toneMapped: false, depthWrite: false }));
   neon.position.copy(B(0.12, 1.568, 2.12)); scene.add(neon);
 
@@ -814,6 +881,8 @@ async function init() {
     { text: "🗂️ projeler", at: B(0.835, 0.88, 0.6), cls: "a" },
   ].map(t => { const el = document.createElement("div"); el.className = "tag3d " + t.cls; el.textContent = t.text; frame.appendChild(el); return { ...t, el }; });
 
+  window.RoomContent && RoomContent.on(applyContent);
+
   // ---------------------------------------------------------------- etkileşim
   const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
   let hover = null, busy = false, teaCount = 1, qi = 0, rgbBoost = 0;
@@ -821,6 +890,7 @@ async function init() {
   const CAT = ["😺 Alpay: Mırr… kod yazarken uyuyakaldım", "😼 Alpay klavyenin üstüne yatmadı, söz", "😸 Alpay: deploy bitince uyandır", "🐟 Alpay'ın mama saati geçti ama…"];
   const QUACK = ["🦆 Quack! Bug'ı bana anlat…", "🦆 Satır satır anlat, bulacağız.", "🦆 Null mı geliyor yoksa?", "🦆 Cache'i temizledin mi?"];
 
+  let hitMat = "";
   function pick(ev) {
     const r = canvas.getBoundingClientRect();
     ndc.set((ev.clientX - r.left) / r.width * 2 - 1, -(ev.clientY - r.top) / r.height * 2 + 1);
@@ -828,7 +898,7 @@ async function init() {
     for (const h of ray.intersectObject(root, true)) {
       let p = h.object; while (p.parent && p.parent !== root) p = p.parent;
       if (p.name === "Room") return null;
-      if (CLICK.includes(p.name) || p.name.startsWith("Book_") || p.name.startsWith("Drawer_")) return p;
+      if (CLICK.includes(p.name) || p.name.startsWith("Book_") || p.name.startsWith("Drawer_")) { hitMat = h.object.material && h.object.material.name; return p; }
       if (p.name.startsWith("Clock")) return parts.Clock;
       if (p.name.startsWith("Fan_")) return parts.PC;
     }
@@ -842,7 +912,8 @@ async function init() {
     hover = p;
     if (hover) (partMats[hover.name] || []).forEach(m => { m.userData.e0 ??= m.emissive.getHex(); if (!m.userData.e0) m.emissive.set("#2a2550"); });
     canvas.style.cursor = hover ? "pointer" : "";
-    const label = hover && (hover.name.startsWith("Book_") ? "Kitap" : hover.name.startsWith("Drawer_") ? "Çekmece" : NAMES[hover.name]);
+    const label = hover && (hover.name.startsWith("Book_") ? "Kitap" : hover.name.startsWith("Poster") ? tileLabel(featuredOf(hover.name))
+      : hover.name === "Gallery" ? "🖼️ galeri" : hover.name === projectsDrawer ? "🗂️ Projeler" : hover.name.startsWith("Drawer") ? "Çekmece" : NAMES[hover.name]);
     dispatchEvent(new CustomEvent("room:hover", { detail: label || "" }));
     const b = hover && BOOKS[hover.name.slice(5)];
     tip.classList.toggle("show", !!(hover && hover.name.startsWith("Book_") && b));
@@ -906,7 +977,10 @@ async function init() {
     return frame.classList.contains("is-3d") && parts[name] ? rectOf(parts[name]) : null;
   });
   const openDrawer = async () => { if (drawerAmt < 0.99) { sfx("drawer"); const a0 = drawerAmt; await tween(600, t => setDrawer(a0 + (1 - a0) * t)); } drawerHold = true; };
-  Devices.onOpen(type => { if (type === "archive") openDrawer(); });
+  Devices.onOpen(type => { if (type === "archive" && projectsDrawer === "Drawer") openDrawer(); });
+  let heldExtra = null;
+  const slideExtra = (d, a1) => { const a0 = d.amt; return tween(600, t => { d.amt = a0 + (a1 - a0) * t; d.o.position.z = d.z - 0.33 * (1 - d.amt); }); };
+  const itemOf = n => { const it = drawerItems[n]; return it && !it.soon && (it.title || it.text || it.image || it.link) ? it : null; };
   // telefon ve projeler: önce kamera cihaza gider (menüden açınca da), sonra arayüz açılır
   Devices.setPreOpen(async type => {
     resetOffset();
@@ -918,7 +992,13 @@ async function init() {
       const c = new THREE.Box3().setFromObject(parts.Phone).getCenter(new THREE.Vector3());
       await Promise.all([flyTo(c.clone().add(new THREE.Vector3(0, 0.15, 0.9)), c, 650), lift("Phone")]);
     } else if (type === "archive") {
-      await Promise.all([openDrawer(), flyTo(stops[4].pos, stops[4].look, 800)]);
+      if (projectsDrawer === "Drawer") await Promise.all([openDrawer(), flyTo(stops[4].pos, stops[4].look, 800)]);
+      else {  // projeler başka çekmecede: kamera o çekmeceye gider, çekmece açılır
+        const d = extraDrawers.find(x => x.o === parts[projectsDrawer]);
+        const c = new THREE.Box3().setFromObject(parts[projectsDrawer]).getCenter(new THREE.Vector3());
+        sfx("drawer"); heldExtra = d;
+        await Promise.all([d ? slideExtra(d, 1) : 0, flyTo(c.clone().add(new THREE.Vector3(0, 0.55, 0.85)), c, 800)]);
+      }
     }
   });
   // masaüstü monitörün içinde açılır: kamera ekranı kadraja sığdırır, arayüz ekranın üstüne oturur
@@ -960,6 +1040,7 @@ async function init() {
     Object.values(screens).forEach(sc => { sc.mesh.visible = true; });
     document.documentElement.classList.remove("roomzoom");
     if (drawerHold) { drawerHold = false; sfx("drawer"); }
+    if (heldExtra) { const d = heldExtra; heldExtra = null; sfx("drawer"); slideExtra(d, 0); }
     busy = true; await flyTo(base.pos, base.look, 800); busy = false;
   });
 
@@ -985,11 +1066,21 @@ async function init() {
   async function act(p) {
     if (!p || busy) return;
     const n = p.name;
-    if (n.startsWith("Drawer_")) {
-      const d = extraDrawers.find(x => x.o === p), a0 = d.amt, a1 = a0 > 0.5 ? 0 : 1;
+    if (n === projectsDrawer) { Devices.open("archive"); return; }
+    if (n.startsWith("Drawer")) {  // panelden içerik varsa açılır ve gösterilir; yoksa coming soon
+      const item = itemOf(n);
+      if (n === "Drawer") {
+        const a1 = drawerAmt > 0.5 ? 0 : 1; sfx("drawer"); drawerHold = !!a1;
+        if (a1 && !item) say(p, "📄 Coming soon: bu çekmece yakında dolacak");
+        const a0 = drawerAmt; await tween(600, t => setDrawer(a0 + (a1 - a0) * t));
+        if (a1 && item) Devices.openItem(item);
+        return;
+      }
+      const d = extraDrawers.find(x => x.o === p), a1 = d.amt > 0.5 ? 0 : 1;
       sfx("drawer");
-      if (a1) say(p, "📄 Coming soon: yeni projeler bu çekmecede");
-      await tween(600, t => { d.amt = a0 + (a1 - a0) * t; p.position.z = d.z - 0.33 * (1 - d.amt); });
+      if (a1 && !item) say(p, "📄 Coming soon: bu çekmece yakında dolacak");
+      await slideExtra(d, a1);
+      if (a1 && item) { heldExtra = d; Devices.openItem(item); }
       return;
     }
     if (n === "Keyboard") { await Devices.open("imac", "terminal"); window.Term?.autoplay(); return; }
@@ -1005,8 +1096,6 @@ async function init() {
     }
     if (n === "iMac" || n === "Shelf") {
       Devices.open("imac", n === "Shelf" ? "yetenekler" : undefined);
-    } else if (n === "Drawer") {
-      Devices.open("archive");
     } else if (n === "Monitor2") {
       Devices.open("tablet");
     } else if (n === "Phone") {
@@ -1034,8 +1123,14 @@ async function init() {
       say(p, day ? "☀️ Üsküdar'dan Boğaz manzarası" : "🌠 Kız Kulesi manzarası, bir dilek tut");
     } else if (n === "Cert") { sfx("paper"); say(p, "📜 MCPD — 100 puan (2013)"); }
     else if (n === "PC") { sfx("whooshIn"); rgbBoost = 1; say(p, "🖥️ TUF GT502 · RTX 4090 Suprim · 360 sıvı soğutma + 7 fan ⚡"); }
-    else if (n === "Poster") { sfx("paper"); say(p, "🎯 Mafia Gun: yeni oyunum, şimdi oyna! mafiagun.com"); setTimeout(() => Devices.open("archive"), 900); }
-    else if (n === "Gallery") { sfx("paper"); say(p, "🖼️ Coming soon: eski oyunlarım ve uygulamalarım burada sergilenecek"); }
+    else if (n.startsWith("Poster") || n === "Gallery") {
+      const t = n === "Gallery" ? content && content.gallery[+(/^W_Gal_(\d)$/.exec(hitMat) || [])[1]] : featuredOf(n);
+      sfx("paper");
+      if (!t || t.soon) say(p, "🖼️ Coming soon: burada yakında yeni bir şey sergilenecek");
+      else if (t.project) { say(p, "🎯 " + (t.title || "Proje")); setTimeout(() => Devices.openProject(t.project), 700); }
+      else if (t.link) { say(p, "🔗 " + (t.title || "Aç")); window.open(t.link, "_blank", "noopener"); }
+      else say(p, "🖼️ " + (t.title || ""));
+    }
     else if (n === "Printer") { sfx("drawer"); say(p, "🖨️ CV yazdırılıyor…"); setTimeout(() => Devices.open("tablet", "cv"), 900); }
     else if (n === "Mouse") { sfx("click"); say(p, "🖱️ MX Master 3: yan tekerlek, sonsuz kaydırma"); }
     else if (n === "TV") { sfx("click"); say(p, "📺 65 inç · PS5 hazır: akşam bir maç? 🎮"); }
@@ -1213,16 +1308,17 @@ async function init() {
   }
 
   // kare süresi ölçülür: yavaşsa çözünürlük düşer (donma olmasın), hızlıysa yavaşça geri çıkar
-  let perfT = 0, perfN = 0, perfSum = 0, fastFor = 0;
+  let perfT = 0, perfN = 0, perfSum = 0, fastFor = 0, slowFor = 0, warmup = 0;
   function adapt(dt) {
     if (!dt || dt > 0.2) return;
+    if ((warmup += dt) < 4) return;  // açılışta shader derleme ve doku yükleme kareleri sayılmaz
     perfSum += dt; perfN++; perfT += dt;
     if (perfT < 1) return;
     const avg = perfSum / perfN; perfT = perfSum = perfN = 0;
     let next = pr;
-    if (avg > 0.024 && pr > PR_MIN) { next = Math.max(PR_MIN, pr - 0.2); fastFor = 0; }
-    else if (avg < 0.0145 && pr < PR_MAX) { if (++fastFor >= 3) { next = Math.min(PR_MAX, pr + 0.1); fastFor = 0; } }
-    else fastFor = 0;
+    if (avg > 0.034 && pr > PR_MIN) { fastFor = 0; if (++slowFor >= 2) { next = Math.max(PR_MIN, pr - 0.15); slowFor = 0; } }   // 30 fps altı iki saniye
+    else if (avg < 0.021 && pr < PR_MAX) { slowFor = 0; if (++fastFor >= 2) { next = Math.min(PR_MAX, pr + 0.15); fastFor = 0; } }  // 48 fps üstü: netleş
+    else { fastFor = 0; slowFor = 0; }
     if (next !== pr) { pr = next; renderer.setPixelRatio(pr); resize(); }
   }
 
@@ -1239,7 +1335,7 @@ async function init() {
     tour();
     if (now % 30000 < 20) screenTex.W_Screen_Phone.redraw();
     if (now - lastWatch > 1000) { screenTex.W_Screen_Watch.redraw(); lastWatch = now; }
-    if (!reduceMotion && now - lastTV > 90) { screenTex.W_Screen_TV.redraw(now); lastTV = now; }
+    if (!reduceMotion && now - lastTV > (tvState.mode === "gameplay" ? 66 : 90)) { screenTex.W_Screen_TV.redraw(now); lastTV = now; }
     if (parts.Cat) {
       catPoke *= 0.94;
       const b = Math.sin(now / 900) * (reduceMotion ? 0 : 1), k = Math.sin(now / 60) * catPoke;

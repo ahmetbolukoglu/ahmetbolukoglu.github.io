@@ -891,6 +891,62 @@
     .rh-acts { display: flex; flex-wrap: wrap; gap: 10px; } .rh-acts .btn { flex: 1 1 auto; justify-content: center; cursor: pointer; padding: 10px 14px; }
     @media (max-width: 420px) { .roam-help { padding: 16px; } .roam-help li { grid-template-columns: 24px 1fr; } .roam-help li em { grid-column: 2; } }
 
+    /* ---------- TV: PS5 tarzı arayüz ---------- */
+    .dev-tv { width: min(1100px, 100%); aspect-ratio: 16 / 9; height: auto; padding: 10px; overflow: hidden; background: #050506; border-radius: 10px; box-shadow: 0 0 0 2px #1f2937, 0 40px 120px -30px rgba(99,102,241,.5); }
+    .dev-tv.embed { padding: 0; background: none; box-shadow: none; border-radius: 0; aspect-ratio: auto; }
+    .tv-screen { position: relative; width: 100%; height: 100%; overflow: hidden; color: #fff; font-family: var(--sans); background: #06070d; }
+    .ps-bg { position: absolute; inset: -40px; background: #0b1020 center / cover no-repeat; filter: blur(26px) brightness(.5) saturate(1.2); transform: scale(1.05); transition: background-image .4s; }
+    .ps::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(90deg, rgba(4,6,14,.92) 0%, rgba(4,6,14,.55) 45%, rgba(4,6,14,.2) 100%), linear-gradient(0deg, rgba(4,6,14,.9), transparent 45%); }
+    .ps > * { position: relative; z-index: 1; }
+    .ps-top { display: flex; justify-content: space-between; align-items: center; padding: 34px 60px 0; font-size: 24px; }
+    .ps-top nav { display: flex; gap: 34px; } .ps-top nav b { font-weight: 600; } .ps-top nav span { opacity: .55; }
+    .ps-meta { display: flex; align-items: center; gap: 22px; font: 500 24px var(--sans); opacity: .9; }
+    .ps-meta i { width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; font: 700 16px var(--sans); font-style: normal; background: linear-gradient(135deg, var(--cyan), var(--violet)); color: #0b0a1a; }
+    .ps-row { display: flex; align-items: center; gap: 18px; padding: 40px 60px 0; height: 210px; }
+    .ps-tile { flex: none; width: 128px; height: 128px; padding: 0; border: 0; border-radius: 22px; overflow: hidden; background: #1f2433; cursor: pointer; transition: width .25s, height .25s, box-shadow .25s; }
+    .ps-tile img { width: 100%; height: 100%; object-fit: cover; display: block; } .ps-tile span { font: 700 48px var(--sans); color: #fff; }
+    .ps-tile.on, .ps-tile:focus-visible { width: 170px; height: 170px; box-shadow: 0 0 0 4px #fff, 0 20px 50px rgba(0,0,0,.6); outline: none; }
+    .ps-tname { font: 600 30px var(--sans); margin-left: 10px; text-shadow: 0 2px 12px rgba(0,0,0,.6); }
+    .ps-hero { padding: 26px 60px 0; max-width: 980px; }
+    .ps-hero h2 { font: 800 76px/1 var(--sans); letter-spacing: -.02em; margin: 0 0 10px; text-shadow: 0 4px 30px rgba(0,0,0,.5); }
+    .ps-hero p { font-size: 24px; line-height: 1.45; color: rgba(255,255,255,.85); margin: 0 0 8px; max-width: 900px; }
+    .ps-status { color: #5eead4 !important; font: 600 20px var(--mono) !important; }
+    .ps-acts { display: flex; gap: 16px; margin-top: 22px; }
+    .ps-btn { font: 700 24px var(--sans); color: #0b0a1a; background: #fff; border: 0; border-radius: 999px; padding: 16px 38px; cursor: pointer; text-decoration: none; }
+    .ps-btn:not(.main) { color: #fff; background: rgba(255,255,255,.14); }
+    .ps-btn:hover, .ps-btn:focus-visible { box-shadow: 0 0 0 4px rgba(255,255,255,.5); outline: none; }
+    .ps-shelf { position: absolute; left: 0; right: 0; bottom: 34px; padding: 0 60px; }
+    .ps-shelf h4 { font: 600 22px var(--sans); margin: 0 0 14px; opacity: .85; }
+    .ps-media { display: flex; gap: 18px; overflow-x: auto; scrollbar-width: none; padding: 6px 4px 10px; }
+    .ps-card { position: relative; flex: none; width: 300px; height: 170px; padding: 0; border: 0; border-radius: 16px; overflow: hidden; background: #1f2433; cursor: pointer; color: #fff; text-align: left; transition: transform .2s, box-shadow .2s; }
+    .ps-card.tall img { object-position: top; }
+    .ps-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .ps-card b { position: absolute; left: 0; right: 0; bottom: 0; padding: 30px 14px 12px; font: 600 18px var(--sans); background: linear-gradient(transparent, rgba(0,0,0,.85)); }
+    .ps-card:hover, .ps-card:focus-visible { transform: scale(1.04); box-shadow: 0 0 0 4px #fff; outline: none; }
+    .ps-none, .ps-empty { font-size: 22px; opacity: .7; } .ps-empty { padding: 80px 0; }
+    .ps-player { position: absolute; inset: 0; z-index: 5; background: #000; }
+    .ps-player[hidden] { display: none; }
+    .ps-stage, .ps-stage video, .ps-stage iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; background: #000; object-fit: contain; }
+    .ps-slides figure { position: absolute; inset: 0; margin: 0; opacity: 0; transition: opacity .8s; }
+    .ps-slides figure.on { opacity: 1; }
+    .ps-blur { position: absolute; inset: -60px; background: center / cover no-repeat; filter: blur(34px) brightness(.4); }
+    .ps-slides img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
+    .ps-slides figure.on img { animation: psKB 6s ease-out both; }
+    .ps-player.paused .ps-slides figure.on img { animation-play-state: paused; }
+    @keyframes psKB { from { transform: scale(1); } to { transform: scale(1.07); } }
+    .ps-slides figcaption { position: absolute; left: 60px; bottom: 170px; font: 700 40px var(--sans); text-shadow: 0 3px 20px rgba(0,0,0,.8); }
+    .ps-ctrl { position: absolute; left: 0; right: 0; bottom: 0; padding: 40px 60px 34px; background: linear-gradient(transparent, rgba(0,0,0,.85)); transition: opacity .35s; pointer-events: none; }
+    .ps-ctrl > * { pointer-events: auto; }
+    .ps-player.idle:not(.paused) .ps-ctrl { opacity: 0; }
+    .ps-ptitle { display: block; font: 600 26px var(--sans); margin-bottom: 16px; }
+    .ps-bar { height: 8px; border-radius: 4px; background: rgba(255,255,255,.25); cursor: pointer; margin-bottom: 20px; }
+    .ps-bar i { display: block; height: 100%; width: 0; border-radius: 4px; background: #fff; }
+    .ps-btns { display: flex; align-items: center; gap: 14px; }
+    .ps-btns button { font: 600 26px var(--sans); color: #fff; background: rgba(255,255,255,.14); border: 0; border-radius: 999px; min-width: 64px; height: 64px; padding: 0 22px; cursor: pointer; }
+    .ps-btns button:hover, .ps-btns button:focus-visible { background: #fff; color: #000; outline: none; }
+    .ps-btns .ps-play { background: #fff; color: #000; min-width: 84px; }
+    .ps-time { margin-left: auto; font: 500 22px var(--mono); opacity: .85; }
+
     /* ---------- 2. DALGA ---------- */
     .stat .k { display: block; font: 11px var(--mono); letter-spacing: .14em; color: var(--muted); margin-bottom: 12px; }
     .reel-btn { border-style: dashed; }
@@ -1750,9 +1806,9 @@
   // ---------- DEVICES: pick up from desk ----------
   const Devices = (function () {
     const stage = $("#stage"), dev = $("#device"), closeBtn = $("#stageClose");
-    const SRC = { imac: "#hMonitor", tablet: "#hTablet", phone: "#hPhone", archive: "#room", watch: "#room" };
-    const LABEL = { imac: "Masaüstü", tablet: "CV", phone: "İletişim", archive: "Projeler", watch: "Akıllı saat" };
-    const PARTS = { imac: [], tablet: [], phone: [], archive: [], watch: [] };  // ana ekranlı cihazlar bölümleri uygulama açılınca alır
+    const SRC = { imac: "#hMonitor", tablet: "#hTablet", phone: "#hPhone", archive: "#room", watch: "#room", tv: "#room" };
+    const LABEL = { imac: "Masaüstü", tablet: "CV", phone: "İletişim", archive: "Projeler", watch: "Akıllı saat", tv: "Televizyon" };
+    const PARTS = { imac: [], tablet: [], phone: [], archive: [], watch: [], tv: [] };  // ana ekranlı cihazlar bölümleri uygulama açılınca alır
     // projeler: hepsi hazırlanıyor (coming soon); ad, tür ve teknoloji geldikçe buraya yazılır
     // uygulamalar: sayfa bölümleri cihazın içine taşınır ya da uygulamaya özel ekran çizilir
     const profile = s => `
@@ -1967,6 +2023,28 @@
             <button type="button" class="w-back">Geri</button>
           </div>
         </div>`,
+      tv: () => `
+        <div class="tv-screen ps">
+          <div class="ps-bg"></div>
+          <header class="ps-top"><nav><b>Oyunlar</b><span>Medya</span></nav><div class="ps-meta"><span data-clock>${$("#navTime").textContent}</span><i>AB</i></div></header>
+          <div class="ps-row" role="listbox" aria-label="Oyunlar"></div>
+          <section class="ps-hero"></section>
+          <section class="ps-shelf"><h4>Medya</h4><div class="ps-media"></div></section>
+          <div class="ps-player" hidden>
+            <div class="ps-stage"></div>
+            <div class="ps-ctrl">
+              <b class="ps-ptitle"></b>
+              <div class="ps-bar"><i></i></div>
+              <div class="ps-btns">
+                <button type="button" data-p="back" aria-label="Geri">◀ Geri</button>
+                <button type="button" data-p="prev" aria-label="Önceki">⏮</button>
+                <button type="button" data-p="toggle" class="ps-play" aria-label="Oynat / duraklat">⏸</button>
+                <button type="button" data-p="next" aria-label="Sonraki">⏭</button>
+                <span class="ps-time"></span>
+              </div>
+            </div>
+          </div>
+        </div>`,
       archive: () => `
         <div class="ar-drawer">
           <div class="ar-head"><span>~/çekmece/<b>projeler</b></span><span lang="en">${PROJECTS.filter(p => !p.soon).length} yayında · ${PROJECTS.filter(p => p.soon).length} coming soon</span></div>
@@ -1982,6 +2060,112 @@
           <div class="ar-detail" hidden></div>
         </div>`,
     };
+
+    // ---------- TV: PS5 tarzı arayüz ----------
+    // içerik: RoomContent.tv.library (oyunlar + videoları + oynanış/ekran görüntüsü sergileri), theyvoice.com panelinden
+    let tvBack = () => false;
+    function setupTV() {
+      const box = dev.querySelector(".ps"), row = box.querySelector(".ps-row"), hero = box.querySelector(".ps-hero"), media = box.querySelector(".ps-media");
+      const bg = box.querySelector(".ps-bg"), pl = box.querySelector(".ps-player"), stageEl = pl.querySelector(".ps-stage");
+      const bar = pl.querySelector(".ps-bar i"), playBtn = pl.querySelector(".ps-play"), timeEl = pl.querySelector(".ps-time"), titleEl = pl.querySelector(".ps-ptitle");
+      const tvc = (window.RoomContent && RoomContent.get() && RoomContent.get().tv) || { library: [] };
+      const lib = tvc.library || [];
+      let sel = Math.max(0, lib.findIndex(g => g.id === tvc.featured)), item = 0, slide = 0, paused = false, timer = 0, slideT0 = 0, slideAcc = 0, idleT = 0;
+      const SLIDE_MS = 6000;
+      if (!lib.length) { hero.innerHTML = '<div class="ps-empty">Henüz içerik yok. theyvoice.com panelinden oyun ve video ekledikçe burada görünecek.</div>'; return; }
+      const fmt = s => { s = Math.max(0, Math.floor(s)); return String(Math.floor(s / 60)).padStart(2, "0") + ":" + String(s % 60).padStart(2, "0"); };
+      const thumbOf = m => m.thumb || (m.slides && m.slides[0] && m.slides[0].image) || lib[sel].cover;
+      function home() {
+        const g = lib[sel];
+        row.innerHTML = lib.map((x, i) => `<button type="button" class="ps-tile${i === sel ? " on" : ""}" data-g="${i}" role="option" aria-selected="${i === sel}">
+          ${x.icon || x.cover ? `<img src="${x.icon || x.cover}" alt="" loading="lazy">` : `<span>${esc(x.name[0] || "?")}</span>`}</button>`).join("")
+          + `<span class="ps-tname">${esc(g.name)}</span>`;
+        bg.style.backgroundImage = g.cover && !g.logo ? `url("${g.cover}")` : "none";
+        hero.innerHTML = `<h2>${esc(g.name)}</h2><p class="ps-status">${esc(g.status || "")}</p><p>${esc(g.desc || "")}</p>
+          <div class="ps-acts">${g.play ? `<a class="ps-btn main" href="${g.play}" target="_blank" rel="noopener">▶ Oyna</a>` : ""}
+          ${g.media.length ? '<button type="button" class="ps-btn" data-m="0">🎬 ' + esc(g.media[0].kind === "slides" ? "Oynanış" : "İzle") + '</button>' : ""}</div>`;
+        media.innerHTML = g.media.length ? g.media.map((m, i) => `<button type="button" class="ps-card${m.kind === "slides" ? " tall" : ""}" data-m="${i}">
+          ${thumbOf(m) ? `<img src="${thumbOf(m)}" alt="" loading="lazy">` : ""}<b>${m.kind === "slides" ? "🖼️" : "▶"} ${esc(m.title)}</b></button>`).join("")
+          : '<p class="ps-none">Bu oyunun medyası yakında.</p>';
+      }
+      // oynatıcı
+      function stopMedia() { clearInterval(timer); stageEl.innerHTML = ""; }
+      function play(i) {
+        const g = lib[sel], m = g.media[i]; if (!m) return;
+        item = i; slide = 0; paused = false; slideAcc = 0; slideT0 = performance.now();
+        stopMedia(); pl.hidden = false; titleEl.textContent = m.title.startsWith(g.name) ? m.title : g.name + " · " + m.title; sfx("whooshIn");
+        if (m.kind === "file") {
+          stageEl.innerHTML = `<video src="${m.url}" ${m.thumb ? `poster="${m.thumb}"` : ""} autoplay playsinline></video>`;
+          const v = stageEl.querySelector("video");
+          v.addEventListener("timeupdate", () => { bar.style.width = (v.currentTime / (v.duration || 1) * 100) + "%"; timeEl.textContent = fmt(v.currentTime) + " / " + fmt(v.duration || 0); });
+          v.addEventListener("ended", () => next());
+          v.addEventListener("play", () => { paused = false; playBtn.textContent = "⏸"; });
+          v.addEventListener("pause", () => { paused = true; playBtn.textContent = "▶"; });
+        } else if (m.kind === "youtube" || m.kind === "vimeo") {
+          stageEl.innerHTML = `<iframe src="${m.embed}" title="${esc(m.title)}" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>`;
+          bar.style.width = "0"; timeEl.textContent = m.kind === "youtube" ? "YouTube" : "Vimeo";
+        } else {
+          stageEl.innerHTML = `<div class="ps-slides">${m.slides.map((s, k) => `<figure class="${k ? "" : "on"}"><i class="ps-blur" style="background-image:url(&quot;${s.image}&quot;)"></i><img src="${s.image}" alt=""><figcaption>${esc(s.caption || "")}</figcaption></figure>`).join("")}</div>`;
+          timer = setInterval(tick, 200);
+        }
+        playBtn.textContent = "⏸"; pl.classList.remove("paused");
+        poke();
+      }
+      function showSlide(k) {
+        const m = lib[sel].media[item], figs = stageEl.querySelectorAll("figure");
+        if (!figs.length) return;
+        slide = (k + m.slides.length) % m.slides.length; slideAcc = 0; slideT0 = performance.now();
+        figs.forEach((f, j) => { f.classList.toggle("on", j === slide); if (j === slide) { const im = f.querySelector("img"); im.style.animation = "none"; void im.offsetWidth; im.style.animation = ""; } });
+      }
+      function tick() {
+        const m = lib[sel].media[item]; if (!m || m.kind !== "slides" || paused) return;
+        const el = slideAcc + performance.now() - slideT0, n = m.slides.length;
+        bar.style.width = ((slide + Math.min(1, el / SLIDE_MS)) / n * 100) + "%";
+        timeEl.textContent = fmt((slide * SLIDE_MS + el) / 1000) + " / " + fmt(n * SLIDE_MS / 1000);
+        if (el >= SLIDE_MS) { if (slide + 1 < n) showSlide(slide + 1); else next(); }
+      }
+      function toggle() {
+        const m = lib[sel].media[item], v = stageEl.querySelector("video");
+        if (v) return v.paused ? v.play() : v.pause();
+        if (m.kind !== "slides") return;
+        paused = !paused;
+        if (paused) slideAcc += performance.now() - slideT0; else slideT0 = performance.now();
+        pl.classList.toggle("paused", paused); playBtn.textContent = paused ? "▶" : "⏸";
+      }
+      function next() { const g = lib[sel]; if (g.media[item].kind === "slides" && slide + 1 < g.media[item].slides.length) return showSlide(slide + 1); play((item + 1) % g.media.length); }
+      function prev() { const g = lib[sel]; if (g.media[item].kind === "slides" && slide > 0) return showSlide(slide - 1); play((item - 1 + g.media.length) % g.media.length); }
+      function seek(frac) {
+        const m = lib[sel].media[item], v = stageEl.querySelector("video");
+        if (v && v.duration) v.currentTime = frac * v.duration;
+        else if (m.kind === "slides") showSlide(Math.min(m.slides.length - 1, Math.floor(frac * m.slides.length)));
+      }
+      function poke() { pl.classList.remove("idle"); clearTimeout(idleT); idleT = setTimeout(() => pl.classList.add("idle"), 2600); }
+      tvBack = () => { if (pl.hidden) return false; stopMedia(); pl.hidden = true; sfx("whooshOut"); return true; };
+      box.addEventListener("click", e => {
+        const t = e.target.closest("[data-g]"), mm = e.target.closest("[data-m]"), p = e.target.closest("[data-p]");
+        if (t) { sel = +t.dataset.g; sfx("tick"); home(); }
+        else if (mm) play(+mm.dataset.m);
+        else if (p) ({ back: tvBack, prev, next, toggle })[p.dataset.p]();
+        else if (e.target.closest(".ps-bar")) { const r = e.target.closest(".ps-bar").getBoundingClientRect(); seek((e.clientX - r.left) / r.width); }
+        else if (e.target.closest(".ps-stage") && !pl.hidden) toggle();
+      });
+      pl.addEventListener("pointermove", poke);
+      box.onkeydown = e => {
+        if (!pl.hidden) {
+          if (e.key === " ") { e.preventDefault(); toggle(); } else if (e.key === "ArrowRight") next(); else if (e.key === "ArrowLeft") prev();
+          return;
+        }
+        if (e.key === "ArrowRight" || e.key === "ArrowLeft") { sel = (sel + (e.key === "ArrowRight" ? 1 : -1) + lib.length) % lib.length; sfx("tick"); home(); row.querySelector(".on")?.focus({ preventScroll: true }); }
+        else if (e.key === "Enter" && lib[sel].media.length && !e.target.closest("a, button")) play(0);
+      };
+      document.addEventListener("keydown", e => { if (current === "tv" && box.isConnected && box.onkeydown) box.onkeydown(e); });
+      // gömülü değilse (telefon, dar ekran) 1600×900 tasarım cihaza sığdırılır
+      if (!embed) {
+        const fit = () => { if (!box.isConnected) return removeEventListener("resize", fit); const s = (dev.clientWidth - 20) / 1600; Object.assign(box.style, { width: "1600px", height: "900px", flex: "none", transform: `scale(${s})`, transformOrigin: "0 0" }); };
+        requestAnimationFrame(fit); setTimeout(fit, 60); addEventListener("resize", fit);  // cihaz görünür olduktan sonra ölçülür
+      }
+      home();
+    }
 
     // projeler çekmecesi: dev isim listesi, imleci izleyen dosya önizlemesi, açılan dosya kâğıdı
     function setupArchive() {
@@ -2061,17 +2245,18 @@
       w.querySelectorAll(".reveal").forEach(e => e.classList.add("in"));
       into.appendChild(w); borrowed.push([w, ph]);
     }
-    function giveBack() { borrowed.forEach(([w, ph]) => { w.hidden = false; ph.replaceWith(w); }); borrowed = []; }
+    function giveBack() {
+      dev.querySelectorAll(".ps-stage video").forEach(v => v.pause()); borrowed.forEach(([w, ph]) => { w.hidden = false; ph.replaceWith(w); }); borrowed = []; }
 
     // 3D odada masaüstü monitörün içinde açılır: kamera ekrana yaklaşır, arayüz ekranın üstüne oturur
     let embed = null, embedSource = null, preOpen = null;
     // monitörün "çözünürlüğü": arayüz bu genişlikte çizilir, ekrana ölçeklenir (gerçek bir ekran gibi)
-    const NATIVE = { imac: 1600, tablet: 1280, watch: 360 };
+    const NATIVE = { imac: 1600, tablet: 1280, watch: 360, tv: 1600 };
     function place() {
       if (!embed) return;
       const r = embed();
       Object.assign(dev.style, { left: r.left + "px", top: r.top + "px", width: r.width + "px", height: r.height + "px" });
-      const inner = dev.querySelector(".imac-screen, .tab-screen, .watch-screen"), vw = NATIVE[current];
+      const inner = dev.querySelector(".imac-screen, .tab-screen, .watch-screen, .tv-screen"), vw = NATIVE[current];
       if (inner && vw) {
         const s = r.width / vw, vh = r.height / s;
         Object.assign(inner.style, { width: vw + "px", height: vh + "px", flex: "none", transform: `scale(${s})`, transformOrigin: "0 0" });
@@ -2118,6 +2303,7 @@
       const body = dev.querySelector(".screen-body");
       PARTS[type].forEach(id => borrow(id, body));
       if (type === "archive") setupArchive();
+      if (type === "tv") setupTV();
       if (dev.querySelector(".os")) dev.querySelector(".os").classList.add("os-on");
       if (HOME_APPS[type]) {
         dev.addEventListener("click", osClick);
@@ -2136,6 +2322,7 @@
     async function close(switching) {
       if (!current) return;
       if (HOME_APPS[current] && !switching && dev.querySelector(".os-app") && !dev.querySelector(".os-app").hidden) { openApp(null); return; }  // önce ana ekrana dön
+      if (current === "tv" && !switching && tvBack()) return;  // oynatıcıdan önce ana ekrana
       if (current === "archive") { const det = dev.querySelector(".ar-detail"); if (det && !det.hidden && !switching) { det.hidden = true; sfx("paper"); return; } }
       sfx("whooshOut");
       stage.classList.remove("on");

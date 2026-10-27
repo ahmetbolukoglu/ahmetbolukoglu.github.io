@@ -99,7 +99,7 @@ const SCREENS = ["W_Screen_iMac", "W_Screen_Left", "W_Screen_TV", "W_Screen_Phon
 const CLICK = ["iMac", "Monitor2", "Phone", "Shelf", "Tea", "Duck", "Ball", "Window", "Cert", "Clock", "Neon", "Drawer", "Keyboard", "PC", "TV", "PS5", "Controllers", "Headphones", "Bottle", "Modem", "Watch", "Chair", "Cat", "Mouse", "Poster", "Poster_L", "Poster_R", "Gallery", "Printer"];
 // imlecin yanında görünen adlar
 const NAMES = { iMac: "49\" masaüstü", Monitor2: "CV · 27\"", Phone: "İletişim · S22", Shelf: "Kitaplık", Tea: "Çay", Duck: "🦆 Ördeğe sor", Ball: "Top", Window: "Boğaz manzarası",
-  Cert: "Sertifika", Clock: "Saat", Neon: "Neon", Drawer: "Projeler", Keyboard: "Apex 7 · terminal", PC: "TUF GT502 · RTX 4090", TV: "65\" TV", PS5: "PS5", Controllers: "DualSense ×2",
+  Cert: "Sertifika", Clock: "Saat", Neon: "Neon", Drawer: "Projeler", Keyboard: "Apex 7 · terminal", PC: "TUF GT502 · RTX 4090", TV: "📺 TV · oyunlar ve oynanışlar", PS5: "PS5", Controllers: "DualSense ×2",
   Headphones: "Arctis 7+ · müzik", Bottle: "Su", Modem: "Modem", Watch: "Akıllı saat", Chair: "Koltuk", Cat: "😺 Alpay", Mouse: "MX Master 3", Poster: "🎯 Mafia Gun", Gallery: "🖼️ yakında", Printer: "🖨️ HP LaserJet · CV yazdır" };
 
 function webglOK() {
@@ -983,7 +983,7 @@ async function init() {
     }
   }
 
-  const DEV = { iMac: "imac", Monitor2: "tablet", Phone: "phone", Drawer: "archive", Watch: "watch" };
+  const DEV = { iMac: "imac", Monitor2: "tablet", Phone: "phone", Drawer: "archive", Watch: "watch", TV: "tv" };
   Devices.setRectSource(type => {
     const name = Object.keys(DEV).find(k => DEV[k] === type);
     return frame.classList.contains("is-3d") && parts[name] ? rectOf(parts[name]) : null;
@@ -1019,6 +1019,10 @@ async function init() {
   root.traverse(o => {
     if (!o.isMesh) return;
     if (o.material.name === "W_Screen_iMac") screens.imac = { mesh: o, w: 1.16, h: 0.33, normal: new THREE.Vector3(0, 0, 1), curved: true };
+    if (o.material.name === "W_Screen_TV") {  // 65" TV (sol duvar): oyunlar ve oynanışlar
+      const n = new THREE.Vector3().fromBufferAttribute(o.geometry.attributes.normal, 0).transformDirection(o.matrixWorld).normalize();
+      screens.tv = { mesh: o, w: 1.43, h: 0.81, normal: n };
+    }
     if (o.material.name === "W_Screen_Left") {
       const n = new THREE.Vector3().fromBufferAttribute(o.geometry.attributes.normal, 0).transformDirection(o.matrixWorld).normalize();
       screens.tablet = { mesh: o, w: 0.6, h: 0.338, normal: n };
@@ -1145,7 +1149,7 @@ async function init() {
     }
     else if (n === "Printer") { sfx("drawer"); say(p, "🖨️ CV yazdırılıyor…"); setTimeout(() => Devices.open("tablet", "cv"), 900); }
     else if (n === "Mouse") { sfx("click"); say(p, "🖱️ MX Master 3: yan tekerlek, sonsuz kaydırma"); }
-    else if (n === "TV") { sfx("click"); say(p, "📺 65 inç · PS5 hazır: akşam bir maç? 🎮"); }
+    else if (n === "TV") { sfx("click"); Devices.open("tv"); }
     else if (n === "PS5") { sfx("thump"); say(p, "🎮 Kod molası: bir maç?"); }
     else if (n === "Controllers") { sfx("thump"); say(p, "🎮 İki DualSense şarjda, rakip aranıyor"); }
     else if (n === "Headphones") { const on = Sfx.music.toggle(); say(p, on ? "🎧 Çalıyor: " + Sfx.music.name : "🎧 Müzik durdu"); }

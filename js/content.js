@@ -21,6 +21,18 @@ window.RoomContent = (function () {
   const recent = d => d && Date.now() - new Date(d) < 7 * 864e5;
   const PLATFORM = { web: "Web", android: "Android", ios: "iOS", windows: "Windows", mac: "macOS", linux: "Linux", steam: "Steam" };
   const LINK = { web: "▶ Web'de oyna", android: "Google Play", ios: "App Store", steam: "Steam", website: "Web sitesi", discord: "Discord" };
+  // video: YouTube, Vimeo ya da doğrudan mp4/webm; nesne ya da düz adres olabilir
+  function video(v) {
+    const o = typeof v === "string" ? { url: v } : v || {}, url = safeLink(o.url || o.src || "");
+    if (!url || url.startsWith("mailto:")) return null;
+    let m, kind = "", embed = "";
+    if ((m = /(?:youtube\.com\/(?:watch\?(?:.*&)?v=|shorts\/|embed\/)|youtu\.be\/)([\w-]{6,})/.exec(url))) { kind = "youtube"; embed = "https://www.youtube-nocookie.com/embed/" + m[1] + "?autoplay=1&rel=0&playsinline=1"; }
+    else if ((m = /vimeo\.com\/(?:video\/)?(\d+)/.exec(url))) { kind = "vimeo"; embed = "https://player.vimeo.com/video/" + m[1] + "?autoplay=1"; }
+    else if (/\.(mp4|webm|m4v)(\?|$)/i.test(url)) kind = "file";
+    else return null;
+    const thumb = safeImg(o.poster || o.thumb || "") || (kind === "youtube" ? "https://i.ytimg.com/vi/" + m[1] + "/hqdefault.jpg" : "");
+    return { kind, url, embed, title: str(o.title, "Video"), thumb };
+  }
   const STATUS = { released: "Yayında", beta: "Beta", coming_soon: "Yakında" };
 
   // TheyVoice projesi → çekmece dosyası
@@ -35,6 +47,7 @@ window.RoomContent = (function () {
       shots: arr(p.screenshots).map(safeImg).filter(Boolean), links, accent: str(p.accent),
       version: p.latest ? str(p.latest.version) : "", isNew: recent(p.latest && p.latest.published_at),
       update: p.latest ? str(p.latest.title) : "",
+      videos: arr(p.videos).map(video).filter(Boolean),
     };
   }
   // GitHub deposu → çekmece dosyası (son sürüm etiketi ya da son push)
@@ -57,10 +70,11 @@ window.RoomContent = (function () {
     if (o.logo) out.logo = true;
     if (Array.isArray(o.tech)) out.tech = o.tech.map(String);
     if (Array.isArray(o.shots)) out.shots = o.shots.map(safeImg).filter(Boolean);
+    if (Array.isArray(o.videos)) out.videos = o.videos.map(video).filter(Boolean);
     if (Array.isArray(o.links)) out.links = o.links.map(l => [String(l[0]), safeLink(l[1])]).filter(l => l[1]);
     return out;
   }
-  const EMPTY = { name: "", status: "", type: "", release: "", platforms: "", desc: "", tech: [], cover: "", icon: "", shots: [], links: [] };
+  const EMPTY = { name: "", status: "", type: "", release: "", platforms: "", desc: "", tech: [], cover: "", icon: "", shots: [], links: [], videos: [] };
 
   function normalize(room, tvProjects) {
     const tvBySlug = Object.fromEntries(arr(tvProjects).map(p => [p.slug, p]));
@@ -100,7 +114,16 @@ window.RoomContent = (function () {
       customApps: arr(room.customApps).filter(a => a && /^[a-z0-9_-]{1,30}$/.test(a.key)).map(a => ({
         key: a.key, label: str(a.label, a.key), icon: str(a.icon, "📄"), color: /^#[0-9a-f]{6}$/i.test(a.color) ? a.color : "#7c3aed",
         title: str(a.title, a.label), text: str(a.text), image: safeImg(a.image), link: safeLink(a.link) })),
-      tv: { mode: tv.mode === "marquee" ? "marquee" : "gameplay", title: str(tv.title), slides },
+      tv: { mode: tv.mode === "marquee" ? "marquee" : "gameplay", title: str(tv.title), slides, featured: str(tv.featured || tv.project),
+        library: projects.filter(p => !p.soon && (p.videos.length || p.shots.length)).map(p => ({
+          id: p.id, name: p.name, icon: p.icon, cover: p.cover, logo: !!p.logo, desc: p.type || p.desc, status: p.status, play: (p.links[0] || [])[1] || "",
+          media: [
+            ...p.videos.map(v => ({ ...v })),
+            ...((tv.project === p.id || (!tv.project && p === projects.find(q => !q.soon && q.shots.length))) && slides.length
+              ? [{ kind: "slides", title: str(tv.title, p.name + " · oynanış"), slides }] : []),
+            ...(p.shots.length ? [{ kind: "slides", title: p.name + " · ekran görüntüleri", slides: p.shots.map(image => ({ image, caption: p.name })) }] : []),
+          ],
+        })) },
       news: arr(raw && raw.news).slice(0, 5).map(n => ({ title: str(n.title), url: safeLink(n.url), at: str(n.published_at) })).filter(n => n.title),
     };
   }

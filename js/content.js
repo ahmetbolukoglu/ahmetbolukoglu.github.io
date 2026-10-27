@@ -124,6 +124,12 @@ window.RoomContent = (function () {
             ...(p.shots.length ? [{ kind: "slides", title: p.name + " · ekran görüntüleri", slides: p.shots.map(image => ({ image, caption: p.name })) }] : []),
           ],
         })) },
+      // izlediklerim (Netflix, Prime Video, Apple TV+, Disney+…): servislerin açık API'si yok, panelden yönetilir
+      watching: arr(room.watching).slice(0, 60).map(w => ({
+        title: str(w && w.title), service: ["netflix", "prime", "appletv", "disney", "youtube"].includes(w && w.service) ? w.service : "other",
+        status: ["watching", "watched", "watchlist"].includes(w && w.status) ? w.status : "watchlist",
+        poster: safeImg(w && w.poster), link: safeLink(w && w.link), year: str(w && String(w.year || "")), note: str(w && w.note),
+        progress: Math.max(0, Math.min(100, Number(w && w.progress) || 0)) })).filter(w => w.title),
       news: arr(raw && raw.news).slice(0, 5).map(n => ({ title: str(n.title), url: safeLink(n.url), at: str(n.published_at) })).filter(n => n.title),
     };
   }

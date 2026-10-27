@@ -105,6 +105,9 @@ sayfa yenilenmeden yerine oturur.
 | `screens.<cihaz>.apps` | Ana ekrandaki uygulamalar ve sırası. Hazır anahtarlar: `hakkimda`, `yetenekler`, `terminal`, `cv`, `archive` (projeler), `iletisim`, `mail`, `github`, `linkedin`, `hizmet`, `ordek`, `player`; saat: `bildirim`, `nabiz`, `adim`, `hava`, `takvim`, `muzik`. Ayrıca `customApps` anahtarları. |
 | `customApps` | Panelden eklenen sayfa uygulamaları (başlık, metin, görsel, bağlantı). |
 | `tv.mode` | `gameplay`: görsellerden canlı yayın gibi akan oynanış (yavaş yakınlaşma ve kaydırma, geçişler, alt yazı, CANLI rozeti); `marquee`: çalıştığım yerler şeridi. |
+| `tv.featured` | TV açılınca seçili oyun (`theyvoice:<slug>`). |
+| `watching` | TV'deki "İzliyorum" sekmesi: `[{ title, service: netflix|prime|appletv|disney|youtube|other, status: watching|watched|watchlist, poster, link, year, note, progress }]`. Servislerin açık API'si olmadığı için panelden yönetilir. |
+| `projects[].videos` | TheyVoice projelerinin videoları (YouTube; ileride mp4/Vimeo) TV'nin medya rafında oynar. |
 | `tv.slides` | Oynanış görselleri ve alt yazıları. Boşsa `tv.project` ya da ilk projenin ekran görüntüleri kullanılır. |
 
 Bilinmeyen alanlar yok sayılır; eksik alanlarda site varsayılanı kullanır. Görsel adresleri https olmalı.

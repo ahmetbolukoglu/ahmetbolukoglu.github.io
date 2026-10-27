@@ -31,7 +31,7 @@ const MATS = {
   W_Pot: { color: "#c2410c", roughness: 0.8 },
   W_Gold: { color: "#fbbf24", roughness: 0.28, metalness: 1 },
   W_LED: { color: "#5eead4", emissive: "#5eead4", emissiveIntensity: 2.5 },
-  W_Ball: { color: "#f8fafc", roughness: 0.55, map: "ball" },
+  W_Ball: { color: "#ffffff", roughness: 0.45, map: "ball" },
   W_Book_purple: { color: "#7c3aed", roughness: 0.7 }, W_Book_blue: { color: "#2563eb", roughness: 0.7 },
   W_Book_red: { color: "#dc2626", roughness: 0.7 }, W_Book_cyan: { color: "#0891b2", roughness: 0.7 },
   W_Book_green: { color: "#059669", roughness: 0.7 }, W_Book_pink: { color: "#db2777", roughness: 0.7 },
@@ -95,6 +95,17 @@ for (const k of ["W_Poster_C", "W_Poster_L", "W_Poster_R", ...Array.from({ lengt
   MATS[k] = { color: "#ffffff", roughness: 0.6, emissive: "#ffffff", emissiveIntensity: 0.3 };
 // sağ duvar çerçevelerinin ölçüleri (make_room.py GALLERY ile aynı sıra): doku oranı çerçeveye uysun
 const GAL_SIZE = [[0.4, 0.5], [0.5, 0.36], [0.34, 0.46], [0.44, 0.34], [0.3, 0.3], [0.36, 0.46], [0.5, 0.34], [0.3, 0.4], [0.38, 0.3]];
+// Mafia Gun karakter figürleri: odanın boş yerlerine serpiştirilir (models/figures.glb, make_figures.py)
+const FIGS = [
+  { id: "madam_v", name: "Madam V", info: "Kraliçenin Çağrısı: her 7 saniyede 3 sustalı çocuk çağırır", at: [-1.32, 1.5, 1.306], h: 0.17, yaw: 10 },
+  { id: "the_butcher", name: "Kasap", info: "Kan Kokusu: canı yarının altındaki hedeflere %50 fazla vurur", at: [0.9, 1.3, 1.212], h: 0.15, yaw: -15 },
+  { id: "stiletto_boys", name: "Sustalı Çocuklar", info: "İlk Bıçak: ilk vuruşu 2 kat hasar verir", at: [-1.0, 0.98, 0.75], h: 0.13, yaw: 20 },
+  { id: "pistol_sisters", name: "Tabancalı Kardeşler", info: "Çift Atış: her 3. atışı 2 kat hasar verir", at: [-1.74, -0.3, 0.4], h: 0.17, yaw: -60 },
+  { id: "yakuza_enforcer", name: "Yakuza Kılıcı", info: "Öfke: canı yarıya inince %40 daha hızlı vurur", at: [-1.74, 0.2, 0.4], h: 0.17, yaw: -70 },
+  { id: "the_heavy", name: "Ağır Abi", info: "Demir Yumruk: binaya ilk vuruşu 2 kat hasar verir", at: [1.7, -0.95, 0], h: 0.55, yaw: 35 },
+  { id: "sharpshooter", name: "Keskin Nişancı", info: "Nişan Al: aynı hedefe her vuruşta %15 daha sert", at: [1.12, 0.82, 0], h: 0.32, yaw: 25 },
+  { id: "grenadier", name: "Bombacı", info: "Son Hediye: ölünce son bombasını bırakır", at: [-1.5, -0.6, 0], h: 0.3, yaw: -30 },
+];
 const SCREENS = ["W_Screen_iMac", "W_Screen_Left", "W_Screen_TV", "W_Screen_Phone", "W_Screen_Watch", "W_Cert"];
 const CLICK = ["iMac", "Monitor2", "Phone", "Shelf", "Tea", "Duck", "Ball", "Window", "Cert", "Clock", "Neon", "Drawer", "Keyboard", "PC", "TV", "PS5", "Controllers", "Headphones", "Bottle", "Modem", "Watch", "Chair", "Cat", "Mouse", "Poster", "Poster_L", "Poster_R", "Gallery", "Printer"];
 // imlecin yanında görünen adlar
@@ -162,13 +173,37 @@ const PATTERNS = {
     t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(0.4, 0.6);
     return t;
   },
-  ball: () => canvasTex(256, 128, (g, w, h) => {
-    g.fillStyle = "#fff"; g.fillRect(0, 0, w, h); g.fillStyle = "#15132e";
-    for (let i = 0; i < 6; i++) for (let j = 0; j < 3; j++) {
-      const x = (i + (j % 2) * .5) * w / 6 * 1.0, y = 20 + j * 44;
-      g.beginPath();
-      for (let k = 0; k < 5; k++) { const a = k / 5 * Math.PI * 2 - Math.PI / 2; g.lineTo(x + Math.cos(a) * 11, y + Math.sin(a) * 11); }
-      g.fill();
+  ball: () => canvasTex(1536, 768, (g, w, h) => {
+    // küre UV'si boylam/enlem (eşdikdörtgen): yıldızlar 12 eşit noktada (ikosahedron), enlemle yatayda genişler
+    // İznik desen karosu: lale, karanfil, rumi yaprak ve küçük yıldızlar (altın + gümüş, lacivert zemin)
+    const tile = document.createElement("canvas"); tile.width = tile.height = 96;
+    const t = tile.getContext("2d");
+    t.fillStyle = "#1c2f7e"; t.fillRect(0, 0, 96, 96);
+    const leaf = (x, y, r, rot, c) => { t.save(); t.translate(x, y); t.rotate(rot); t.fillStyle = c; t.beginPath(); t.moveTo(0, -r); t.quadraticCurveTo(r * 0.7, 0, 0, r); t.quadraticCurveTo(-r * 0.7, 0, 0, -r); t.fill(); t.restore(); };
+    const tulip = (x, y, r, c) => { t.fillStyle = c; t.beginPath(); t.moveTo(x, y + r); t.quadraticCurveTo(x - r, y + r * 0.2, x - r * 0.55, y - r); t.lineTo(x, y - r * 0.3); t.lineTo(x + r * 0.55, y - r); t.quadraticCurveTo(x + r, y + r * 0.2, x, y + r); t.fill(); };
+    const flower = (x, y, r, c, d) => { for (let k = 0; k < 6; k++) leaf(x + Math.cos(k * Math.PI / 3) * r * 0.55, y + Math.sin(k * Math.PI / 3) * r * 0.55, r * 0.5, k * Math.PI / 3 + Math.PI / 2, c); t.fillStyle = d; t.beginPath(); t.arc(x, y, r * 0.28, 0, 7); t.fill(); };
+    leaf(24, 26, 20, -0.7, "#c9d1e6"); leaf(72, 70, 20, 0.7 + Math.PI, "#c9d1e6");     // gümüş rumi yapraklar
+    leaf(24, 26, 11, -0.7, "#1c2f7e"); leaf(72, 70, 11, 0.7 + Math.PI, "#1c2f7e");
+    flower(70, 24, 14, "#d9b45a", "#8a5a12"); flower(24, 72, 14, "#d9b45a", "#8a5a12");    // altın karanfil
+    tulip(48, 48, 10, "#e3c06b");                                                          // lale
+    t.fillStyle = "#c9d1e6"; for (const [x, y] of [[4, 48], [92, 48], [48, 4], [48, 92]]) { t.beginPath(); t.arc(x, y, 3, 0, 7); t.fill(); }
+    g.fillStyle = g.createPattern(tile, "repeat"); g.fillRect(0, 0, w, h);
+    g.fillStyle = "rgba(14,24,72,.18)"; g.fillRect(0, 0, w, h);
+    const T = (1 + Math.sqrt(5)) / 2, P = [[-1, T, 0], [1, T, 0], [-1, -T, 0], [1, -T, 0], [0, -1, T], [0, 1, T], [0, -1, -T], [0, 1, -T], [T, 0, -1], [T, 0, 1], [-T, 0, -1], [-T, 0, 1]];
+    // yıldız: 8 yumuşak uçlu, turuncu kenar çizgisi, beyaz iç
+    const star = (cx, cy, R, sx, rot, fill) => {
+      g.save(); g.translate(cx, cy); g.scale(sx, 1); g.rotate(rot); g.fillStyle = fill; g.beginPath();
+      for (let k = 0; k < 16; k++) { const ang = k / 16 * Math.PI * 2, r = k % 2 ? R * 0.62 : R; g.lineTo(Math.cos(ang) * r, Math.sin(ang) * r); }
+      g.closePath(); g.lineJoin = "round"; g.fill(); g.restore();
+    };
+    for (const [x, y, z] of P) {
+      const n = Math.hypot(x, y, z), lat = Math.asin(y / n), lon = Math.atan2(z, x);
+      const sx = Math.min(5, 1 / Math.max(0.2, Math.cos(lat))), cy = (0.5 - lat / Math.PI) * h, R = h * 0.172;
+      for (const dx of [-w, 0, w]) {
+        const cx = (lon / (2 * Math.PI) + 0.5) * w + dx;
+        star(cx, cy, R + 7, sx, 0.2, "#f26b2a");                                        // turuncu kenar
+        star(cx, cy, R, sx, 0.2, "#fbfbfd");                                            // beyaz yıldız
+      }
     }
   }),
 };
@@ -853,6 +888,20 @@ async function init() {
     o.material = m;
   });
 
+  // top: küre UV'si metre cinsinden (çevre × yay); yıldız dokusu topun etrafına tam bir kez sarılır (r = 0.11)
+  // top: modelin UV'si metre cinsinden; küre (boylam/enlem) UV'si yeniden hesaplanır ki yıldız dokusu doğru otursun
+  parts.Ball && parts.Ball.traverse(m => {
+    if (!m.isMesh) return;
+    const g = m.geometry.index ? m.geometry.toNonIndexed() : m.geometry, p = g.attributes.position, uv = new Float32Array(p.count * 2), v = new THREE.Vector3();
+    for (let i = 0; i < p.count; i++) { v.fromBufferAttribute(p, i).normalize(); uv[i * 2] = Math.atan2(-v.z, v.x) / (2 * Math.PI) + 0.5; uv[i * 2 + 1] = 0.5 - Math.asin(THREE.MathUtils.clamp(v.y, -1, 1)) / Math.PI; }
+    for (let i = 0; i < p.count; i += 3) {  // dikiş yerinden geçen üçgenler: u değerleri aynı tarafa
+      const us = [uv[i * 2], uv[i * 2 + 2], uv[i * 2 + 4]];
+      if (Math.max(...us) - Math.min(...us) > 0.5) for (let k = 0; k < 3; k++) if (us[k] < 0.5) uv[(i + k) * 2] += 1;
+    }
+    g.setAttribute("uv", new THREE.BufferAttribute(uv, 2)); m.geometry = g;
+  });
+  if (patterns.ball) { const t = patterns.ball; t.wrapS = THREE.RepeatWrapping; t.anisotropy = 8; t.needsUpdate = true; }
+
   // ---------------------------------------------------------------- oda içeriği (theyvoice.com paneli)
   let content = null, projectsDrawer = "Drawer", drawerItems = {};
   const featuredOf = n => content ? content.featured[{ Poster: "center", Poster_L: "left", Poster_R: "right" }[n]] : null;
@@ -913,6 +962,7 @@ async function init() {
       if (CLICK.includes(p.name) || p.name.startsWith("Book_") || p.name.startsWith("Drawer_")) { hitMat = h.object.material && h.object.material.name; return p; }
       if (p.name.startsWith("Clock")) return parts.Clock;
       if (p.name.startsWith("Fan_")) return parts.PC;
+      if (p.name.startsWith("Fig_")) return p;
     }
     return null;
   }
@@ -924,12 +974,14 @@ async function init() {
     hover = p;
     if (hover) (partMats[hover.name] || []).forEach(m => { m.userData.e0 ??= m.emissive.getHex(); if (!m.userData.e0) m.emissive.set("#2a2550"); });
     canvas.style.cursor = hover ? "pointer" : "";
-    const label = hover && (hover.name.startsWith("Book_") ? "Kitap" : hover.name.startsWith("Poster") ? tileLabel(featuredOf(hover.name))
+    const label = hover && (hover.name.startsWith("Fig_") ? "🎴 " + (FIGS.find(f => "Fig_" + f.id === hover.name) || {}).name : hover.name.startsWith("Book_") ? "Kitap" : hover.name.startsWith("Poster") ? tileLabel(featuredOf(hover.name))
       : hover.name === "Gallery" ? "🖼️ galeri" : hover.name === projectsDrawer ? "🗂️ Projeler" : hover.name.startsWith("Drawer") ? "Çekmece" : NAMES[hover.name]);
     dispatchEvent(new CustomEvent("room:hover", { detail: label || "" }));
-    const b = hover && BOOKS[hover.name.slice(5)];
-    tip.classList.toggle("show", !!(hover && hover.name.startsWith("Book_") && b));
-    if (b && hover.name.startsWith("Book_")) tip.innerHTML = `<b>${b.title}</b><span>${b.sub}</span>`;
+    const b = hover && hover.name.startsWith("Book_") && BOOKS[hover.name.slice(5)];
+    const fig = hover && hover.name.startsWith("Fig_") && FIGS.find(f => "Fig_" + f.id === hover.name);
+    tip.classList.toggle("show", !!(b || fig));
+    if (b) tip.innerHTML = `<b>${b.title}</b><span>${b.sub}</span>`;
+    if (fig) tip.innerHTML = `<b>🎴 ${fig.name}</b><span>Mafia Gun · ${fig.info}</span>`;
   }
   function rectOf(obj) {
     const box = new THREE.Box3().setFromObject(obj), r = canvas.getBoundingClientRect();
@@ -1097,6 +1149,12 @@ async function init() {
       if (a1 && !item) say(p, "📄 Coming soon: bu çekmece yakında dolacak");
       await slideExtra(d, a1);
       if (a1 && item) { heldExtra = d; Devices.openItem(item); }
+      return;
+    }
+    if (n.startsWith("Fig_")) {  // figür: zıplar, adını ve yeteneğini söyler
+      const f = FIGS.find(x => "Fig_" + x.id === n), y0 = p.userData.y0 ??= p.position.y, r0 = p.userData.r0 ??= p.rotation.y;
+      sfx("thump"); say(p, "🎴 " + f.name + " · " + f.info);
+      tween(650, t => { p.position.y = y0 + Math.sin(t * Math.PI) * f.h * 0.35; p.rotation.y = r0 + t * Math.PI * 2; });
       return;
     }
     if (n === "Keyboard") { await Devices.open("imac", "terminal"); window.Term?.autoplay(); return; }
@@ -1484,7 +1542,26 @@ async function init() {
     await new Promise(r => setTimeout(r, reduceMotion ? 0 : 650));
     T.boot = null; T.redraw();
   }
-  const intro = async () => { await bootScreen(); firstHelp(); await flyTo(base.pos, base.look, reduceMotion ? 0 : 2400); busy = false; setTimeout(ferry, 15000); ferryLoop(); };
+  async function loadFigures() {
+    try {
+      const g = await new GLTFLoader().loadAsync("models/figures.glb");
+      for (const f of FIGS) {
+        const o = g.scene.getObjectByName("Fig_" + f.id); if (!o) continue;
+        o.traverse(m => {
+          if (!m.isMesh) return;
+          m.geometry.computeVertexNormals();
+          const map = m.material.map; if (map) { map.colorSpace = THREE.SRGBColorSpace; map.anisotropy = 4; }
+          m.material = new THREE.MeshStandardMaterial({ map, roughness: 0.7, metalness: 0 });
+          m.material.emissive = new THREE.Color(0x000000);
+          (partMats[o.name] ||= []).push(m.material);
+        });
+        o.position.copy(B(...f.at)); o.scale.setScalar(f.h); o.rotation.set(0, THREE.MathUtils.degToRad(f.yaw), 0);
+        o.name = "Fig_" + f.id; root.add(o); parts[o.name] = o;
+      }
+    } catch (e) { console.warn("Figürler yüklenemedi:", e); }
+  }
+  const intro = async () => {
+    setTimeout(loadFigures, 1500); await bootScreen(); firstHelp(); await flyTo(base.pos, base.look, reduceMotion ? 0 : 2400); busy = false; setTimeout(ferry, 15000); ferryLoop(); };
   if (boot.entered) intro(); else addEventListener("devroom:enter", intro, { once: true });
   boot.ready();
 }

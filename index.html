@@ -891,61 +891,136 @@
     .rh-acts { display: flex; flex-wrap: wrap; gap: 10px; } .rh-acts .btn { flex: 1 1 auto; justify-content: center; cursor: pointer; padding: 10px 14px; }
     @media (max-width: 420px) { .roam-help { padding: 16px; } .roam-help li { grid-template-columns: 24px 1fr; } .roam-help li em { grid-column: 2; } }
 
-    /* ---------- TV: PS5 tarzı arayüz ---------- */
+    /* ---------- TV: PS5 tarzı arayüz (tasarım 1600×900; gömülüyken TV ekranına ölçeklenir) ---------- */
     .dev-tv { width: min(1100px, 100%); aspect-ratio: 16 / 9; height: auto; padding: 10px; overflow: hidden; background: #050506; border-radius: 10px; box-shadow: 0 0 0 2px #1f2937, 0 40px 120px -30px rgba(99,102,241,.5); }
     .dev-tv.embed { padding: 0; background: none; box-shadow: none; border-radius: 0; aspect-ratio: auto; }
-    .tv-screen { position: relative; width: 100%; height: 100%; overflow: hidden; color: #fff; font-family: var(--sans); background: #06070d; }
-    .ps-bg { position: absolute; inset: -40px; background: #0b1020 center / cover no-repeat; filter: blur(26px) brightness(.5) saturate(1.2); transform: scale(1.05); transition: background-image .4s; }
-    .ps::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(90deg, rgba(4,6,14,.92) 0%, rgba(4,6,14,.55) 45%, rgba(4,6,14,.2) 100%), linear-gradient(0deg, rgba(4,6,14,.9), transparent 45%); }
-    .ps > * { position: relative; z-index: 1; }
-    .ps-top { display: flex; justify-content: space-between; align-items: center; padding: 34px 60px 0; font-size: 24px; }
-    .ps-top nav { display: flex; gap: 34px; } .ps-top nav b { font-weight: 600; } .ps-top nav span { opacity: .55; }
-    .ps-meta { display: flex; align-items: center; gap: 22px; font: 500 24px var(--sans); opacity: .9; }
-    .ps-meta i { width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; font: 700 16px var(--sans); font-style: normal; background: linear-gradient(135deg, var(--cyan), var(--violet)); color: #0b0a1a; }
-    .ps-row { display: flex; align-items: center; gap: 18px; padding: 40px 60px 0; height: 210px; }
-    .ps-tile { flex: none; width: 128px; height: 128px; padding: 0; border: 0; border-radius: 22px; overflow: hidden; background: #1f2433; cursor: pointer; transition: width .25s, height .25s, box-shadow .25s; }
+    .tv-screen { position: relative; width: 100%; height: 100%; overflow: hidden; color: #fff; font-family: var(--sans); background: #06070d; isolation: isolate; }
+    .ps-bg { position: absolute; inset: 0; width: 100%; height: 100%; opacity: .6; z-index: 0; }
+    .ps::after { content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none; background: linear-gradient(90deg, rgba(4,6,14,.92) 0%, rgba(4,6,14,.6) 45%, rgba(4,6,14,.25) 100%), linear-gradient(0deg, rgba(4,6,14,.92), transparent 50%); }
+    .ps > :not(.ps-bg) { position: relative; z-index: 1; }
+    .ps .ps-sheet, .ps .ps-player { position: absolute; z-index: 5; }
+    .ps button { font-family: var(--sans); }
+    .ps-top { display: flex; justify-content: space-between; align-items: center; padding: 30px 60px 0; }
+    .ps-tabs { display: flex; gap: 10px; }
+    .ps-tabs button { font: 600 26px var(--sans); color: rgba(255,255,255,.6); background: none; border: 0; border-radius: 999px; padding: 10px 22px; cursor: pointer; }
+    .ps-tabs button.on { color: #fff; background: rgba(255,255,255,.12); }
+    .ps-tabs button:hover, .ps-tabs button:focus-visible { color: #fff; outline: none; box-shadow: inset 0 0 0 2px rgba(255,255,255,.5); }
+    .ps-meta { display: flex; align-items: center; gap: 22px; font: 500 26px var(--sans); }
+    .ps-avatar { width: 52px; height: 52px; border-radius: 50%; border: 0; font: 700 18px var(--sans); background: linear-gradient(135deg, var(--cyan), var(--violet)); color: #0b0a1a; cursor: pointer; }
+    .ps-avatar:hover, .ps-avatar:focus-visible { box-shadow: 0 0 0 4px #fff; outline: none; }
+    .ps-view { height: calc(100% - 92px); }
+    .ps-view[hidden] { display: none; }
+    .ps-row { display: flex; align-items: center; gap: 18px; padding: 30px 60px 0; height: 200px; }
+    .ps-tile { flex: none; width: 128px; height: 128px; padding: 0; border: 0; border-radius: 22px; overflow: hidden; background: #1f2433; cursor: pointer; transition: width .2s, height .2s; }
     .ps-tile img { width: 100%; height: 100%; object-fit: cover; display: block; } .ps-tile span { font: 700 48px var(--sans); color: #fff; }
-    .ps-tile.on, .ps-tile:focus-visible { width: 170px; height: 170px; box-shadow: 0 0 0 4px #fff, 0 20px 50px rgba(0,0,0,.6); outline: none; }
-    .ps-tname { font: 600 30px var(--sans); margin-left: 10px; text-shadow: 0 2px 12px rgba(0,0,0,.6); }
-    .ps-hero { padding: 26px 60px 0; max-width: 980px; }
-    .ps-hero h2 { font: 800 76px/1 var(--sans); letter-spacing: -.02em; margin: 0 0 10px; text-shadow: 0 4px 30px rgba(0,0,0,.5); }
-    .ps-hero p { font-size: 24px; line-height: 1.45; color: rgba(255,255,255,.85); margin: 0 0 8px; max-width: 900px; }
+    .ps-tile.on, .ps-tile:focus-visible { width: 170px; height: 170px; box-shadow: 0 0 0 4px #fff; outline: none; }
+    .ps-tname { font: 600 30px var(--sans); margin-left: 10px; }
+    .ps-hero { padding: 18px 60px 0; max-width: 1000px; }
+    .ps-hero h2 { font: 800 76px/1 var(--sans); letter-spacing: -.02em; margin: 0 0 10px; }
+    .ps-hero p, .ps-card-sheet p { font-size: 24px; line-height: 1.45; color: rgba(255,255,255,.85); margin: 0 0 8px; }
     .ps-status { color: #5eead4 !important; font: 600 20px var(--mono) !important; }
-    .ps-acts { display: flex; gap: 16px; margin-top: 22px; }
-    .ps-btn { font: 700 24px var(--sans); color: #0b0a1a; background: #fff; border: 0; border-radius: 999px; padding: 16px 38px; cursor: pointer; text-decoration: none; }
-    .ps-btn:not(.main) { color: #fff; background: rgba(255,255,255,.14); }
-    .ps-btn:hover, .ps-btn:focus-visible { box-shadow: 0 0 0 4px rgba(255,255,255,.5); outline: none; }
-    .ps-shelf { position: absolute; left: 0; right: 0; bottom: 34px; padding: 0 60px; }
-    .ps-shelf h4 { font: 600 22px var(--sans); margin: 0 0 14px; opacity: .85; }
+    .ps-acts { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 22px; }
+    .ps-btn { font: 700 24px var(--sans); color: #fff; background: rgba(255,255,255,.14); border: 0; border-radius: 999px; padding: 16px 34px; cursor: pointer; text-decoration: none; }
+    .ps-btn.main { color: #0b0a1a; background: #fff; }
+    .ps-btn:hover, .ps-btn:focus-visible { box-shadow: 0 0 0 4px rgba(255,255,255,.55); outline: none; }
+    .ps-shelf { position: absolute; left: 0; right: 0; bottom: 28px; padding: 0 60px; }
+    .ps-shelf h4, .ps-h, .ps-watch h4 { font: 600 24px var(--sans); margin: 0 0 14px; }
+    .ps-h small, .ps-watch h4 small { opacity: .55; font-weight: 500; margin-left: 8px; }
     .ps-media { display: flex; gap: 18px; overflow-x: auto; scrollbar-width: none; padding: 6px 4px 10px; }
-    .ps-card { position: relative; flex: none; width: 300px; height: 170px; padding: 0; border: 0; border-radius: 16px; overflow: hidden; background: #1f2433; cursor: pointer; color: #fff; text-align: left; transition: transform .2s, box-shadow .2s; }
+    .ps-card { position: relative; flex: none; width: 300px; height: 170px; padding: 0; border: 0; border-radius: 16px; overflow: hidden; background: #1f2433; cursor: pointer; color: #fff; text-align: left; }
     .ps-card.tall img { object-position: top; }
-    .ps-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
-    .ps-card b { position: absolute; left: 0; right: 0; bottom: 0; padding: 30px 14px 12px; font: 600 18px var(--sans); background: linear-gradient(transparent, rgba(0,0,0,.85)); }
-    .ps-card:hover, .ps-card:focus-visible { transform: scale(1.04); box-shadow: 0 0 0 4px #fff; outline: none; }
-    .ps-none, .ps-empty { font-size: 22px; opacity: .7; } .ps-empty { padding: 80px 0; }
-    .ps-player { position: absolute; inset: 0; z-index: 5; background: #000; }
+    .ps-card img, .ps-pic img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .ps-card b, .ps-pic b { position: absolute; left: 0; right: 0; bottom: 0; padding: 30px 14px 12px; font: 600 18px var(--sans); background: linear-gradient(transparent, rgba(0,0,0,.85)); }
+    .ps-card:hover, .ps-card:focus-visible, .ps-pic:hover, .ps-pic:focus-visible, .ps-poster:hover, .ps-poster:focus-visible { box-shadow: 0 0 0 4px #fff; outline: none; }
+    .ps-view[data-view="media"], .ps-view[data-view="watch"] { overflow-y: auto; padding: 28px 60px 40px; scrollbar-width: thin; }
+    .ps-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 16px; }
+    .ps-pic { position: relative; aspect-ratio: 3 / 4; padding: 0; border: 0; border-radius: 14px; overflow: hidden; background: #1f2433; cursor: pointer; color: #fff; text-align: left; }
+    .ps-svc { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 26px; }
+    .ps-chip { font: 600 22px var(--sans); color: #fff; background: rgba(255,255,255,.1); border: 2px solid transparent; border-radius: 999px; padding: 10px 22px; cursor: pointer; }
+    .ps-chip em { font-style: normal; opacity: .6; margin-left: 10px; font-size: 18px; }
+    .ps-chip.on { border-color: var(--c); background: color-mix(in srgb, var(--c) 25%, transparent); }
+    .ps-chip:hover, .ps-chip:focus-visible { border-color: #fff; outline: none; }
+    .ps-watch section { margin-bottom: 26px; }
+    .ps-posters { display: flex; gap: 16px; overflow-x: auto; padding: 6px 4px 10px; scrollbar-width: none; }
+    .ps-poster { position: relative; flex: none; width: 180px; aspect-ratio: 2 / 3; padding: 0; border: 0; border-radius: 12px; overflow: hidden; cursor: pointer; color: #fff; text-align: left; background: linear-gradient(160deg, var(--c), #0b0a1a); }
+    .ps-poster img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .ps-poster span { position: absolute; inset: 14px; font: 700 24px/1.2 var(--sans); }
+    .ps-poster i { position: absolute; left: 8px; top: 8px; font: 700 13px var(--sans); font-style: normal; padding: 3px 8px; border-radius: 6px; background: var(--c); }
+    .ps-poster b { position: absolute; left: 0; right: 0; bottom: 0; padding: 26px 10px 10px; font: 600 16px var(--sans); background: linear-gradient(transparent, rgba(0,0,0,.9)); }
+    .ps-poster u { position: absolute; left: 0; bottom: 0; height: 5px; background: var(--c); }
+    .ps-none, .ps-empty { font-size: 24px; opacity: .75; max-width: 900px; } .ps-empty { padding: 60px 0; }
+    .ps-sheet { inset: 0; display: grid; place-items: center; background: rgba(0,0,0,.6); }
+    .ps-sheet[hidden] { display: none; }
+    .ps-card-sheet { width: min(1100px, 90%); background: #12131c; border-radius: 26px; padding: 44px; box-shadow: 0 30px 90px rgba(0,0,0,.7); }
+    .ps-prof { display: flex; gap: 34px; align-items: center; }
+    .ps-prof > i { flex: none; width: 140px; height: 140px; border-radius: 50%; display: grid; place-items: center; font: 800 46px var(--sans); font-style: normal; color: #0b0a1a; background: linear-gradient(135deg, var(--cyan), var(--violet)); }
+    .ps-prof h3, .ps-wdet h3 { font: 800 48px var(--sans); margin: 0 0 8px; }
+    .ps-prof dl { display: flex; gap: 38px; margin: 18px 0 0; } .ps-prof dt { font-size: 18px; opacity: .6; } .ps-prof dd { font: 700 38px var(--sans); margin: 0; }
+    .ps-wdet { display: flex; gap: 34px; } .ps-wdet img { width: 260px; aspect-ratio: 2 / 3; object-fit: cover; border-radius: 14px; flex: none; }
+    .ps-badge { display: inline-block; font: 700 18px var(--sans); padding: 5px 12px; border-radius: 8px; background: var(--c); margin-bottom: 12px; }
+    .ps-player { inset: 0; background: #000; }
     .ps-player[hidden] { display: none; }
+    .ps-player:fullscreen { width: 100vw; height: 100vh; }
     .ps-stage, .ps-stage video, .ps-stage iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; background: #000; object-fit: contain; }
-    .ps-slides figure { position: absolute; inset: 0; margin: 0; opacity: 0; transition: opacity .8s; }
+    .ps-slides figure { position: absolute; inset: 0; margin: 0; opacity: 0; transition: opacity .8s; overflow: hidden; }
     .ps-slides figure.on { opacity: 1; }
     .ps-blur { position: absolute; inset: -60px; background: center / cover no-repeat; filter: blur(34px) brightness(.4); }
     .ps-slides img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
     .ps-slides figure.on img { animation: psKB 6s ease-out both; }
     .ps-player.paused .ps-slides figure.on img { animation-play-state: paused; }
-    @keyframes psKB { from { transform: scale(1); } to { transform: scale(1.07); } }
-    .ps-slides figcaption { position: absolute; left: 60px; bottom: 170px; font: 700 40px var(--sans); text-shadow: 0 3px 20px rgba(0,0,0,.8); }
-    .ps-ctrl { position: absolute; left: 0; right: 0; bottom: 0; padding: 40px 60px 34px; background: linear-gradient(transparent, rgba(0,0,0,.85)); transition: opacity .35s; pointer-events: none; }
-    .ps-ctrl > * { pointer-events: auto; }
+    @keyframes psKB { from { transform: scale(1); } to { transform: scale(1.06); } }
+    .ps-slides figcaption { position: absolute; left: 60px; bottom: 190px; font: 700 40px var(--sans); text-shadow: 0 3px 20px rgba(0,0,0,.8); }
+    .ps-ctrl { position: absolute; left: 0; right: 0; bottom: 0; padding: 40px 60px 34px; background: linear-gradient(transparent, rgba(0,0,0,.85)); transition: opacity .35s; }
     .ps-player.idle:not(.paused) .ps-ctrl { opacity: 0; }
-    .ps-ptitle { display: block; font: 600 26px var(--sans); margin-bottom: 16px; }
-    .ps-bar { height: 8px; border-radius: 4px; background: rgba(255,255,255,.25); cursor: pointer; margin-bottom: 20px; }
-    .ps-bar i { display: block; height: 100%; width: 0; border-radius: 4px; background: #fff; }
+    .ps-player.idle:not(.paused) { cursor: none; }
+    .ps-ptitle { display: block; font: 600 26px var(--sans); margin-bottom: 18px; }
+    .ps-bar { position: relative; height: 10px; border-radius: 5px; background: rgba(255,255,255,.25); cursor: pointer; margin-bottom: 22px; touch-action: none; }
+    .ps-bar::before { content: ""; position: absolute; inset: -12px 0; }
+    .ps-bar i { position: absolute; left: 0; top: 0; bottom: 0; width: 0; border-radius: 5px; background: #fff; }
+    .ps-bar s { position: absolute; top: 50%; left: 0; width: 22px; height: 22px; margin: -11px 0 0 -11px; border-radius: 50%; background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,.5); }
+    .ps-bar:focus-visible { outline: 3px solid rgba(255,255,255,.6); outline-offset: 6px; }
     .ps-btns { display: flex; align-items: center; gap: 14px; }
     .ps-btns button { font: 600 26px var(--sans); color: #fff; background: rgba(255,255,255,.14); border: 0; border-radius: 999px; min-width: 64px; height: 64px; padding: 0 22px; cursor: pointer; }
     .ps-btns button:hover, .ps-btns button:focus-visible { background: #fff; color: #000; outline: none; }
     .ps-btns .ps-play { background: #fff; color: #000; min-width: 84px; }
     .ps-time { margin-left: auto; font: 500 22px var(--mono); opacity: .85; }
+    .ps-np { display: flex; align-items: center; gap: 10px; max-width: 360px; font: 600 20px var(--sans); color: #fff; background: rgba(255,255,255,.1); border: 0; border-radius: 999px; padding: 10px 18px; cursor: pointer; }
+    .ps-np i { font-style: normal; font-size: 24px; } .ps-np span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ps-np.on { background: rgba(94,234,212,.2); color: #5eead4; }
+    .ps-np:hover, .ps-np:focus-visible { box-shadow: 0 0 0 3px #fff; outline: none; }
+    .ps-web { position: absolute; inset: 0; z-index: 6; background: #000; display: flex; flex-direction: column; }
+    .ps-web[hidden] { display: none; }
+    .ps-web header { display: flex; align-items: center; gap: 20px; padding: 16px 24px; background: #0b0c14; }
+    .ps-web header b { flex: 1; font: 600 24px var(--sans); text-align: center; }
+    .ps-web .ps-btn { padding: 10px 22px; font-size: 20px; }
+    .ps-webbox { flex: 1; position: relative; } .ps-webbox iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; background: #000; }
+    .ps-card-sheet { max-height: 86%; overflow-y: auto; scrollbar-width: thin; }
+    .ps-sh { font: 800 44px var(--sans); margin: 0 0 22px; } .ps-sh small { font-size: 22px; opacity: .55; font-weight: 500; margin-left: 10px; }
+    .ps-info { display: flex; gap: 34px; align-items: flex-start; }
+    .ps-info-cover { width: 460px; aspect-ratio: 1200 / 630; object-fit: cover; border-radius: 16px; flex: none; background: #0b0a10; }
+    .ps-info-cover.logo { object-fit: contain; padding: 30px; }
+    .ps-info h3 { font: 800 52px var(--sans); margin: 0 0 6px; }
+    .ps-facts { display: flex; flex-wrap: wrap; gap: 28px; margin: 14px 0; } .ps-facts dt { font-size: 16px; opacity: .55; } .ps-facts dd { font: 600 20px var(--sans); margin: 0; }
+    .ps-tags { display: flex; flex-wrap: wrap; gap: 8px; } .ps-tags span { font: 500 17px var(--sans); background: rgba(255,255,255,.1); border-radius: 8px; padding: 6px 12px; }
+    .ps-shots { display: flex; gap: 14px; overflow-x: auto; margin-top: 24px; padding-bottom: 8px; scrollbar-width: thin; }
+    .ps-shots button { flex: none; padding: 0; border: 0; border-radius: 12px; overflow: hidden; cursor: pointer; background: #1f2433; }
+    .ps-shots img { height: 220px; display: block; }
+    .ps-shots button:hover, .ps-shots button:focus-visible, .ps-pcard:hover, .ps-pcard:focus-visible, .ps-tracks button:hover, .ps-tracks button:focus-visible { box-shadow: 0 0 0 4px #fff; outline: none; }
+    .ps-plist { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+    .ps-pcard { display: grid; grid-template-columns: 90px 1fr; grid-template-rows: auto auto; gap: 4px 16px; align-items: center; text-align: left; padding: 16px; border: 0; border-radius: 16px; background: rgba(255,255,255,.08); color: #fff; cursor: pointer; }
+    .ps-pcard img { grid-row: span 2; width: 90px; height: 90px; object-fit: cover; border-radius: 18px; }
+    .ps-pcard b { font: 700 26px var(--sans); } .ps-pcard small { font: 500 18px var(--mono); color: #5eead4; }
+    .ps-mail { font: 700 40px var(--mono) !important; color: #fff !important; }
+    .ps-mnow { display: flex; align-items: center; gap: 26px; padding: 24px; border-radius: 20px; background: linear-gradient(135deg, rgba(219,39,119,.25), rgba(124,58,237,.25)); margin-bottom: 20px; }
+    .ps-mnow b { display: block; font: 700 32px var(--sans); } .ps-mnow small { font: 500 20px var(--mono); opacity: .75; }
+    .ps-mctl { display: flex; gap: 12px; margin-left: auto; } .ps-mctl .ps-btn { min-width: 76px; }
+    .ps-eq { display: flex; gap: 6px; align-items: end; height: 46px; } .ps-eq i { width: 9px; height: 10px; border-radius: 3px; background: #f472b6; }
+    .ps-mnow.on .ps-eq i { animation: weq .8s ease-in-out infinite; } .ps-mnow.on .ps-eq i:nth-child(2) { animation-delay: .2s; } .ps-mnow.on .ps-eq i:nth-child(3) { animation-delay: .4s; } .ps-mnow.on .ps-eq i:nth-child(4) { animation-delay: .6s; }
+    .ps-tracks { display: grid; gap: 10px; }
+    .ps-tracks button { display: grid; grid-template-columns: 50px 1fr auto; align-items: center; gap: 16px; padding: 16px 20px; text-align: left; border: 0; border-radius: 14px; background: rgba(255,255,255,.06); color: #fff; cursor: pointer; font: 600 24px var(--sans); }
+    .ps-tracks button span { font: 500 18px var(--mono); opacity: .5; } .ps-tracks button small { font: 500 18px var(--mono); opacity: .6; }
+    .ps-tracks button.on { background: rgba(244,114,182,.18); color: #f9a8d4; }
+    .ps-prog { height: 8px; border-radius: 4px; background: rgba(255,255,255,.15); margin-top: 16px; } .ps-prog i { display: block; height: 100%; border-radius: 4px; background: var(--c); }
 
     /* ---------- 2. DALGA ---------- */
     .stat .k { display: block; font: 11px var(--mono); letter-spacing: .14em; color: var(--muted); margin-bottom: 12px; }
@@ -2025,22 +2100,33 @@
         </div>`,
       tv: () => `
         <div class="tv-screen ps">
-          <div class="ps-bg"></div>
-          <header class="ps-top"><nav><b>Oyunlar</b><span>Medya</span></nav><div class="ps-meta"><span data-clock>${$("#navTime").textContent}</span><i>AB</i></div></header>
-          <div class="ps-row" role="listbox" aria-label="Oyunlar"></div>
-          <section class="ps-hero"></section>
-          <section class="ps-shelf"><h4>Medya</h4><div class="ps-media"></div></section>
+          <canvas class="ps-bg" width="64" height="36" aria-hidden="true"></canvas>
+          <header class="ps-top">
+            <nav class="ps-tabs" role="tablist"><button type="button" data-tab="games" class="on">Oyunlar</button><button type="button" data-tab="media">Medya</button><button type="button" data-tab="watch">İzliyorum</button></nav>
+            <div class="ps-meta"><button type="button" class="ps-np" data-act="music" aria-label="Müzik"><i>♪</i><span></span></button><span data-clock>${$("#navTime").textContent}</span><button type="button" class="ps-avatar" data-act="profile" aria-label="Profil">AB</button></div>
+          </header>
+          <div class="ps-view" data-view="games">
+            <div class="ps-row" role="listbox" aria-label="Oyunlar"></div>
+            <section class="ps-hero"></section>
+            <section class="ps-shelf"><h4>Medya</h4><div class="ps-media"></div></section>
+          </div>
+          <div class="ps-view" data-view="media" hidden><h3 class="ps-h">Galeri <small></small></h3><div class="ps-grid"></div></div>
+          <div class="ps-view" data-view="watch" hidden><div class="ps-svc"></div><div class="ps-watch"></div></div>
+          <div class="ps-sheet" hidden></div>
+          <div class="ps-web" hidden><header><button type="button" class="ps-btn" data-act="webback">◀ TV'ye dön</button><b></b><button type="button" class="ps-btn" data-act="reload">⟳ Yenile</button></header><div class="ps-webbox"></div></div>
           <div class="ps-player" hidden>
             <div class="ps-stage"></div>
             <div class="ps-ctrl">
               <b class="ps-ptitle"></b>
-              <div class="ps-bar"><i></i></div>
+              <div class="ps-bar" role="slider" aria-label="İlerleme" tabindex="0"><i></i><s></s></div>
               <div class="ps-btns">
                 <button type="button" data-p="back" aria-label="Geri">◀ Geri</button>
                 <button type="button" data-p="prev" aria-label="Önceki">⏮</button>
                 <button type="button" data-p="toggle" class="ps-play" aria-label="Oynat / duraklat">⏸</button>
                 <button type="button" data-p="next" aria-label="Sonraki">⏭</button>
                 <span class="ps-time"></span>
+                <button type="button" data-p="mute" class="ps-mute" aria-label="Ses">🔊</button>
+                <button type="button" data-p="full" aria-label="Tam ekran">⛶</button>
               </div>
             </div>
           </div>
@@ -2062,112 +2148,297 @@
     };
 
     // ---------- TV: PS5 tarzı arayüz ----------
-    // içerik: RoomContent.tv.library (oyunlar + videoları + oynanış/ekran görüntüsü sergileri), theyvoice.com panelinden
-    let tvBack = () => false;
+    // içerik theyvoice.com Portfolyo panelinden: oyunlar ve medyaları (tv.library), galeri görselleri, izlediklerim (watching)
+    let tvBack = () => false, tvKey = null, tvDrawNP = null, tvMusicHooked = false, tvUnduck = null;
+    document.addEventListener("keydown", e => { if (current === "tv" && tvKey) tvKey(e); });  // tek dinleyici, her açılışta yenisi eklenmez
+    const SVC = { netflix: ["Netflix", "#e50914"], prime: ["Prime Video", "#00a8e1"], appletv: ["Apple TV+", "#a1a1aa"], disney: ["Disney+", "#113ccf"], youtube: ["YouTube", "#ff0033"], other: ["Diğer", "#6b7280"] };
+    const WSTAT = { watching: "İzliyorum", watchlist: "Listemde", watched: "İzledim" };
     function setupTV() {
-      const box = dev.querySelector(".ps"), row = box.querySelector(".ps-row"), hero = box.querySelector(".ps-hero"), media = box.querySelector(".ps-media");
-      const bg = box.querySelector(".ps-bg"), pl = box.querySelector(".ps-player"), stageEl = pl.querySelector(".ps-stage");
-      const bar = pl.querySelector(".ps-bar i"), playBtn = pl.querySelector(".ps-play"), timeEl = pl.querySelector(".ps-time"), titleEl = pl.querySelector(".ps-ptitle");
-      const tvc = (window.RoomContent && RoomContent.get() && RoomContent.get().tv) || { library: [] };
-      const lib = tvc.library || [];
-      let sel = Math.max(0, lib.findIndex(g => g.id === tvc.featured)), item = 0, slide = 0, paused = false, timer = 0, slideT0 = 0, slideAcc = 0, idleT = 0;
+      const box = dev.querySelector(".ps"), $$ = s => box.querySelector(s);
+      const row = $$(".ps-row"), hero = $$(".ps-hero"), shelf = $$(".ps-media"), grid = $$(".ps-grid"), svcEl = $$(".ps-svc"), watchEl = $$(".ps-watch");
+      const sheet = $$(".ps-sheet"), pl = $$(".ps-player"), stageEl = $$(".ps-stage"), bgc = $$(".ps-bg");
+      const bar = $$(".ps-bar i"), knob = $$(".ps-bar s"), playBtn = $$(".ps-play"), muteBtn = $$(".ps-mute"), timeEl = $$(".ps-time"), titleEl = $$(".ps-ptitle");
+      const C = (window.RoomContent && RoomContent.get()) || { tv: { library: [] }, watching: [], featured: {}, gallery: [] };
+      const lib = C.tv.library || [], watching = C.watching || [];
+      // galeri: oyunların ekran görüntüleri + panelden tablo ve galeri görselleri
+      const pics = [];
+      lib.forEach(g => g.media.filter(m => m.kind === "slides").forEach(m => m.slides.forEach(s => { if (!pics.some(p => p.image === s.image)) pics.push({ image: s.image, caption: s.caption || g.name }); })));
+      [...Object.values(C.featured || {}), ...(C.gallery || [])].forEach(t => { if (t && !t.soon && t.image && !pics.some(p => p.image === t.image)) pics.push({ image: t.image, caption: t.title || "" }); });
+      let sel = Math.max(0, lib.findIndex(g => g.id === C.tv.featured)), tab = "games", svc = "all";
+      let list = [], item = 0, slide = 0, paused = false, timer = 0, slideT0 = 0, slideAcc = 0, idleT = 0, muted = false, ext = null;
       const SLIDE_MS = 6000;
-      if (!lib.length) { hero.innerHTML = '<div class="ps-empty">Henüz içerik yok. theyvoice.com panelinden oyun ve video ekledikçe burada görünecek.</div>'; return; }
-      const fmt = s => { s = Math.max(0, Math.floor(s)); return String(Math.floor(s / 60)).padStart(2, "0") + ":" + String(s % 60).padStart(2, "0"); };
-      const thumbOf = m => m.thumb || (m.slides && m.slides[0] && m.slides[0].image) || lib[sel].cover;
-      function home() {
+      const fmt = s => { s = Math.max(0, Math.floor(s || 0)); return String(Math.floor(s / 60)).padStart(2, "0") + ":" + String(s % 60).padStart(2, "0"); };
+      const thumbOf = (m, g) => m.thumb || (m.slides && m.slides[0] && m.slides[0].image) || (g && g.cover) || "";
+      // arka plan: seçili görselin küçük kopyası büyütülür (doğal bulanıklık; CSS filtre yok → titreme yok)
+      function paintBg(src) {
+        const g = bgc.getContext("2d"); g.fillStyle = "#0b1020"; g.fillRect(0, 0, 64, 36);
+        if (!src) return;
+        const im = new Image(); im.onload = () => { if (!box.isConnected) return; const r = Math.max(64 / im.width, 36 / im.height); g.drawImage(im, (64 - im.width * r) / 2, (36 - im.height * r) / 2, im.width * r, im.height * r); }; im.src = src;
+      }
+      // ---------- görünümler
+      function show(t) {
+        tab = t; sfx("tick");
+        box.querySelectorAll(".ps-tabs button").forEach(b => b.classList.toggle("on", b.dataset.tab === t));
+        box.querySelectorAll(".ps-view").forEach(v => { v.hidden = v.dataset.view !== t; });
+        if (t === "games") games(); else if (t === "media") media(); else watch();
+      }
+      function games() {
+        if (!lib.length) { row.innerHTML = ""; hero.innerHTML = '<div class="ps-empty">Henüz oyun yok. theyvoice.com Portfolyo panelinden ekledikçe burada görünecek.</div>'; shelf.innerHTML = ""; paintBg(""); return; }
         const g = lib[sel];
-        row.innerHTML = lib.map((x, i) => `<button type="button" class="ps-tile${i === sel ? " on" : ""}" data-g="${i}" role="option" aria-selected="${i === sel}">
-          ${x.icon || x.cover ? `<img src="${x.icon || x.cover}" alt="" loading="lazy">` : `<span>${esc(x.name[0] || "?")}</span>`}</button>`).join("")
-          + `<span class="ps-tname">${esc(g.name)}</span>`;
-        bg.style.backgroundImage = g.cover && !g.logo ? `url("${g.cover}")` : "none";
+        row.innerHTML = lib.map((x, i) => `<button type="button" class="ps-tile${i === sel ? " on" : ""}" data-g="${i}" role="option" aria-selected="${i === sel}" aria-label="${esc(x.name)}">
+          ${x.icon || x.cover ? `<img src="${x.icon || x.cover}" alt="" loading="lazy">` : `<span>${esc(x.name[0] || "?")}</span>`}</button>`).join("") + `<span class="ps-tname">${esc(g.name)}</span>`;
+        paintBg(g.logo ? "" : g.cover);
         hero.innerHTML = `<h2>${esc(g.name)}</h2><p class="ps-status">${esc(g.status || "")}</p><p>${esc(g.desc || "")}</p>
-          <div class="ps-acts">${g.play ? `<a class="ps-btn main" href="${g.play}" target="_blank" rel="noopener">▶ Oyna</a>` : ""}
-          ${g.media.length ? '<button type="button" class="ps-btn" data-m="0">🎬 ' + esc(g.media[0].kind === "slides" ? "Oynanış" : "İzle") + '</button>' : ""}</div>`;
-        media.innerHTML = g.media.length ? g.media.map((m, i) => `<button type="button" class="ps-card${m.kind === "slides" ? " tall" : ""}" data-m="${i}">
-          ${thumbOf(m) ? `<img src="${thumbOf(m)}" alt="" loading="lazy">` : ""}<b>${m.kind === "slides" ? "🖼️" : "▶"} ${esc(m.title)}</b></button>`).join("")
+          <div class="ps-acts">${g.play ? `<button type="button" class="ps-btn main" data-act="playgame">▶ Oyna</button>` : ""}
+          ${g.media.length ? `<button type="button" class="ps-btn" data-m="0">🎬 ${g.media[0].kind === "slides" ? "Oynanış" : "İzle"}</button>` : ""}
+          <button type="button" class="ps-btn" data-act="info">🗂️ Proje dosyası</button></div>`;
+        shelf.innerHTML = g.media.length ? g.media.map((m, i) => `<button type="button" class="ps-card${m.kind === "slides" ? " tall" : ""}" data-m="${i}">
+          ${thumbOf(m, g) ? `<img src="${thumbOf(m, g)}" alt="" loading="lazy">` : ""}<b>${m.kind === "slides" ? "🖼️" : "▶"} ${esc(m.title)}</b></button>`).join("")
           : '<p class="ps-none">Bu oyunun medyası yakında.</p>';
       }
-      // oynatıcı
-      function stopMedia() { clearInterval(timer); stageEl.innerHTML = ""; }
-      function play(i) {
-        const g = lib[sel], m = g.media[i]; if (!m) return;
-        item = i; slide = 0; paused = false; slideAcc = 0; slideT0 = performance.now();
-        stopMedia(); pl.hidden = false; titleEl.textContent = m.title.startsWith(g.name) ? m.title : g.name + " · " + m.title; sfx("whooshIn");
+      function media() {
+        $$(".ps-h small").textContent = pics.length + " görsel";
+        grid.innerHTML = pics.length ? pics.map((p, i) => `<button type="button" class="ps-pic" data-pic="${i}"><img src="${p.image}" alt="" loading="lazy"><b>${esc(p.caption)}</b></button>`).join("")
+          : '<p class="ps-none">Galeri yakında: theyvoice.com\'a görsel ekledikçe burada.</p>';
+        paintBg(pics[0] && pics[0].image);
+      }
+      function watch() {
+        const chips = [["all", "Tümü", "#ffffff"], ...Object.entries(SVC).filter(([k]) => k !== "other" || watching.some(w => w.service === "other")).map(([k, v]) => [k, v[0], v[1]])];
+        svcEl.innerHTML = chips.map(([k, l, c]) => `<button type="button" class="ps-chip${svc === k ? " on" : ""}" data-svc="${k}" style="--c:${c}">${l}<em>${k === "all" ? watching.length : watching.filter(w => w.service === k).length}</em></button>`).join("");
+        const ws = watching.filter(w => svc === "all" || w.service === svc);
+        watchEl.innerHTML = ws.length ? ["watching", "watchlist", "watched"].map(st => {
+          const xs = ws.filter(w => w.status === st); if (!xs.length) return "";
+          return `<section><h4>${WSTAT[st]} <small>${xs.length}</small></h4><div class="ps-posters">${xs.map(w => { const i = watching.indexOf(w), s = SVC[w.service];
+            return `<button type="button" class="ps-poster" data-w="${i}" style="--c:${s[1]}">${w.poster ? `<img src="${w.poster}" alt="" loading="lazy">` : `<span>${esc(w.title)}</span>`}
+              <i>${s[0]}</i>${st === "watching" && w.progress ? `<u style="width:${w.progress}%"></u>` : ""}<b>${esc(w.title)}</b></button>`; }).join("")}</div></section>`;
+        }).join("") : `<div class="ps-empty">${watching.length ? "Bu serviste kayıt yok." : "İzlediklerim, izleme listem ve bitirdiklerim theyvoice.com Portfolyo panelinden eklendikçe burada görünecek."}</div>`;
+        paintBg((ws.find(w => w.poster) || {}).poster);
+      }
+      // ---------- alt sayfalar: profil ve izleme kaydı
+      function openSheet(html) { sheet.innerHTML = `<div class="ps-card-sheet">${html}<div class="ps-acts"><button type="button" class="ps-btn" data-act="close">Kapat</button></div></div>`; sheet.hidden = false; sfx("whooshIn"); }
+      function profile() {
+        openSheet(`<div class="ps-prof"><i>AB</i><div><h3>Ahmet Bölükoğlu</h3><p>Kıdemli Yazılım Geliştirme Uzmanı · TheyVoice</p>
+          <dl><div><dt>Oyun</dt><dd>${lib.length}</dd></div><div><dt>Görsel</dt><dd>${pics.length}</dd></div><div><dt>İzlediklerim</dt><dd>${watching.filter(w => w.status === "watched").length}</dd></div><div><dt>Listemde</dt><dd>${watching.filter(w => w.status === "watchlist").length}</dd></div></dl></div></div>
+          <div class="ps-acts"><button type="button" class="ps-btn main" data-act="projects">🗂️ Projeler</button><button type="button" class="ps-btn" data-act="contact">💬 İletişim</button><button type="button" class="ps-btn" data-act="theyvoice">🦊 TheyVoice</button></div>`);
+      }
+      function watchItem(i) {
+        const w = watching[i], s = SVC[w.service];
+        openSheet(`<div class="ps-wdet">${w.poster ? `<img src="${w.poster}" alt="">` : ""}<div><span class="ps-badge" style="--c:${s[1]}">${s[0]}</span><h3>${esc(w.title)}</h3>
+          <p class="ps-status">${WSTAT[w.status]}${w.year ? " · " + esc(w.year) : ""}${w.status === "watching" && w.progress ? " · %" + w.progress : ""}</p>
+          ${w.note ? `<p>${esc(w.note)}</p>` : ""}${w.status === "watching" && w.progress ? `<div class="ps-prog"><i style="width:${w.progress}%;--c:${s[1]}"></i></div>` : ""}</div></div>`);
+      }
+      // proje dosyası (çekmecedeki bilginin aynısı, TV'de)
+      function info(id) {
+        const p = PROJECTS.find(x => x.id === id || x.name === id) || {}, g = lib.find(x => x.id === id) || {};
+        const shots = (p.shots && p.shots.length ? p.shots : (g.media || []).flatMap(m => (m.slides || []).map(s => s.image))).slice(0, 12);
+        infoShots = shots;
+        openSheet(`<div class="ps-info">${p.cover || g.cover ? `<img class="ps-info-cover${p.logo ? " logo" : ""}" src="${p.cover || g.cover}" alt="">` : ""}
+          <div><h3>${esc(p.name || g.name || "Proje")}</h3><p class="ps-status">${esc(p.status || g.status || "")}</p>
+          <dl class="ps-facts">${[["Tür", p.type], ["Platform", p.platforms], ["Yayın", p.release]].filter(x => x[1]).map(([k, v]) => `<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join("")}</dl>
+          <p>${esc(p.desc || g.desc || "")}</p>
+          <div class="ps-tags">${(p.tech || []).map(t => `<span>${esc(t)}</span>`).join("")}</div></div></div>
+          ${shots.length ? `<div class="ps-shots">${shots.map((s, i) => `<button type="button" data-shot="${i}"><img src="${s}" alt="" loading="lazy"></button>`).join("")}</div>` : ""}
+          <div class="ps-acts">${g.play || (p.links && p.links[0]) ? `<button type="button" class="ps-btn main" data-act="playgame" data-url="${g.play || p.links[0][1]}">▶ ${g.play ? "Oyna" : "Aç"}</button>` : ""}</div>`);
+      }
+      function projects() {
+        const ps = PROJECTS.filter(p => !p.soon);
+        openSheet(`<h3 class="ps-sh">🗂️ Projeler</h3><div class="ps-plist">${ps.map(p => `<button type="button" class="ps-pcard" data-proj="${esc(p.id || p.name)}">
+          ${p.icon || p.cover ? `<img src="${p.icon || p.cover}" alt="" loading="lazy">` : ""}<b>${esc(p.name)}</b><small>${esc(p.status || "")}</small></button>`).join("")}</div>`);
+      }
+      function contact() {
+        openSheet(`<h3 class="ps-sh">💬 İletişim</h3><p class="ps-mail">${esc(EMAIL)}</p>
+          <p>GitHub: github.com/ahmetbolukoglu · LinkedIn: linkedin.com/in/ahmetbolukoglu</p>
+          <div class="ps-acts"><button type="button" class="ps-btn main" data-act="copymail">📋 Maili kopyala</button></div>`);
+      }
+      // müzik (PS5'teki gibi arka planda çalan müzik): Sfx.music
+      function music() {
+        const m = Sfx.music;
+        openSheet(`<h3 class="ps-sh">🎵 Müzik <small>kod yazmalık, telifsiz</small></h3>
+          <div class="ps-mnow${m.playing ? " on" : ""}"><div class="ps-eq"><i></i><i></i><i></i><i></i></div><div><b>${esc(m.name)}</b><small>${esc(m.tracks[m.index].style)} · ${m.tracks[m.index].bpm} BPM</small></div>
+          <div class="ps-mctl"><button type="button" class="ps-btn" data-mu="-1" aria-label="Önceki">⏮</button><button type="button" class="ps-btn main" data-mu="0" aria-label="Çal / duraklat">${m.playing ? "⏸" : "▶"}</button><button type="button" class="ps-btn" data-mu="1" aria-label="Sonraki">⏭</button></div></div>
+          <div class="ps-tracks">${m.tracks.map((t, i) => `<button type="button" class="${i === m.index ? "on" : ""}" data-trk="${i}"><span>${String(i + 1).padStart(2, "0")}</span><b>${esc(t.name)}</b><small>${esc(t.style)}</small></button>`).join("")}</div>`);
+      }
+      const np = $(".ps-np");
+      const drawNP = () => { if (!box.isConnected) return; np.classList.toggle("on", Sfx.music.playing); np.querySelector("span").textContent = Sfx.music.playing ? Sfx.music.name : ""; if (!sheet.hidden && sheet.querySelector(".ps-mnow")) music(); };
+      if (!tvMusicHooked) { tvMusicHooked = true; Sfx.music.onChange(() => tvDrawNP && tvDrawNP()); }
+      tvDrawNP = drawNP; drawNP();
+      // video, oyun ya da site açılınca arka plan müziği susar, kapanınca devam eder
+      let ducked = false;
+      tvUnduck = () => duck(false);  // TV kapanınca susturulan müzik geri gelir
+      const duck = on => { if (on && Sfx.music.playing) { Sfx.music.toggle(); ducked = true; } else if (!on && ducked) { ducked = false; if (!Sfx.music.playing) Sfx.music.toggle(); } };
+      // TV içi tarayıcı: oyun ya da site ekranın içinde açılır
+      const web = $(".ps-web"), webbox = $(".ps-webbox");
+      function openWeb(url, title) {
+        if (!/^https:\/\//.test(url || "")) return;
+        sheet.hidden = true; duck(true);
+        web.querySelector("b").textContent = title || url.replace(/^https:\/\/(www\.)?/, "");
+        webbox.innerHTML = `<iframe src="${url}" title="${esc(title || "")}" allow="autoplay; fullscreen; gamepad; clipboard-write" allowfullscreen></iframe>`;
+        web.hidden = false; sfx("whooshIn");
+      }
+      function closeWeb() { webbox.innerHTML = ""; web.hidden = true; duck(false); sfx("whooshOut"); }
+      let infoShots = [];
+
+      // ---------- oynatıcı (video dosyası, YouTube, Vimeo, görsel akışı)
+      function setBar(f) { const p = Math.max(0, Math.min(1, f || 0)) * 100; bar.style.width = p + "%"; knob.style.left = p + "%"; }
+      function stopMedia() {
+        clearInterval(timer); timer = 0;
+        if (ext) { removeEventListener("message", ext.onMsg); clearInterval(ext.ping); ext = null; }
+        stageEl.innerHTML = "";
+      }
+      function openList(l, i, title) { list = l; play(i, title); }
+      function play(i, title) {
+        const m = list[i]; if (!m) return;
+        item = i; slide = m.start || 0; paused = false; slideAcc = 0; slideT0 = performance.now();
+        stopMedia(); pl.hidden = false; titleEl.textContent = title || m.title; sfx("whooshIn");
+        playBtn.textContent = "⏸"; pl.classList.remove("paused"); setBar(0); timeEl.textContent = "";
+        duck(m.kind !== "slides");
         if (m.kind === "file") {
           stageEl.innerHTML = `<video src="${m.url}" ${m.thumb ? `poster="${m.thumb}"` : ""} autoplay playsinline></video>`;
-          const v = stageEl.querySelector("video");
-          v.addEventListener("timeupdate", () => { bar.style.width = (v.currentTime / (v.duration || 1) * 100) + "%"; timeEl.textContent = fmt(v.currentTime) + " / " + fmt(v.duration || 0); });
+          const v = stageEl.querySelector("video"); v.muted = muted;
+          v.addEventListener("timeupdate", () => { setBar(v.currentTime / (v.duration || 1)); timeEl.textContent = fmt(v.currentTime) + " / " + fmt(v.duration); });
           v.addEventListener("ended", () => next());
-          v.addEventListener("play", () => { paused = false; playBtn.textContent = "⏸"; });
-          v.addEventListener("pause", () => { paused = true; playBtn.textContent = "▶"; });
+          v.addEventListener("play", () => { paused = false; playBtn.textContent = "⏸"; pl.classList.remove("paused"); });
+          v.addEventListener("pause", () => { paused = true; playBtn.textContent = "▶"; pl.classList.add("paused"); });
         } else if (m.kind === "youtube" || m.kind === "vimeo") {
-          stageEl.innerHTML = `<iframe src="${m.embed}" title="${esc(m.title)}" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>`;
-          bar.style.width = "0"; timeEl.textContent = m.kind === "youtube" ? "YouTube" : "Vimeo";
+          const yt = m.kind === "youtube";
+          const src = m.embed + (yt ? "&enablejsapi=1&origin=" + encodeURIComponent(location.origin) : "&api=1");
+          stageEl.innerHTML = `<iframe src="${src}" title="${esc(m.title)}" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>`;
+          const fr = stageEl.querySelector("iframe");
+          ext = { kind: m.kind, fr, cur: 0, dur: 0, state: 1,
+            send(o) { try { fr.contentWindow.postMessage(JSON.stringify(o), "*"); } catch {} },
+            onMsg(e) {
+              if (!ext || e.source !== fr.contentWindow) return;
+              let d; try { d = typeof e.data === "string" ? JSON.parse(e.data) : e.data; } catch { return; }
+              if (yt && d.event === "infoDelivery" && d.info) {
+                const f = d.info;
+                if (typeof f.currentTime === "number") ext.cur = f.currentTime;
+                if (typeof f.duration === "number" && f.duration) ext.dur = f.duration;
+                if (typeof f.playerState === "number") { ext.state = f.playerState; paused = f.playerState !== 1 && f.playerState !== 3; playBtn.textContent = paused ? "▶" : "⏸"; pl.classList.toggle("paused", paused); if (f.playerState === 0) next(); }
+                ext.ready = true;
+              } else if (!yt) {
+                if (d.event === "ready") ["timeupdate", "play", "pause", "ended"].forEach(v => ext.send({ method: "addEventListener", value: v }));
+                if (d.event === "timeupdate" && d.data) { ext.cur = d.data.seconds; ext.dur = d.data.duration; ext.ready = true; }
+                if (d.event === "play") { paused = false; playBtn.textContent = "⏸"; pl.classList.remove("paused"); }
+                if (d.event === "pause") { paused = true; playBtn.textContent = "▶"; pl.classList.add("paused"); }
+                if (d.event === "ended") next();
+              }
+              setBar(ext.dur ? ext.cur / ext.dur : 0); timeEl.textContent = ext.dur ? fmt(ext.cur) + " / " + fmt(ext.dur) : "";
+            } };
+          addEventListener("message", ext.onMsg);
+          fr.addEventListener("load", () => {
+            if (yt) { ext.send({ event: "listening", id: 1, channel: "widget" }); ext.ping = setInterval(() => { if (!ext) return; ext.send({ event: "listening", id: 1, channel: "widget" }); if (ext.ready) { clearInterval(ext.ping); if (muted) ext.send({ event: "command", func: "mute", args: [] }); } }, 400); }
+            else ext.send({ method: "addEventListener", value: "timeupdate" });
+          });
         } else {
-          stageEl.innerHTML = `<div class="ps-slides">${m.slides.map((s, k) => `<figure class="${k ? "" : "on"}"><i class="ps-blur" style="background-image:url(&quot;${s.image}&quot;)"></i><img src="${s.image}" alt=""><figcaption>${esc(s.caption || "")}</figcaption></figure>`).join("")}</div>`;
-          timer = setInterval(tick, 200);
+          stageEl.innerHTML = `<div class="ps-slides">${m.slides.map((s, k) => `<figure class="${k === slide ? "on" : ""}"><i class="ps-blur" style="background-image:url(&quot;${s.image}&quot;)"></i><img src="${s.image}" alt="" loading="${Math.abs(k - slide) < 2 ? "eager" : "lazy"}"><figcaption>${esc(s.caption || "")}</figcaption></figure>`).join("")}</div>`;
+          timer = setInterval(tick, 200); tick();
         }
-        playBtn.textContent = "⏸"; pl.classList.remove("paused");
         poke();
       }
       function showSlide(k) {
-        const m = lib[sel].media[item], figs = stageEl.querySelectorAll("figure");
+        const m = list[item], figs = stageEl.querySelectorAll(".ps-slides figure");
         if (!figs.length) return;
         slide = (k + m.slides.length) % m.slides.length; slideAcc = 0; slideT0 = performance.now();
-        figs.forEach((f, j) => { f.classList.toggle("on", j === slide); if (j === slide) { const im = f.querySelector("img"); im.style.animation = "none"; void im.offsetWidth; im.style.animation = ""; } });
+        figs.forEach((f, j) => { f.classList.toggle("on", j === slide); if (j === slide) { const im = f.querySelector("img"); im.loading = "eager"; im.style.animation = "none"; void im.offsetWidth; im.style.animation = ""; } });
+        tick();
       }
       function tick() {
-        const m = lib[sel].media[item]; if (!m || m.kind !== "slides" || paused) return;
-        const el = slideAcc + performance.now() - slideT0, n = m.slides.length;
-        bar.style.width = ((slide + Math.min(1, el / SLIDE_MS)) / n * 100) + "%";
-        timeEl.textContent = fmt((slide * SLIDE_MS + el) / 1000) + " / " + fmt(n * SLIDE_MS / 1000);
-        if (el >= SLIDE_MS) { if (slide + 1 < n) showSlide(slide + 1); else next(); }
+        const m = list[item]; if (!m || m.kind !== "slides") return;
+        const el = paused ? slideAcc : slideAcc + performance.now() - slideT0, n = m.slides.length;
+        setBar((slide + Math.min(1, el / SLIDE_MS)) / n);
+        timeEl.textContent = (slide + 1) + " / " + n + " · " + fmt((slide * SLIDE_MS + el) / 1000) + " / " + fmt(n * SLIDE_MS / 1000);
+        if (!paused && el >= SLIDE_MS) { if (slide + 1 < n) showSlide(slide + 1); else next(); }
       }
       function toggle() {
-        const m = lib[sel].media[item], v = stageEl.querySelector("video");
+        const m = list[item], v = stageEl.querySelector("video");
         if (v) return v.paused ? v.play() : v.pause();
+        if (ext) { if (ext.kind === "youtube") ext.send({ event: "command", func: paused ? "playVideo" : "pauseVideo", args: [] }); else ext.send({ method: paused ? "play" : "pause" }); return; }
         if (m.kind !== "slides") return;
         paused = !paused;
         if (paused) slideAcc += performance.now() - slideT0; else slideT0 = performance.now();
-        pl.classList.toggle("paused", paused); playBtn.textContent = paused ? "▶" : "⏸";
+        pl.classList.toggle("paused", paused); playBtn.textContent = paused ? "▶" : "⏸"; tick();
       }
-      function next() { const g = lib[sel]; if (g.media[item].kind === "slides" && slide + 1 < g.media[item].slides.length) return showSlide(slide + 1); play((item + 1) % g.media.length); }
-      function prev() { const g = lib[sel]; if (g.media[item].kind === "slides" && slide > 0) return showSlide(slide - 1); play((item - 1 + g.media.length) % g.media.length); }
-      function seek(frac) {
-        const m = lib[sel].media[item], v = stageEl.querySelector("video");
-        if (v && v.duration) v.currentTime = frac * v.duration;
-        else if (m.kind === "slides") showSlide(Math.min(m.slides.length - 1, Math.floor(frac * m.slides.length)));
+      function next() { const m = list[item]; if (m.kind === "slides" && slide + 1 < m.slides.length) return showSlide(slide + 1); if (list.length > 1 || m.kind !== "slides") play((item + 1) % list.length); else showSlide(0); }
+      function prev() { const m = list[item]; if (m.kind === "slides" && slide > 0) return showSlide(slide - 1); play((item - 1 + list.length) % list.length); }
+      function seek(f) {
+        f = Math.max(0, Math.min(1, f));
+        const m = list[item], v = stageEl.querySelector("video");
+        if (v && v.duration) { v.currentTime = f * v.duration; return; }
+        if (ext && ext.dur) { const t = f * ext.dur; ext.cur = t; setBar(f); if (ext.kind === "youtube") ext.send({ event: "command", func: "seekTo", args: [t, true] }); else ext.send({ method: "setCurrentTime", value: t }); return; }
+        if (m.kind === "slides") showSlide(Math.min(m.slides.length - 1, Math.floor(f * m.slides.length)));
       }
+      function mute() {
+        muted = !muted; muteBtn.textContent = muted ? "🔇" : "🔊";
+        const v = stageEl.querySelector("video"); if (v) v.muted = muted;
+        if (ext) { if (ext.kind === "youtube") ext.send({ event: "command", func: muted ? "mute" : "unMute", args: [] }); else ext.send({ method: "setVolume", value: muted ? 0 : 1 }); }
+      }
+      function full() { if (document.fullscreenElement) document.exitFullscreen(); else pl.requestFullscreen?.().catch(() => {}); }
       function poke() { pl.classList.remove("idle"); clearTimeout(idleT); idleT = setTimeout(() => pl.classList.add("idle"), 2600); }
-      tvBack = () => { if (pl.hidden) return false; stopMedia(); pl.hidden = true; sfx("whooshOut"); return true; };
+      // geri: önce alt sayfa, sonra oynatıcı, sonra Oyunlar sekmesi
+      tvBack = () => {
+        if (!sheet.hidden) { sheet.hidden = true; sfx("whooshOut"); return true; }
+        if (!web.hidden && pl.hidden) { closeWeb(); return true; }
+        if (!pl.hidden) { if (document.fullscreenElement) document.exitFullscreen(); stopMedia(); pl.hidden = true; duck(false); sfx("whooshOut"); return true; }
+        if (!web.hidden) { closeWeb(); return true; }
+        if (tab !== "games") { show("games"); return true; }
+        return false;
+      };
+      // ilerleme çubuğu: tıkla ya da sürükle
+      const barEl = $$(".ps-bar");
+      const barAt = e => { const r = barEl.getBoundingClientRect(); return (e.clientX - r.left) / r.width; };
+      barEl.addEventListener("pointerdown", e => {
+        e.preventDefault(); barEl.setPointerCapture(e.pointerId); seek(barAt(e)); poke();
+        const mv = ev => { const f = Math.max(0, Math.min(1, barAt(ev))); setBar(f); };
+        const up = ev => { barEl.removeEventListener("pointermove", mv); barEl.removeEventListener("pointerup", up); seek(barAt(ev)); };
+        barEl.addEventListener("pointermove", mv); barEl.addEventListener("pointerup", up);
+      });
+      barEl.addEventListener("keydown", e => { if (e.key === "ArrowRight" || e.key === "ArrowLeft") { e.stopPropagation(); e.key === "ArrowRight" ? next() : prev(); } });
       box.addEventListener("click", e => {
-        const t = e.target.closest("[data-g]"), mm = e.target.closest("[data-m]"), p = e.target.closest("[data-p]");
-        if (t) { sel = +t.dataset.g; sfx("tick"); home(); }
-        else if (mm) play(+mm.dataset.m);
-        else if (p) ({ back: tvBack, prev, next, toggle })[p.dataset.p]();
-        else if (e.target.closest(".ps-bar")) { const r = e.target.closest(".ps-bar").getBoundingClientRect(); seek((e.clientX - r.left) / r.width); }
+        const t = e.target.closest("[data-g]"), mm = e.target.closest("[data-m]"), p = e.target.closest("[data-p]"), tb = e.target.closest("[data-tab]");
+        const pic = e.target.closest("[data-pic]"), sv = e.target.closest("[data-svc]"), w = e.target.closest("[data-w]"), act = e.target.closest("[data-act]");
+        if (tb) show(tb.dataset.tab);
+        else if (t) { sel = +t.dataset.g; sfx("tick"); games(); }
+        else if (mm) openList(lib[sel].media, +mm.dataset.m, null);
+        else if (pic) openList([{ kind: "slides", title: "Galeri", slides: pics, start: +pic.dataset.pic }], 0, "Galeri");
+        else if (sv) { svc = sv.dataset.svc; sfx("tick"); watch(); }
+        else if (w) watchItem(+w.dataset.w);
+        else if (p) ({ back: tvBack, prev, next, toggle, mute, full })[p.dataset.p]();
+        else if (act) ({ profile, music, projects, contact, close: () => { sheet.hidden = true; },
+          info: () => info(lib[sel] && lib[sel].id),
+          playgame: () => { const u = act.dataset.url || (lib[sel] && lib[sel].play); openWeb(u, lib[sel] ? lib[sel].name : ""); },
+          theyvoice: () => openWeb("https://theyvoice.com/", "TheyVoice"),
+          webback: closeWeb, reload: () => { const f = webbox.querySelector("iframe"); if (f) f.src = f.src; },
+          copymail: async () => { try { await navigator.clipboard.writeText(EMAIL); act.textContent = "✅ Kopyalandı"; } catch { act.textContent = EMAIL; } } })[act.dataset.act]();
+        else if (e.target.closest("[data-proj]")) info(e.target.closest("[data-proj]").dataset.proj);
+        else if (e.target.closest("[data-shot]")) { sheet.hidden = true; openList([{ kind: "slides", title: "Ekran görüntüleri", slides: infoShots.map(image => ({ image, caption: "" })), start: +e.target.closest("[data-shot]").dataset.shot }], 0, "Ekran görüntüleri"); }
+        else if (e.target.closest("[data-mu]")) { const d = +e.target.closest("[data-mu]").dataset.mu; d ? Sfx.music.skip(d) : Sfx.music.toggle(); ducked = false; }
+        else if (e.target.closest("[data-trk]")) { Sfx.music.play(+e.target.closest("[data-trk]").dataset.trk); ducked = false; }
+        else if (e.target === sheet) sheet.hidden = true;
         else if (e.target.closest(".ps-stage") && !pl.hidden) toggle();
       });
       pl.addEventListener("pointermove", poke);
       box.onkeydown = e => {
+        if (e.target.closest("input, textarea")) return;
         if (!pl.hidden) {
-          if (e.key === " ") { e.preventDefault(); toggle(); } else if (e.key === "ArrowRight") next(); else if (e.key === "ArrowLeft") prev();
-          return;
+          if (e.key === " " || e.key === "k") { e.preventDefault(); toggle(); } else if (e.key === "ArrowRight") next(); else if (e.key === "ArrowLeft") prev();
+          else if (e.key === "m") mute(); else if (e.key === "f") full();
+          poke(); return;
         }
-        if (e.key === "ArrowRight" || e.key === "ArrowLeft") { sel = (sel + (e.key === "ArrowRight" ? 1 : -1) + lib.length) % lib.length; sfx("tick"); home(); row.querySelector(".on")?.focus({ preventScroll: true }); }
-        else if (e.key === "Enter" && lib[sel].media.length && !e.target.closest("a, button")) play(0);
+        if (!sheet.hidden) return;
+        if (tab === "games" && lib.length && (e.key === "ArrowRight" || e.key === "ArrowLeft")) { sel = (sel + (e.key === "ArrowRight" ? 1 : -1) + lib.length) % lib.length; sfx("tick"); games(); row.querySelector(".on")?.focus({ preventScroll: true }); }
+        else if (e.key === "Enter" && tab === "games" && lib[sel] && lib[sel].media.length && !e.target.closest("a, button")) openList(lib[sel].media, 0, null);
+        else if (e.key === "Tab" && e.shiftKey === false && e.target === box) { /* tarayıcı varsayılanı */ }
       };
-      document.addEventListener("keydown", e => { if (current === "tv" && box.isConnected && box.onkeydown) box.onkeydown(e); });
+      tvKey = box.onkeydown;
       // gömülü değilse (telefon, dar ekran) 1600×900 tasarım cihaza sığdırılır
       if (!embed) {
         const fit = () => { if (!box.isConnected) return removeEventListener("resize", fit); const s = (dev.clientWidth - 20) / 1600; Object.assign(box.style, { width: "1600px", height: "900px", flex: "none", transform: `scale(${s})`, transformOrigin: "0 0" }); };
         requestAnimationFrame(fit); setTimeout(fit, 60); addEventListener("resize", fit);  // cihaz görünür olduktan sonra ölçülür
       }
-      home();
+      show("games");
     }
 
-    // projeler çekmecesi: dev isim listesi, imleci izleyen dosya önizlemesi, açılan dosya kâğıdı
+        // projeler çekmecesi: dev isim listesi, imleci izleyen dosya önizlemesi, açılan dosya kâğıdı
     function setupArchive() {
       const box = dev.querySelector(".ar-drawer"), pv = dev.querySelector(".ar-preview"), det = dev.querySelector(".ar-detail");
       let shown = -1;
@@ -2246,7 +2517,9 @@
       into.appendChild(w); borrowed.push([w, ph]);
     }
     function giveBack() {
-      dev.querySelectorAll(".ps-stage video").forEach(v => v.pause()); borrowed.forEach(([w, ph]) => { w.hidden = false; ph.replaceWith(w); }); borrowed = []; }
+      dev.querySelectorAll(".ps-stage video").forEach(v => v.pause());
+      dev.querySelectorAll(".ps-stage iframe, .ps-webbox iframe").forEach(f => f.remove());
+      if (tvUnduck) { tvUnduck(); tvUnduck = null; } borrowed.forEach(([w, ph]) => { w.hidden = false; ph.replaceWith(w); }); borrowed = []; }
 
     // 3D odada masaüstü monitörün içinde açılır: kamera ekrana yaklaşır, arayüz ekranın üstüne oturur
     let embed = null, embedSource = null, preOpen = null;
